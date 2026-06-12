@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Grill-Checkliste</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2f6fed">
+  <style>
+    :root{--bg:#f6f6f6;--card:#fff;--text:#1f1f1f;--muted:#666;--border:#ddd;--blue:#2f6fed}
+    @media(prefers-color-scheme:dark){:root{--bg:#121212;--card:#1e1e1e;--text:#f2f2f2;--muted:#aaa;--border:#333}}
+    body{margin:0;padding:16px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--text)}
+    h1{margin:0 0 14px;font-size:28px}.top{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+    section{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:14px}
+    h2{margin:0 0 8px;font-size:20px}.item{display:flex;align-items:center;gap:10px;padding:11px 0;border-top:1px solid var(--border);font-size:18px}
+    .item:first-of-type{border-top:0}input[type=checkbox]{width:24px;height:24px}.checked span{text-decoration:line-through;color:var(--muted)}
+    input[type=text]{flex:1;font-size:16px;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text)}
+    button{font-size:15px;padding:10px 12px;border:0;border-radius:10px;background:var(--blue);color:white}.ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+    .delete{margin-left:auto;background:transparent;color:var(--muted);padding:6px 8px;border:0}.add-row{display:flex;gap:8px;margin-top:10px}.note{font-size:13px;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <h1>🔥 Grill-Checkliste</h1>
+  <div class="top">
+    <button onclick="exportData()">Backup exportieren</button>
+    <button class="ghost" onclick="document.getElementById('importFile').click()">Backup importieren</button>
+    <button class="ghost" onclick="resetList()">Zurücksetzen</button>
+    <input id="importFile" type="file" accept="application/json" hidden onchange="importData(event)">
+  </div>
+  <div id="app"></div>
+  <p class="note">Installierbar als PWA: im Handy-Browser öffnen → Teilen/Menu → „Zum Home-Bildschirm“. Funktioniert offline nach dem ersten Laden.</p>
+
+<script>
+const defaultData={
+"Transport & Kühlung":[["Kühltasche",false],["Kühlpads / Kühlakkus",false],["Alubox (Ikea)",false]],
+"Grill & Feuer":[["Grill",false],["Grillzange",false],["Kohle (kaufen)",false],["Grillanzünder",false],["Feuerzeug",false],["Aluschale",false]],
+"Essen":[["Pouletflügel",true],["Poulet-Minifilet",true],["Rinds-Entrecôte",true],["Poulet-Bratwurst",true],["Tofu",true],["Champignons",true],["Frischkäse für Champignons",true],["Pimientos de Padrón",true],["Cherrytomaten",true],["Zucchetti",true],["Cevapcici Denner (kaufen)",false],["Saucen",false],["Olivenöl",false],["Salz",false],["Pfeffer",false]],
+"Trinken":[["Wasser",false],["Eistee",true],["Zitronen / Zitronensaft",true]],
+"Geschirr & Küchenzubehör":[["Besteck",false],["Teller",false],["Becher",false],["Servietten",false],["Schneidebrett",false],["Messer",false],["Küchenpapier",false]],
+"Komfort & Sonne":[["Picknickdecke",false],["Campingstühle",false],["Sonnenschirm",false],["Sonnenschutz",false]],
+"Baden":[["Badehose",false],["Badetuch",false]],
+"Aufräumen & Hygiene":[["Müllsack",false],["Feuchttücher",false]]
+};
+let data=JSON.parse(localStorage.getItem("grillPwaData")||"null")||defaultData;
+function save(){localStorage.setItem("grillPwaData",JSON.stringify(data))}
+function render(){
+ const app=document.getElementById("app"); app.innerHTML="";
+ Object.keys(data).forEach(cat=>{
+  const s=document.createElement("section"); const h=document.createElement("h2"); h.textContent=cat; s.appendChild(h);
+  data[cat].forEach((item,i)=>{
+   const row=document.createElement("label"); row.className="item"+(item[1]?" checked":"");
+   const cb=document.createElement("input"); cb.type="checkbox"; cb.checked=item[1];
+   cb.onchange=()=>{data[cat][i][1]=cb.checked;save();render()};
+   const sp=document.createElement("span"); sp.textContent=item[0];
+   const del=document.createElement("button"); del.className="delete"; del.textContent="×"; del.onclick=e=>{e.preventDefault();data[cat].splice(i,1);save();render()};
+   row.append(cb,sp,del); s.appendChild(row);
+  });
+  const add=document.createElement("div"); add.className="add-row";
+  const inp=document.createElement("input"); inp.placeholder="Neuen Eintrag hinzufügen";
+  const btn=document.createElement("button"); btn.textContent="+";
+  const addItem=()=>{let v=inp.value.trim(); if(!v)return; data[cat].push([v,false]); save(); render()};
+  btn.onclick=addItem; inp.onkeydown=e=>{if(e.key==="Enter")addItem()};
+  add.append(inp,btn); s.appendChild(add); app.appendChild(s);
+ });
+}
+function exportData(){
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+ const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="grill-checkliste-backup.json"; a.click();
+}
+function importData(e){
+ const f=e.target.files[0]; if(!f)return;
+ const r=new FileReader(); r.onload=()=>{data=JSON.parse(r.result);save();render()}; r.readAsText(f);
+}
+function resetList(){if(confirm("Checkliste wirklich zurücksetzen?")){data=structuredClone(defaultData);save();render()}}
+if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js")}
+render();
+</script>
+</body></html>
