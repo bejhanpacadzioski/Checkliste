@@ -29,24 +29,25 @@
 </header>
 
 <main>
-  <section id="config" class="card">
+  <section id="configSection" class="card">
     <h2>Supabase verbinden</h2>
     <label>Supabase URL</label>
     <input id="supabaseUrl" placeholder="https://xxxxx.supabase.co">
     <label>Anon/Public Key</label>
     <input id="supabaseKey" placeholder="sb_publishable... oder eyJ...">
-    <button onclick="saveConfig()">Speichern</button>
+    <button id="saveConfigBtn" type="button">Speichern</button>
+    <p id="configMsg" class="muted"></p>
   </section>
 
-  <section id="login" class="card hidden">
+  <section id="loginSection" class="card hidden">
     <h2>Anmelden</h2>
     <label>E-Mail</label><input id="email" type="email" autocomplete="email">
     <label>Passwort</label><input id="password" type="password" autocomplete="current-password">
-    <div class="row"><button onclick="login()">Anmelden</button><button class="ghost" onclick="logout()">Abmelden</button></div>
+    <div class="row"><button id="loginBtn" type="button">Anmelden</button><button id="logoutBtn" class="ghost" type="button">Abmelden</button></div>
     <p id="loginMsg" class="muted"></p>
   </section>
 
-  <section id="dashboard" class="hidden">
+  <section id="dashboardSection" class="hidden">
     <div class="card">
       <h2>Dashboard</h2>
       <p id="profileLine" class="muted"></p>
@@ -68,45 +69,101 @@
 </main>
 
 <script>
-let client=null, currentUser=null, currentProfile=null, currentOrgId=null;
+let sb=null, currentUser=null, currentOrgId=null;
 
-function getConfig(){return {url:localStorage.getItem("supabaseUrl")||"",key:localStorage.getItem("supabaseKey")||""};}
-function init(){
-  const cfg=getConfig();
-  supabaseUrl.value=cfg.url; supabaseKey.value=cfg.key;
-  if(cfg.url&&cfg.key){client=supabase.createClient(cfg.url,cfg.key);login.classList.remove("hidden");checkSession();}
+function el(id){ return document.getElementById(id); }
+
+function getConfig(){
+  return {
+    url: localStorage.getItem("supabaseUrl") || "",
+    key: localStorage.getItem("supabaseKey") || ""
+  };
 }
-function saveConfig(){localStorage.setItem("supabaseUrl",supabaseUrl.value.trim());localStorage.setItem("supabaseKey",supabaseKey.value.trim());location.reload();}
-async function login(){
-  const {error}=await client.auth.signInWithPassword({email:email.value.trim(),password:password.value});
-  loginMsg.textContent=error?error.message:"Angemeldet.";
+
+function createClientIfPossible(){
+  const cfg = getConfig();
+  el("supabaseUrl").value = cfg.url;
+  el("supabaseKey").value = cfg.key;
+
+  if(!cfg.url || !cfg.key) return false;
+  if(!window.supabase){
+    el("configMsg").textContent = "Supabase-Bibliothek konnte nicht geladen werden. Internetverbindung prüfen.";
+    return false;
+  }
+
+  sb = window.supabase.createClient(cfg.url, cfg.key);
+  el("loginSection").classList.remove("hidden");
+  el("configMsg").textContent = "Verbindung gespeichert.";
+  return true;
+}
+
+function saveConfig(){
+  const url = el("supabaseUrl").value.trim().replace(/\/rest\/v1\/?$/, "").replace(/\/$/, "");
+  const key = el("supabaseKey").value.trim();
+
+  if(!url || !key){
+    el("configMsg").textContent = "Bitte URL und Public Key eintragen.";
+    return;
+  }
+
+  localStorage.setItem("supabaseUrl", url);
+  localStorage.setItem("supabaseKey", key);
+  el("configMsg").textContent = "Gespeichert. Login wird geladen...";
+  createClientIfPossible();
+  checkSession();
+}
+
+async function signIn(){
+  if(!sb) createClientIfPossible();
+  const email = el("email").value.trim();
+  const password = el("password").value;
+  const {error} = await sb.auth.signInWithPassword({email, password});
+  el("loginMsg").textContent = error ? error.message : "Angemeldet.";
   if(!error) loadApp();
 }
-async function logout(){if(client)await client.auth.signOut();dashboard.classList.add("hidden");subtitle.textContent="Login";}
-async function checkSession(){const {data}=await client.auth.getSession();if(data.session)loadApp();}
+
+async function signOut(){
+  if(sb) await sb.auth.signOut();
+  el("dashboardSection").classList.add("hidden");
+  el("subtitle").textContent = "Login";
+}
+
+async function checkSession(){
+  if(!sb) return;
+  const {data} = await sb.auth.getSession();
+  if(data.session) loadApp();
+}
 
 async function loadApp(){
-  subtitle.textContent="Dashboard"; dashboard.classList.remove("hidden");
-  const {data:userData}=await client.auth.getUser(); currentUser=userData.user;
-  const {data:profile}=await client.from("profiles").select("*").eq("id",currentUser.id).single(); currentProfile=profile;
-  profileLine.textContent=profile?`${profile.display_name} · ${profile.email}`:currentUser.email;
-  const {data:memberships}=await client.from("organization_members").select("organization_id,role").eq("user_id",currentUser.id);
-  currentOrgId=memberships?.[0]?.organization_id || null;
-  adminBadge.classList.toggle("hidden", !(memberships||[]).some(m=>m.role==="super_admin"));
-  await loadTemplates(); await loadChecklists();
+  el("subtitle").textContent = "Dashboard";
+  el("dashboardSection").classList.remove("hidden");
+  const {data:userData,error:userErr} = await sb.auth.getUser();
+  if(userErr){ el("loginMsg").textContent = userErr.message; return; }
+  currentUser = userData.user;
+
+  const {data:profile} = await sb.from("profiles").select("*").eq("id",currentUser.id).single();
+  el("profileLine").textContent = profile ? `${profile.display_name} · ${profile.email}` : currentUser.email;
+
+  const {data:memberships,error:mErr} = await sb.from("organization_members").select("organization_id,role").eq("user_id",currentUser.id);
+  if(mErr){ el("profileLine").textContent += " · " + mErr.message; }
+  currentOrgId = memberships?.[0]?.organization_id || null;
+  el("adminBadge").classList.toggle("hidden", !(memberships||[]).some(m=>m.role==="super_admin"));
+
+  await loadTemplates();
+  await loadChecklists();
 }
 
 async function loadTemplates(){
-  const box=templatesList;
-  const {data,error}=await client.from("templates").select("id,title,description,icon,is_global").order("title");
+  const box=el("templatesList");
+  const {data,error}=await sb.from("templates").select("id,title,description,icon,is_global").order("title");
   if(error){box.textContent=error.message;return;}
   if(!data?.length){box.textContent="Keine Vorlagen vorhanden.";return;}
   box.innerHTML="";
   data.forEach(t=>{
-    const div=document.createElement("div");div.className="item";
+    const div=document.createElement("div"); div.className="item";
     div.innerHTML=`<strong>${t.icon||"📂"} ${t.title}</strong><br><span class="muted">${t.description||""} ${t.is_global?"· global":""}</span><br>`;
-    const btn=document.createElement("button");btn.textContent="Checkliste erstellen";btn.style.marginTop="8px";
-    btn.onclick=()=>createChecklistFromTemplate(t);
+    const btn=document.createElement("button"); btn.textContent="Checkliste erstellen"; btn.style.marginTop="8px";
+    btn.addEventListener("click",()=>createChecklistFromTemplate(t));
     div.appendChild(btn); box.appendChild(div);
   });
 }
@@ -114,73 +171,78 @@ async function loadTemplates(){
 async function createChecklistFromTemplate(t){
   const title=prompt("Titel der neuen Checkliste:", t.title + " " + new Date().toLocaleDateString("de-CH"));
   if(!title)return;
-  const {data:checklist,error}=await client.from("checklists").insert({
+  const {data:checklist,error}=await sb.from("checklists").insert({
     organization_id:currentOrgId, owner_id:currentUser.id, created_by:currentUser.id, updated_by:currentUser.id,
     template_id:t.id, title, icon:t.icon, description:t.description
   }).select().single();
   if(error){alert(error.message);return;}
 
-  const {data:cats,error:catErr}=await client.from("template_categories").select("id,title,sort_order").eq("template_id",t.id).order("sort_order");
+  const {data:cats,error:catErr}=await sb.from("template_categories").select("id,title,sort_order").eq("template_id",t.id).order("sort_order");
   if(catErr){alert(catErr.message);return;}
 
   for(const cat of cats||[]){
-    const {data:newCat,error:newCatErr}=await client.from("checklist_categories").insert({
-      checklist_id:checklist.id,title:cat.title,sort_order:cat.sort_order
-    }).select().single();
+    const {data:newCat,error:newCatErr}=await sb.from("checklist_categories").insert({checklist_id:checklist.id,title:cat.title,sort_order:cat.sort_order}).select().single();
     if(newCatErr){alert(newCatErr.message);return;}
 
-    const {data:items,error:itemErr}=await client.from("template_items").select("title,sort_order").eq("category_id",cat.id).order("sort_order");
+    const {data:items,error:itemErr}=await sb.from("template_items").select("title,sort_order").eq("category_id",cat.id).order("sort_order");
     if(itemErr){alert(itemErr.message);return;}
     if(items?.length){
       const rows=items.map(i=>({category_id:newCat.id,title:i.title,sort_order:i.sort_order,is_checked:false}));
-      const {error:insertItemsErr}=await client.from("checklist_items").insert(rows);
+      const {error:insertItemsErr}=await sb.from("checklist_items").insert(rows);
       if(insertItemsErr){alert(insertItemsErr.message);return;}
     }
   }
-  await client.from("activity_log").insert({organization_id:currentOrgId,user_id:currentUser.id,action:"checklist_created_from_template",entity_type:"checklist",entity_id:checklist.id,payload:{template_id:t.id,title}});
+  await sb.from("activity_log").insert({organization_id:currentOrgId,user_id:currentUser.id,action:"checklist_created_from_template",entity_type:"checklist",entity_id:checklist.id,payload:{template_id:t.id,title}});
   await loadChecklists();
   await openChecklist(checklist.id);
 }
 
 async function loadChecklists(){
-  const box=checklistsList;
-  const {data,error}=await client.from("checklists").select("id,title,description,icon,archived,created_at").order("created_at",{ascending:false});
+  const box=el("checklistsList");
+  const {data,error}=await sb.from("checklists").select("id,title,description,icon,archived,created_at").order("created_at",{ascending:false});
   if(error){box.textContent=error.message;return;}
   if(!data?.length){box.textContent="Noch keine Checklisten vorhanden.";return;}
   box.innerHTML="";
   data.forEach(c=>{
-    const div=document.createElement("div");div.className="item";
+    const div=document.createElement("div"); div.className="item";
     div.innerHTML=`<strong>${c.icon||"📋"} ${c.title}</strong><br><span class="muted">${c.description||""}</span><br>`;
-    const btn=document.createElement("button");btn.textContent="Öffnen";btn.style.marginTop="8px";btn.onclick=()=>openChecklist(c.id);
-    div.appendChild(btn);box.appendChild(div);
+    const btn=document.createElement("button"); btn.textContent="Öffnen"; btn.style.marginTop="8px"; btn.addEventListener("click",()=>openChecklist(c.id));
+    div.appendChild(btn); box.appendChild(div);
   });
 }
 
 async function openChecklist(id){
-  const detail=checklistDetail; detail.classList.remove("hidden"); detail.innerHTML="Lade...";
-  const {data:checklist,error}=await client.from("checklists").select("*").eq("id",id).single();
+  const detail=el("checklistDetail"); detail.classList.remove("hidden"); detail.innerHTML="Lade...";
+  const {data:checklist,error}=await sb.from("checklists").select("*").eq("id",id).single();
   if(error){detail.textContent=error.message;return;}
   detail.innerHTML=`<h2>${checklist.icon||"📋"} ${checklist.title}</h2><p class="muted">${checklist.description||""}</p>`;
-  const {data:cats}=await client.from("checklist_categories").select("id,title,sort_order").eq("checklist_id",id).order("sort_order");
+  const {data:cats}=await sb.from("checklist_categories").select("id,title,sort_order").eq("checklist_id",id).order("sort_order");
   for(const cat of cats||[]){
-    const wrap=document.createElement("div");wrap.className="cat";wrap.innerHTML=`<h3>${cat.title}</h3>`;
-    const {data:items}=await client.from("checklist_items").select("*").eq("category_id",cat.id).order("sort_order");
+    const wrap=document.createElement("div"); wrap.className="cat"; wrap.innerHTML=`<h3>${cat.title}</h3>`;
+    const {data:items}=await sb.from("checklist_items").select("*").eq("category_id",cat.id).order("sort_order");
     for(const item of items||[]){
-      const row=document.createElement("label");row.className="checkrow";
-      const cb=document.createElement("input");cb.type="checkbox";cb.checked=item.is_checked;
-      const sp=document.createElement("span");sp.textContent=item.title;if(item.is_checked)sp.className="done";
-      cb.onchange=async()=>{
+      const row=document.createElement("label"); row.className="checkrow";
+      const cb=document.createElement("input"); cb.type="checkbox"; cb.checked=item.is_checked;
+      const sp=document.createElement("span"); sp.textContent=item.title; if(item.is_checked) sp.className="done";
+      cb.addEventListener("change",async()=>{
         sp.className=cb.checked?"done":"";
-        await client.from("checklist_items").update({is_checked:cb.checked,checked_at:cb.checked?new Date().toISOString():null,checked_by:cb.checked?currentUser.id:null}).eq("id",item.id);
-      };
-      row.append(cb,sp);wrap.appendChild(row);
+        await sb.from("checklist_items").update({is_checked:cb.checked,checked_at:cb.checked?new Date().toISOString():null,checked_by:cb.checked?currentUser.id:null}).eq("id",item.id);
+      });
+      row.append(cb,sp); wrap.appendChild(row);
     }
     detail.appendChild(wrap);
   }
 }
 
-if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js");}
-init();
+document.addEventListener("DOMContentLoaded",()=>{
+  el("saveConfigBtn").addEventListener("click",saveConfig);
+  el("loginBtn").addEventListener("click",signIn);
+  el("logoutBtn").addEventListener("click",signOut);
+  createClientIfPossible();
+  checkSession();
+});
+
+if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js"); }
 </script>
 </body>
 </html>
