@@ -379,14 +379,19 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
       <div id="vAdmin" style="display:none">
         <div class="page-header"><div><h1 class="page-title">Admin</h1><p class="page-sub">Benutzer verwalten</p></div></div>
         <div style="margin-top:18px" class="editor-card">
-          <h3 style="font-size:15px;font-weight:700;margin-bottom:14px">Neuer Benutzer</h3>
+          <h3 style="font-size:15px;font-weight:700;margin-bottom:4px">Neuer Benutzer</h3>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Der User wird direkt angelegt und kann sich sofort einloggen.</p>
           <div style="display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">
-            <div class="form-group"><label>Auth UUID</label><input id="newUserId" placeholder="xxxxxxxx-xxxx-…"></div>
-            <div class="form-group"><label>E-Mail</label><input id="newUserEmail" type="email"></div>
-            <div class="form-group"><label>Name</label><input id="newUserName"></div>
+            <div class="form-group"><label>Name</label><input id="newUserName" placeholder="z.B. Anna Müller"></div>
+            <div class="form-group"><label>E-Mail</label><input id="newUserEmail" type="email" placeholder="anna@firma.ch"></div>
+            <div class="form-group"><label>Initiales Passwort</label><input id="newUserPw" type="password" placeholder="Min. 6 Zeichen"></div>
             <div class="form-group"><label>Rolle</label><select id="newUserRole"><option value="user">User</option><option value="admin">Admin</option><option value="super_admin">Super Admin</option></select></div>
           </div>
-          <button class="btn btn-primary btn-sm" id="addUser">Benutzer hinzufügen</button>
+          <div id="adminMsg" style="font-size:13px;margin-bottom:10px;min-height:18px"></div>
+          <button class="btn btn-primary btn-sm" id="addUser">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            Benutzer anlegen
+          </button>
           <div id="users" style="margin-top:16px"></div>
         </div>
       </div>
@@ -950,14 +955,31 @@ async function loadUsers(){
 }
 
 async function addUser(){
-  const id=$("newUserId").value.trim(),email=$("newUserEmail").value.trim(),name=$("newUserName").value.trim(),role=$("newUserRole").value;
-  if(!id||!email||!name){toast("UUID, E-Mail und Name nötig");return}
-  loading(true,"Speichere…");
-  const p=await sb.from("profiles").upsert({id,email,display_name:name});
-  if(p.error){alert(p.error.message);loading(false);return}
-  const m=await sb.from("organization_members").insert({organization_id:orgId,user_id:id,role});
-  if(m.error){alert(m.error.message);loading(false);return}
-  loading(false);loadUsers();toast("Benutzer gespeichert");
+  const email=$("newUserEmail").value.trim();
+  const name=$("newUserName").value.trim();
+  const pw=$("newUserPw").value;
+  const role=$("newUserRole").value;
+  const msgEl=$("adminMsg");
+  msgEl.textContent="";msgEl.style.color="var(--danger)";
+  if(!name||!email||!pw){msgEl.textContent="Name, E-Mail und Passwort sind erforderlich.";return}
+  if(pw.length<6){msgEl.textContent="Passwort muss mindestens 6 Zeichen haben.";return}
+  loading(true,"Lege User an…");
+  try{
+    const session=await sb.auth.getSession();
+    const token=session.data.session?.access_token;
+    const res=await fetch(`${SUPABASE_URL}/functions/v1/create-user`,{
+      method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":`Bearer ${token}`},
+      body:JSON.stringify({email,password:pw,display_name:name,organization_id:orgId,role})
+    });
+    const json=await res.json();
+    if(!res.ok||json.error){msgEl.textContent=json.error||"Fehler beim Anlegen.";loading(false);return}
+    // Clear form
+    $("newUserName").value="";$("newUserEmail").value="";$("newUserPw").value="";
+    msgEl.style.color="var(--success)";msgEl.textContent="✓ User erfolgreich angelegt.";
+    loadUsers();toast("User angelegt");
+  }catch(e){msgEl.textContent=e.message||"Netzwerkfehler."}
+  loading(false);
 }
 
 async function seedStandardTemplates(){
