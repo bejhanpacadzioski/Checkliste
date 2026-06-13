@@ -1,130 +1,133 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Checklists by Bejhan</title>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#2563eb">
+<!DOCTYPE html><html lang="de"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Checklists by Bejhan</title><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#2563eb">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#f6f7fb;--card:#fff;--text:#111827;--muted:#6b7280;--border:#e5e7eb;--p:#2563eb;--d:#dc2626;--g:#16a34a}
+:root{--bg:#f6f7fb;--card:#fff;--text:#111827;--muted:#6b7280;--border:#e5e7eb;--p:#2563eb;--d:#dc2626;--g:#16a34a;--warn:#f59e0b}
 @media(prefers-color-scheme:dark){:root{--bg:#111827;--card:#1f2937;--text:#f9fafb;--muted:#9ca3af;--border:#374151}}
-*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--text)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--text);padding-bottom:78px}
 header{padding:16px;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
-main{padding:14px;max-width:980px;margin:auto}h1{font-size:23px;margin:0}.sub,.muted{color:var(--muted)}.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:15px;margin-bottom:13px}
-input,button,textarea,select{font-size:16px;border-radius:12px;padding:11px}input,textarea,select{width:100%;border:1px solid var(--border);background:var(--card);color:var(--text);margin:6px 0 11px}textarea{min-height:110px}
-button{border:0;background:var(--p);color:white;font-weight:700;margin:3px}.ghost{background:transparent;color:var(--text);border:1px solid var(--border)}.danger{background:var(--d)}.ok{background:var(--g)}
-.hidden{display:none}.row{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.item{padding:12px 0;border-top:1px solid var(--border)}.item:first-child{border-top:0}.pill{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;background:var(--bg);border:1px solid var(--border);margin-right:4px}
-nav{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:13px}.active{background:var(--p)!important;color:white!important}.cat{margin-top:12px;padding-top:10px;border-top:1px solid var(--border)}
-.checkrow{display:flex;align-items:center;gap:10px;padding:9px 0}.checkrow input[type=checkbox]{width:24px;height:24px;margin:0}.done{text-decoration:line-through;color:var(--muted)}
-.small{font-size:13px}.progress{height:9px;background:var(--border);border-radius:99px;overflow:hidden;margin:8px 0}.bar{height:100%;background:var(--g);width:0%}
-.inlineAdd{display:flex;gap:8px;margin-top:8px}.inlineAdd input{margin:0}.inlineAdd button{white-space:nowrap}
-</style>
-</head>
-<body>
-<header><h1>Checklists by Bejhan</h1><div class="sub" id="subtitle">Final feste Verbindung</div></header>
+main{padding:12px;max-width:980px;margin:auto}h1{font-size:22px;margin:0}h2{font-size:21px;margin:0 0 12px}.sub,.muted{color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:15px;margin-bottom:13px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+input,button,select{font-size:17px;border-radius:14px;padding:13px;min-height:48px}input,select{width:100%;border:1px solid var(--border);background:var(--card);color:var(--text);margin:6px 0 11px}
+button{border:0;background:var(--p);color:white;font-weight:800;margin:3px;min-width:48px}.ghost{background:transparent;color:var(--text);border:1px solid var(--border)}.danger{background:var(--d)}.ok{background:var(--g)}
+.hidden{display:none!important}.row{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.item{padding:14px 0;border-top:1px solid var(--border)}.item:first-child{border-top:0}.pill{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;background:var(--bg);border:1px solid var(--border);margin-right:4px}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:8px;z-index:20}
+nav button{font-size:14px;min-height:54px;padding:8px}.active{background:var(--p)!important;color:white!important}.cat{margin-top:12px;padding:12px;border:1px solid var(--border);border-radius:16px;background:var(--bg)}
+.checkrow{display:flex;align-items:center;gap:12px;padding:11px 0}.checkrow input[type=checkbox]{width:28px;height:28px;margin:0}.done{text-decoration:line-through;color:var(--muted)}
+.progress{height:10px;background:var(--border);border-radius:99px;overflow:hidden;margin:8px 0}.bar{height:100%;background:var(--g);width:0%}
+.inlineAdd{display:flex;gap:8px;margin-top:10px}.inlineAdd input{margin:0}.inlineAdd button{white-space:nowrap}.mini{padding:8px 10px;font-size:14px;min-height:38px}
+#toast{position:fixed;left:12px;right:12px;bottom:88px;background:#111827;color:white;border-radius:16px;padding:14px 16px;z-index:60;box-shadow:0 6px 24px rgba(0,0,0,.25);font-weight:700;text-align:center}
+#loader{position:fixed;inset:0;background:rgba(0,0,0,.32);display:flex;align-items:center;justify-content:center;z-index:50}
+#loader .box{background:var(--card);color:var(--text);padding:22px;border-radius:18px;box-shadow:0 8px 30px rgba(0,0,0,.25);font-weight:800}
+.spinner{width:28px;height:28px;border:4px solid var(--border);border-top-color:var(--p);border-radius:50%;display:inline-block;animation:spin .8s linear infinite;vertical-align:middle;margin-right:10px}@keyframes spin{to{transform:rotate(360deg)}}
+@media(min-width:760px){body{padding-bottom:0}nav{position:static;display:flex;margin-bottom:13px;border:0;background:transparent;padding:0}nav button{font-size:16px;min-height:48px}}
+</style></head><body>
+<header><h1>Checklists by Bejhan</h1><div class="sub" id="subtitle">Mobile</div></header>
+<div id="toast" class="hidden"></div><div id="loader" class="hidden"><div class="box"><span class="spinner"></span><span id="loaderText">Lade...</span></div></div>
 <main>
-<section id="config" class="card hidden">
-<h2>Supabase verbinden</h2>
-<label>Supabase URL</label><input id="url" placeholder="https://xxxxx.supabase.co">
-<label>Anon/Public Key</label><input id="key" placeholder="sb_publishable...">
-<button id="saveCfg">Speichern</button><p id="cfgMsg" class="muted"></p>
-</section>
-<section id="login" class="card hidden">
-<h2>Anmelden</h2><label>E-Mail</label><input id="email" type="email"><label>Passwort</label><input id="pw" type="password">
-<button id="doLogin">Anmelden</button><button id="doLogout" class="ghost">Abmelden</button><p id="msg" class="muted"></p>
-</section>
-
+<section id="login" class="card hidden"><h2>Anmelden</h2><label>E-Mail</label><input id="email" type="email"><label>Passwort</label><input id="pw" type="password"><button id="doLogin">Anmelden</button><button id="doLogout" class="ghost">Abmelden</button><p id="msg" class="muted"></p></section>
 <section id="app" class="hidden">
 <div class="card"><h2>Dashboard</h2><p id="profile" class="muted"></p><span id="badge" class="pill hidden">👑 Super Admin</span><span id="acting" class="pill hidden"></span><button id="logoutTop" class="ghost">Abmelden</button></div>
-<nav><button id="bCheck" class="ghost active">📋 Checklisten</button><button id="bTpl" class="ghost">📂 Vorlagen</button><button id="bSettings" class="ghost">⚙️ Einstellungen</button><button id="bAdmin" class="ghost hidden">👥 Admin</button></nav>
+<nav><button id="bCheck" class="ghost active">📋<br>Checklisten</button><button id="bTpl" class="ghost">📂<br>Vorlagen</button><button id="bAdmin" class="ghost hidden">👥<br>Admin</button></nav>
 
 <div id="vCheck"><div class="card"><h2>📋 Checklisten</h2><button id="refreshCheck" class="ghost">Aktualisieren</button><div id="checkList" class="muted"></div></div><div id="checkDetail" class="card hidden"></div></div>
 
 <div id="vTpl" class="hidden">
-<div class="card"><h2>➕ Vorlage erstellen</h2><input id="tplTitle" placeholder="Titel"><input id="tplDesc" placeholder="Beschreibung"><input id="tplIcon" placeholder="Icon, z.B. 🏊"><textarea id="tplText" placeholder="Kategorie&#10;- Eintrag&#10;- Eintrag&#10;&#10;Weitere Kategorie&#10;- Eintrag"></textarea><button id="createTpl">Vorlage speichern</button></div>
-<div class="card"><h2>📂 Vorlagen</h2><button id="seedMore" class="ghost">Standardvorlagen ergänzen</button><div id="tplList" class="muted"></div></div><div id="tplDetail" class="card hidden"></div>
+<div class="card"><h2>📂 Vorlagen</h2><div class="row"><button id="newTpl">➕ Neue Vorlage</button><button id="seedMore" class="ghost">Standardvorlagen ergänzen</button></div><div id="tplList" class="muted"></div></div>
+<div id="tplEditor" class="card hidden"></div>
 </div>
 
-<div id="vSettings" class="hidden">
-<div class="card"><h2>⚙️ Einstellungen</h2><p class="muted">Die Supabase-Verbindung ist fest in der App hinterlegt. Du bleibst auf diesem Gerät eingeloggt, bis du dich abmeldest.</p></div>
-</div>
-
-<div id="vAdmin" class="hidden"><div class="card"><h2>👥 Benutzer</h2><p class="muted small">Benutzer zuerst in Supabase Authentication erstellen, danach hier mit UUID hinzufügen.</p><input id="newUserId" placeholder="Auth User UUID"><input id="newUserEmail" placeholder="E-Mail"><input id="newUserName" placeholder="Name"><select id="newUserRole"><option value="user">User</option><option value="admin">Admin</option><option value="super_admin">Super Admin</option></select><button id="addUser">Benutzer hinzufügen</button><button id="stopActing" class="ghost">Nicht mehr als User arbeiten</button><div id="users" class="muted"></div></div></div>
+<div id="vAdmin" class="hidden"><div class="card"><h2>👥 Benutzer</h2><input id="newUserId" placeholder="Auth User UUID"><input id="newUserEmail" placeholder="E-Mail"><input id="newUserName" placeholder="Name"><select id="newUserRole"><option value="user">User</option><option value="admin">Admin</option><option value="super_admin">Super Admin</option></select><button id="addUser">Benutzer hinzufügen</button><button id="stopActing" class="ghost">Nicht mehr als User arbeiten</button><div id="users" class="muted"></div></div></div>
 </section>
 </main>
 <script>
 const FIXED_SUPABASE_URL="https://hcxqhyswdaycfnxivhnm.supabase.co";
 const FIXED_SUPABASE_KEY="sb_publishable_WwSZT4nIB1hRbDhxF2uZpg_bxnq2BM2";
-let sb,user,orgId,isSuper=false,actingAs=null;
+let sb,user,orgId,isSuper=false,actingAs=null,currentTpl=null;
 const $=id=>document.getElementById(id), q=t=>document.createElement(t);
-function cfg(){return{url:FIXED_SUPABASE_URL,key:FIXED_SUPABASE_KEY}}
+function toast(t){$("toast").textContent=t;$("toast").classList.remove("hidden");clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>$("toast").classList.add("hidden"),2200)}
+function loading(on,t="Lade..."){$("loaderText").textContent=t;$("loader").classList.toggle("hidden",!on)}
+async function run(label,fn){loading(true,label);try{return await fn()}catch(e){alert(e.message||e);throw e}finally{loading(false)}}
 function owner(){return actingAs||user.id}
-function setActing(id,name){actingAs=id;if(id){$("acting").textContent="Arbeitet als: "+name;$("acting").classList.remove("hidden")}else{$("acting").classList.add("hidden")}loadChecklists();loadTemplates();}
-function makeClient(){let c=cfg();$("url").value=c.url;$("key").value=c.key;if(!c.url||!c.key)return false;if(!window.supabase){$("cfgMsg").textContent="Supabase-Bibliothek nicht geladen.";return false}sb=window.supabase.createClient(c.url,c.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});$("login").classList.remove("hidden");$("config").classList.add("hidden");return true}
-function show(v){["Check","Tpl","Settings","Admin"].forEach(x=>{$("v"+x).classList.toggle("hidden",x!==v);$("b"+x).classList.toggle("active",x===v)});if(v==="Admin")loadUsers()}
 function btn(t,fn,cls){let b=q("button");b.textContent=t;if(cls)b.className=cls;b.onclick=fn;return b}
-$("saveCfg").onclick=()=>{let u=$("url").value.trim().replace(/\/rest\/v1\/?$/,"").replace(/\/$/,""),k=$("key").value.trim();localStorage.setItem("supabaseUrl",u);localStorage.setItem("supabaseKey",k);$("cfgMsg").textContent="Gespeichert.";makeClient();session()}
-
-$("doLogin").onclick=async()=>{let{error}=await sb.auth.signInWithPassword({email:$("email").value.trim(),password:$("pw").value});$("msg").textContent=error?error.message:"Angemeldet";if(!error)load()}
-async function logout(){await sb.auth.signOut();$("app").classList.add("hidden");$("login").classList.remove("hidden");$("config").classList.add("hidden")}
-$("doLogout").onclick=logout;$("logoutTop").onclick=logout;
-$("bCheck").onclick=()=>show("Check");$("bTpl").onclick=()=>show("Tpl");$("bSettings").onclick=()=>show("Settings");$("bAdmin").onclick=()=>show("Admin");$("refreshCheck").onclick=loadChecklists;$("createTpl").onclick=createTemplate;$("addUser").onclick=addUser;$("seedMore").onclick=seedStandardTemplates;$("stopActing").onclick=()=>setActing(null,"");
-async function session(){if(!sb)return;let{data}=await sb.auth.getSession();if(data.session)load()}
-async function load(){
- $("subtitle").textContent="Dashboard";$("app").classList.remove("hidden");$("login").classList.add("hidden");$("config").classList.add("hidden");
- let u=await sb.auth.getUser();user=u.data.user;
- let p=await sb.from("profiles").select("*").eq("id",user.id).single();$("profile").textContent=(p.data?p.data.display_name:user.email)+" · "+user.email;
- let m=await sb.from("organization_members").select("organization_id,role").eq("user_id",user.id);orgId=m.data?.[0]?.organization_id;isSuper=(m.data||[]).some(x=>x.role==="super_admin");$("badge").classList.toggle("hidden",!isSuper);$("bAdmin").classList.toggle("hidden",!isSuper);
- await loadTemplates();await loadChecklists();
-}
-function parse(txt){let cats=[],cur=null;txt.split(/\r?\n/).map(x=>x.trim()).forEach(l=>{if(!l)return;if(l.startsWith("-")){if(cur)cur.items.push(l.replace(/^-\s*/,""))}else{cur={title:l,items:[]};cats.push(cur)}});return cats}
-async function createTemplateFromData(title,desc,icon,text,isGlobal=true){
- let {data:t,error}=await sb.from("templates").insert({organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,title,description:desc,icon:icon||"📂",is_global:isGlobal&&isSuper}).select().single(); if(error){alert(error.message);return null}
- let n=10;for(const c of parse(text)){let r=await sb.from("template_categories").insert({template_id:t.id,title:c.title,sort_order:n}).select().single(); if(r.error){alert(r.error.message);return null}let i=10;for(const it of c.items){let e=await sb.from("template_items").insert({category_id:r.data.id,title:it,sort_order:i}); if(e.error){alert(e.error.message);return null}i+=10}n+=10}
- return t;
-}
-async function createTemplate(){let title=$("tplTitle").value.trim(); if(!title)return alert("Titel fehlt"); await createTemplateFromData(title,$("tplDesc").value.trim(),$("tplIcon").value.trim(),$("tplText").value,isSuper);$("tplTitle").value=$("tplDesc").value=$("tplIcon").value=$("tplText").value="";await loadTemplates();alert("Vorlage erstellt")}
+function show(v){["Check","Tpl","Admin"].forEach(x=>{$("v"+x).classList.toggle("hidden",x!==v);$("b"+x)?.classList.toggle("active",x===v)});if(v==="Admin")loadUsers()}
+function setActing(id,name){actingAs=id;if(id){$("acting").textContent="Arbeitet als: "+name;$("acting").classList.remove("hidden")}else{$("acting").classList.add("hidden")}loadChecklists();loadTemplates()}
+function client(){sb=window.supabase.createClient(FIXED_SUPABASE_URL,FIXED_SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});$("login").classList.remove("hidden")}
+$("doLogin").onclick=()=>run("Anmeldung...",async()=>{let{error}=await sb.auth.signInWithPassword({email:$("email").value.trim(),password:$("pw").value});$("msg").textContent=error?error.message:"Angemeldet";if(error)return;toast("Angemeldet");await load()})
+async function logout(){await sb.auth.signOut();$("app").classList.add("hidden");$("login").classList.remove("hidden");toast("Abgemeldet")}
+$("doLogout").onclick=logout;$("logoutTop").onclick=logout;$("bCheck").onclick=()=>show("Check");$("bTpl").onclick=()=>show("Tpl");$("bAdmin").onclick=()=>show("Admin");$("refreshCheck").onclick=()=>run("Aktualisiere...",loadChecklists);$("newTpl").onclick=()=>openTemplateEditor(null);$("seedMore").onclick=()=>run("Ergänze Vorlagen...",seedStandardTemplates);$("addUser").onclick=()=>run("Speichere User...",addUser);$("stopActing").onclick=()=>setActing(null,"");
+async function session(){let{data}=await sb.auth.getSession();if(data.session)load()}
+async function load(){return run("Lade App...",async()=>{
+$("app").classList.remove("hidden");$("login").classList.add("hidden");let u=await sb.auth.getUser();user=u.data.user;
+let p=await sb.from("profiles").select("*").eq("id",user.id).single();$("profile").textContent=(p.data?p.data.display_name:user.email)+" · "+user.email;
+let m=await sb.from("organization_members").select("organization_id,role").eq("user_id",user.id);orgId=m.data?.[0]?.organization_id;isSuper=(m.data||[]).some(x=>x.role==="super_admin");$("badge").classList.toggle("hidden",!isSuper);$("bAdmin").classList.toggle("hidden",!isSuper);
+await loadTemplates();await loadChecklists()
+})}
 async function loadTemplates(){
- let box=$("tplList");let{data,error}=await sb.from("templates").select("*").is("deleted_at",null).order("title"); if(error){box.textContent=error.message;return}
- box.innerHTML=data?.length?"":"Keine Vorlagen.";
- (data||[]).forEach(t=>{let d=q("div");d.className="item";d.innerHTML=`<b>${t.icon||"📂"} ${t.title}</b><br><span class=muted>${t.description||""}</span><br>`;d.append(btn("Checkliste erstellen",()=>makeChecklist(t)),btn("Öffnen",()=>openTemplate(t.id),"ghost"),btn("Vorlage löschen",()=>deleteTemplate(t.id),"danger"));box.appendChild(d)})
+let box=$("tplList");let{data,error}=await sb.from("templates").select("*").is("deleted_at",null).order("title");if(error){box.textContent=error.message;return}
+box.innerHTML=data?.length?"":"Keine Vorlagen.";
+(data||[]).forEach(t=>{let d=q("div");d.className="item";d.innerHTML=`<b>${t.icon||"📂"} ${t.title}</b><br><span class=muted>${t.description||""}</span><br>`;d.append(btn("Checkliste erstellen",()=>run("Erstelle Checkliste...",()=>makeChecklist(t))),btn("Bearbeiten",()=>openTemplateEditor(t.id),"ghost"),btn("Löschen",()=>run("Lösche Vorlage...",()=>deleteTemplate(t.id)),"danger"));box.appendChild(d)})
 }
-async function deleteTemplate(id){if(!confirm("Vorlage wirklich löschen? Bestehende Checklisten bleiben erhalten."))return;let e=await sb.from("templates").update({deleted_at:new Date().toISOString(),deleted_by:user.id}).eq("id",id);if(e.error)return alert(e.error.message);await loadTemplates();$("tplDetail").classList.add("hidden")}
-async function openTemplate(id){
- let box=$("tplDetail");box.classList.remove("hidden");box.innerHTML="Lade...";
- let t=await sb.from("templates").select("*").eq("id",id).single();box.innerHTML=`<h2>${t.data.icon||"📂"} ${t.data.title}</h2><p class=muted>${t.data.description||""}</p>`;
- let cats=await sb.from("template_categories").select("*").eq("template_id",id).order("sort_order");
- for(const c of cats.data||[]){let w=q("div");w.className="cat";w.innerHTML=`<h3>${c.title}</h3>`;let items=await sb.from("template_items").select("*").eq("category_id",c.id).order("sort_order");(items.data||[]).forEach(i=>{let p=q("p");p.textContent="• "+i.title;w.appendChild(p)});box.appendChild(w)}
+async function openTemplateEditor(id){
+loading(true,"Lade Vorlage...");try{
+currentTpl=id;let box=$("tplEditor");box.classList.remove("hidden");box.innerHTML="<h2>"+(id?"Vorlage bearbeiten":"Neue Vorlage")+"</h2>";
+let tpl={title:"",description:"",icon:"📂"}; if(id){let r=await sb.from("templates").select("*").eq("id",id).single();tpl=r.data}
+box.innerHTML+=`<label>Titel</label><input id="edTitle" value="${(tpl.title||"").replaceAll('"','&quot;')}"><label>Beschreibung</label><input id="edDesc" value="${(tpl.description||"").replaceAll('"','&quot;')}"><label>Icon</label><input id="edIcon" value="${tpl.icon||"📂"}"><div class=row><button id=saveTpl>Speichern</button><button id=addCat>➕ Kategorie hinzufügen</button></div><p class="muted">Erstelle zuerst Kategorien. Danach kannst du direkt unter jeder Kategorie Punkte hinzufügen.</p><div id=edCats></div>`;
+$("saveTpl").onclick=()=>run("Speichere Vorlage...",saveTemplateMeta);
+$("addCat").onclick=()=>run("Füge Kategorie hinzu...",addTemplateCategory);
+if(id){let cats=await sb.from("template_categories").select("*").eq("template_id",id).order("sort_order");for(const c of cats.data||[]) await renderTplCategory(c)}
+box.scrollIntoView({behavior:"smooth",block:"start"});
+}finally{loading(false)}
 }
+async function saveTemplateMeta(){
+let data={organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,title:$("edTitle").value.trim(),description:$("edDesc").value.trim(),icon:$("edIcon").value.trim()||"📂",is_global:isSuper};
+if(!data.title){toast("Titel fehlt");return false}
+if(currentTpl){let e=await sb.from("templates").update({title:data.title,description:data.description,icon:data.icon,updated_by:user.id}).eq("id",currentTpl);if(e.error)return alert(e.error.message)}
+else{let r=await sb.from("templates").insert(data).select().single();if(r.error)return alert(r.error.message);currentTpl=r.data.id}
+await loadTemplates();toast("Vorlage gespeichert");return true
+}
+async function addTemplateCategory(){
+if(!currentTpl){let ok=await saveTemplateMeta(); if(!ok||!currentTpl)return}
+let title=prompt("Name der Kategorie:"); if(!title){toast("Abgebrochen");return}
+let r=await sb.from("template_categories").insert({template_id:currentTpl,title,sort_order:Date.now()%100000}).select().single();if(r.error)return alert(r.error.message);await renderTplCategory(r.data);toast("Kategorie hinzugefügt")
+}
+async function renderTplCategory(c){
+let wrap=q("div");wrap.className="cat";wrap.id="tplcat-"+c.id;wrap.innerHTML=`<div class=row><h3 style="flex:1;margin:0">${c.title}</h3></div><div id="tplitems-${c.id}"></div>`;
+let del=btn("Kategorie löschen",async()=>{if(confirm("Kategorie löschen?")){loading(true,"Lösche Kategorie...");await sb.from("template_categories").delete().eq("id",c.id);loading(false);wrap.remove();toast("Kategorie gelöscht")}},"danger mini");wrap.querySelector(".row").appendChild(del);
+let add=q("div");add.className="inlineAdd";let input=q("input");input.placeholder="Neuer Punkt in "+c.title;let plus=btn("+",async()=>{let title=input.value.trim();if(!title){toast("Bitte Punkt eingeben");return}loading(true,"Speichere Punkt...");let e=await sb.from("template_items").insert({category_id:c.id,title,sort_order:Date.now()%100000});loading(false);if(e.error)return alert(e.error.message);input.value="";await loadTplItems(c.id);toast("Punkt hinzugefügt")});add.append(input,plus);wrap.appendChild(add);$("edCats").appendChild(wrap);await loadTplItems(c.id)
+}
+async function loadTplItems(catId){
+let box=$("tplitems-"+catId);if(!box)return;let r=await sb.from("template_items").select("*").eq("category_id",catId).order("sort_order");box.innerHTML="";
+(r.data||[]).forEach(it=>{let row=q("div");row.className="checkrow";let sp=q("span");sp.textContent="• "+it.title;let del=btn("×",async()=>{loading(true,"Lösche Punkt...");await sb.from("template_items").delete().eq("id",it.id);loading(false);toast("Punkt gelöscht");loadTplItems(catId)},"danger mini");row.append(sp,del);box.appendChild(row)})
+}
+async function deleteTemplate(id){if(!confirm("Vorlage löschen?"))return;let e=await sb.from("templates").update({deleted_at:new Date().toISOString(),deleted_by:user.id}).eq("id",id);if(e.error)return alert(e.error.message);await loadTemplates();$("tplEditor").classList.add("hidden");toast("Vorlage gelöscht")}
 async function makeChecklist(t){
- let title=prompt("Titel der Checkliste:",t.title+" "+new Date().toLocaleDateString("de-CH")); if(!title)return;
- let r=await sb.from("checklists").insert({organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,template_id:t.id,title,description:t.description,icon:t.icon}).select().single(); if(r.error)return alert(r.error.message);
- let cats=await sb.from("template_categories").select("*").eq("template_id",t.id).order("sort_order");
- for(const c of cats.data||[]){let nc=await sb.from("checklist_categories").insert({checklist_id:r.data.id,title:c.title,sort_order:c.sort_order}).select().single();if(nc.error)return alert(nc.error.message);let items=await sb.from("template_items").select("*").eq("category_id",c.id).order("sort_order");if(items.data?.length){let rows=items.data.map(i=>({category_id:nc.data.id,title:i.title,sort_order:i.sort_order,is_checked:false}));let e=await sb.from("checklist_items").insert(rows);if(e.error)return alert(e.error.message)}}
- await loadChecklists();show("Check");openChecklist(r.data.id);
+let title=prompt("Titel der Checkliste:",t.title+" "+new Date().toLocaleDateString("de-CH"));if(!title)return;
+let r=await sb.from("checklists").insert({organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,template_id:t.id,title,description:t.description,icon:t.icon}).select().single();if(r.error)return alert(r.error.message);
+let cats=await sb.from("template_categories").select("*").eq("template_id",t.id).order("sort_order");
+for(const c of cats.data||[]){let nc=await sb.from("checklist_categories").insert({checklist_id:r.data.id,title:c.title,sort_order:c.sort_order}).select().single();let items=await sb.from("template_items").select("*").eq("category_id",c.id).order("sort_order");if(items.data?.length)await sb.from("checklist_items").insert(items.data.map(i=>({category_id:nc.data.id,title:i.title,sort_order:i.sort_order,is_checked:false})))}
+await loadChecklists();show("Check");openChecklist(r.data.id);toast("Checkliste erstellt")
 }
 async function loadChecklists(){
- let box=$("checkList");let{data,error}=await sb.from("checklists").select("*").is("deleted_at",null).order("created_at",{ascending:false}); if(error){box.textContent=error.message;return}
- box.innerHTML=data?.length?"":"Noch keine Checklisten.";
- (data||[]).forEach(c=>{let d=q("div");d.className="item";d.innerHTML=`<b>${c.icon||"📋"} ${c.title}</b><br><span class=muted>${c.description||""}</span><br>`;d.append(btn("Öffnen",()=>openChecklist(c.id)),btn("Duplizieren",()=>duplicateChecklist(c.id),"ghost"),btn("Archivieren",()=>archiveChecklist(c.id),"ghost"));box.appendChild(d)})
+let box=$("checkList");let{data,error}=await sb.from("checklists").select("*").is("deleted_at",null).order("created_at",{ascending:false});if(error){box.textContent=error.message;return}
+box.innerHTML=data?.length?"":"Noch keine Checklisten."; (data||[]).forEach(c=>{let d=q("div");d.className="item";d.innerHTML=`<b>${c.icon||"📋"} ${c.title}</b><br><span class=muted>${c.description||""}</span><br>`;d.append(btn("Öffnen",()=>openChecklist(c.id)),btn("Duplizieren",()=>run("Dupliziere...",()=>duplicateChecklist(c.id)),"ghost"),btn("Archivieren",()=>run("Archiviere...",()=>archiveChecklist(c.id)),"ghost"));box.appendChild(d)})
 }
 async function openChecklist(id){
- let box=$("checkDetail");box.classList.remove("hidden");box.innerHTML="Lade...";
- let c=await sb.from("checklists").select("*").eq("id",id).single();box.innerHTML=`<h2>${c.data.icon||"📋"} ${c.data.title}</h2><p class=muted>${c.data.description||""}</p>`;
- let cats=await sb.from("checklist_categories").select("*").eq("checklist_id",id).order("sort_order");
- let total=0,done=0,content=q("div");
- for(const cat of cats.data||[]){let w=q("div");w.className="cat";w.innerHTML=`<h3>${cat.title}</h3>`;let items=await sb.from("checklist_items").select("*").eq("category_id",cat.id).order("sort_order");(items.data||[]).forEach(it=>{total++;if(it.is_checked)done++;let row=q("label");row.className="checkrow";let cb=q("input");cb.type="checkbox";cb.checked=it.is_checked;let sp=q("span");sp.textContent=it.title;if(it.is_checked)sp.className="done";cb.onchange=async()=>{sp.className=cb.checked?"done":"";await sb.from("checklist_items").update({is_checked:cb.checked,checked_at:cb.checked?new Date().toISOString():null,checked_by:cb.checked?user.id:null}).eq("id",it.id);openChecklist(id)};row.append(cb,sp);w.appendChild(row)});
- let add=q("div");add.className="inlineAdd";let input=q("input");input.placeholder="Neuer Eintrag in "+cat.title;let plus=btn("+",async()=>{let title=input.value.trim();if(!title)return;let e=await sb.from("checklist_items").insert({category_id:cat.id,title,sort_order:999,is_checked:false});if(e.error)return alert(e.error.message);openChecklist(id)});add.append(input,plus);w.appendChild(add);content.appendChild(w)}
- let pct=total?Math.round(done/total*100):0;let prog=q("div");prog.innerHTML=`<div class=progress><div class=bar style="width:${pct}%"></div></div><p class="muted small">${done}/${total} erledigt (${pct}%)</p>`;box.appendChild(prog);box.appendChild(content);
+loading(true,"Lade Checkliste...");try{
+let box=$("checkDetail");box.classList.remove("hidden");box.innerHTML="";let c=await sb.from("checklists").select("*").eq("id",id).single();box.innerHTML=`<h2>${c.data.icon||"📋"} ${c.data.title}</h2><p class=muted>${c.data.description||""}</p>`;
+let cats=await sb.from("checklist_categories").select("*").eq("checklist_id",id).order("sort_order");let total=0,done=0,content=q("div");
+for(const cat of cats.data||[]){let w=q("div");w.className="cat";w.innerHTML=`<h3>${cat.title}</h3>`;let items=await sb.from("checklist_items").select("*").eq("category_id",cat.id).order("sort_order");(items.data||[]).forEach(it=>{total++;if(it.is_checked)done++;let row=q("label");row.className="checkrow";let cb=q("input");cb.type="checkbox";cb.checked=it.is_checked;let sp=q("span");sp.textContent=it.title;if(it.is_checked)sp.className="done";cb.onchange=async()=>{sp.className=cb.checked?"done":"";await sb.from("checklist_items").update({is_checked:cb.checked,checked_at:cb.checked?new Date().toISOString():null,checked_by:cb.checked?user.id:null}).eq("id",it.id);toast(cb.checked?"Erledigt":"Nicht erledigt");openChecklist(id)};row.append(cb,sp);w.appendChild(row)});
+let add=q("div");add.className="inlineAdd";let input=q("input");input.placeholder="Neuer Eintrag in "+cat.title;let plus=btn("+",async()=>{let title=input.value.trim();if(!title){toast("Bitte Eintrag eingeben");return}loading(true,"Speichere Eintrag...");let e=await sb.from("checklist_items").insert({category_id:cat.id,title,sort_order:Date.now()%100000,is_checked:false});loading(false);if(e.error)return alert(e.error.message);openChecklist(id);toast("Eintrag hinzugefügt")});add.append(input,plus);w.appendChild(add);content.appendChild(w)}
+let pct=total?Math.round(done/total*100):0;box.innerHTML+=`<div class=progress><div class=bar style="width:${pct}%"></div></div><p class="muted">${done}/${total} erledigt (${pct}%)</p>`;box.appendChild(content);box.scrollIntoView({behavior:"smooth",block:"start"});
+}finally{loading(false)}
 }
-async function archiveChecklist(id){if(!confirm("Archivieren?"))return;let e=await sb.from("checklists").update({archived:true,deleted_at:new Date().toISOString(),deleted_by:user.id}).eq("id",id);if(e.error)return alert(e.error.message);loadChecklists();$("checkDetail").classList.add("hidden")}
-async function duplicateChecklist(id){let c=await sb.from("checklists").select("*").eq("id",id).single();let title=prompt("Name der Kopie:",c.data.title+" Kopie");if(!title)return;let r=await sb.from("checklists").insert({organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,title,description:c.data.description,icon:c.data.icon}).select().single();if(r.error)return alert(r.error.message);let cats=await sb.from("checklist_categories").select("*").eq("checklist_id",id).order("sort_order");for(const cat of cats.data||[]){let nc=await sb.from("checklist_categories").insert({checklist_id:r.data.id,title:cat.title,sort_order:cat.sort_order}).select().single();let items=await sb.from("checklist_items").select("*").eq("category_id",cat.id).order("sort_order");if(items.data?.length){await sb.from("checklist_items").insert(items.data.map(i=>({category_id:nc.data.id,title:i.title,sort_order:i.sort_order,is_checked:false})))}}await loadChecklists()}
+async function archiveChecklist(id){if(!confirm("Archivieren?"))return;let e=await sb.from("checklists").update({archived:true,deleted_at:new Date().toISOString(),deleted_by:user.id}).eq("id",id);if(e.error)return alert(e.error.message);loadChecklists();$("checkDetail").classList.add("hidden");toast("Archiviert")}
+async function duplicateChecklist(id){let c=await sb.from("checklists").select("*").eq("id",id).single();let title=prompt("Name der Kopie:",c.data.title+" Kopie");if(!title)return;let r=await sb.from("checklists").insert({organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,title,description:c.data.description,icon:c.data.icon}).select().single();if(r.error)return alert(r.error.message);let cats=await sb.from("checklist_categories").select("*").eq("checklist_id",id).order("sort_order");for(const cat of cats.data||[]){let nc=await sb.from("checklist_categories").insert({checklist_id:r.data.id,title:cat.title,sort_order:cat.sort_order}).select().single();let items=await sb.from("checklist_items").select("*").eq("category_id",cat.id).order("sort_order");if(items.data?.length)await sb.from("checklist_items").insert(items.data.map(i=>({category_id:nc.data.id,title:i.title,sort_order:i.sort_order,is_checked:false})))}await loadChecklists();toast("Dupliziert")}
 async function loadUsers(){let box=$("users");let{data,error}=await sb.from("profiles").select("*").order("display_name");if(error){box.textContent=error.message;return}box.innerHTML="";(data||[]).forEach(u=>{let d=q("div");d.className="item";d.innerHTML=`<b>${u.display_name}</b><br><span class=muted>${u.email}</span><br>`;d.append(btn("Als User arbeiten",()=>{setActing(u.id,u.display_name);show("Check")},"ghost"));box.appendChild(d)})}
-async function addUser(){let id=$("newUserId").value.trim(),email=$("newUserEmail").value.trim(),name=$("newUserName").value.trim(),role=$("newUserRole").value;if(!id||!email||!name)return alert("UUID, E-Mail und Name nötig");let p=await sb.from("profiles").upsert({id,email,display_name:name});if(p.error)return alert(p.error.message);let m=await sb.from("organization_members").insert({organization_id:orgId,user_id:id,role});if(m.error)return alert(m.error.message);loadUsers()}
-async function seedStandardTemplates(){const templates=[["Camping","Packliste fürs Camping","🏕️","Schlafen\n- Zelt\n- Schlafsack\n- Isomatte\n\nKochen\n- Gaskocher\n- Geschirr\n- Besteck\n- Wasser"],["Wandern","Vorlage für Wanderausflüge","🎒","Ausrüstung\n- Wanderschuhe\n- Rucksack\n- Regenjacke\n\nVerpflegung\n- Wasser\n- Snacks\n- Sandwich"],["Flugreise","Vorlage für Reisen mit Flug","✈️","Dokumente\n- Pass/ID\n- Boardingpass\n- Versicherung\n\nHandgepäck\n- Kopfhörer\n- Ladegerät\n- Powerbank"],["Einkauf","Allgemeine Einkaufsliste","🛒","Lebensmittel\n- Brot\n- Milch\n- Früchte\n\nHaushalt\n- Küchenpapier\n- Müllsäcke"]];for(const t of templates) await createTemplateFromData(t[0],t[1],t[2],t[3],true);await loadTemplates();alert("Standardvorlagen ergänzt")}
-document.addEventListener("DOMContentLoaded",()=>{makeClient();session()});
-if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js");
-</script>
-</body></html>
+async function addUser(){let id=$("newUserId").value.trim(),email=$("newUserEmail").value.trim(),name=$("newUserName").value.trim(),role=$("newUserRole").value;if(!id||!email||!name)return alert("UUID, E-Mail und Name nötig");let p=await sb.from("profiles").upsert({id,email,display_name:name});if(p.error)return alert(p.error.message);let m=await sb.from("organization_members").insert({organization_id:orgId,user_id:id,role});if(m.error)return alert(m.error.message);loadUsers();toast("Benutzer gespeichert")}
+async function seedStandardTemplates(){const templates=[["Camping","Packliste fürs Camping","🏕️","Schlafen\n- Zelt\n- Schlafsack\n- Isomatte\n\nKochen\n- Gaskocher\n- Geschirr\n- Besteck\n- Wasser"],["Wandern","Vorlage für Wanderausflüge","🎒","Ausrüstung\n- Wanderschuhe\n- Rucksack\n- Regenjacke\n\nVerpflegung\n- Wasser\n- Snacks\n- Sandwich"],["Flugreise","Vorlage für Reisen mit Flug","✈️","Dokumente\n- Pass/ID\n- Boardingpass\n- Versicherung\n\nHandgepäck\n- Kopfhörer\n- Ladegerät\n- Powerbank"],["Einkauf","Allgemeine Einkaufsliste","🛒","Lebensmittel\n- Brot\n- Milch\n- Früchte\n\nHaushalt\n- Küchenpapier\n- Müllsäcke"]];for(const t of templates)await createTemplateFromSeed(t);await loadTemplates();toast("Standardvorlagen ergänzt")}
+async function createTemplateFromSeed(t){let r=await sb.from("templates").insert({organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,title:t[0],description:t[1],icon:t[2],is_global:isSuper}).select().single();if(r.error)return;let cur=null,n=10,i=10;for(const line of t[3].split(/\n/).map(x=>x.trim()).filter(Boolean)){if(line.startsWith("-")){if(cur)await sb.from("template_items").insert({category_id:cur,title:line.replace(/^-\s*/,""),sort_order:i}),i+=10}else{let c=await sb.from("template_categories").insert({template_id:r.data.id,title:line,sort_order:n}).select().single();cur=c.data.id;n+=10;i=10}}}
+document.addEventListener("DOMContentLoaded",()=>{client();session()});if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js");
+</script></body></html>
