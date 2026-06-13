@@ -15,14 +15,15 @@ header{padding:16px;background:var(--card);border-bottom:1px solid var(--border)
 main{padding:14px;max-width:980px;margin:auto}h1{font-size:23px;margin:0}.sub,.muted{color:var(--muted)}.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:15px;margin-bottom:13px}
 input,button,textarea,select{font-size:16px;border-radius:12px;padding:11px}input,textarea,select{width:100%;border:1px solid var(--border);background:var(--card);color:var(--text);margin:6px 0 11px}textarea{min-height:110px}
 button{border:0;background:var(--p);color:white;font-weight:700;margin:3px}.ghost{background:transparent;color:var(--text);border:1px solid var(--border)}.danger{background:var(--d)}.ok{background:var(--g)}
-.hidden{display:none}.row{display:flex;gap:7px;flex-wrap:wrap}.item{padding:12px 0;border-top:1px solid var(--border)}.item:first-child{border-top:0}.pill{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;background:var(--bg);border:1px solid var(--border);margin-right:4px}
+.hidden{display:none}.row{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.item{padding:12px 0;border-top:1px solid var(--border)}.item:first-child{border-top:0}.pill{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;background:var(--bg);border:1px solid var(--border);margin-right:4px}
 nav{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:13px}.active{background:var(--p)!important;color:white!important}.cat{margin-top:12px;padding-top:10px;border-top:1px solid var(--border)}
-.checkrow{display:flex;align-items:center;gap:10px;padding:9px 0}.checkrow input{width:24px;height:24px;margin:0}.done{text-decoration:line-through;color:var(--muted)}
+.checkrow{display:flex;align-items:center;gap:10px;padding:9px 0}.checkrow input[type=checkbox]{width:24px;height:24px;margin:0}.done{text-decoration:line-through;color:var(--muted)}
 .small{font-size:13px}.progress{height:9px;background:var(--border);border-radius:99px;overflow:hidden;margin:8px 0}.bar{height:100%;background:var(--g);width:0%}
+.inlineAdd{display:flex;gap:8px;margin-top:8px}.inlineAdd input{margin:0}.inlineAdd button{white-space:nowrap}
 </style>
 </head>
 <body>
-<header><h1>Checklists by Bejhan</h1><div class="sub" id="subtitle">Final MVP</div></header>
+<header><h1>Checklists by Bejhan</h1><div class="sub" id="subtitle">Final UI</div></header>
 <main>
 <section id="config" class="card">
 <h2>Supabase verbinden</h2>
@@ -34,33 +35,43 @@ nav{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:13px}.active{background:va
 <h2>Anmelden</h2><label>E-Mail</label><input id="email" type="email"><label>Passwort</label><input id="pw" type="password">
 <button id="doLogin">Anmelden</button><button id="doLogout" class="ghost">Abmelden</button><p id="msg" class="muted"></p>
 </section>
+
 <section id="app" class="hidden">
-<div class="card"><h2>Dashboard</h2><p id="profile" class="muted"></p><span id="badge" class="pill hidden">👑 Super Admin</span><span id="acting" class="pill hidden"></span></div>
-<nav><button id="bCheck" class="ghost active">📋 Checklisten</button><button id="bTpl" class="ghost">📂 Vorlagen</button><button id="bAdmin" class="ghost hidden">👥 Admin</button></nav>
+<div class="card"><h2>Dashboard</h2><p id="profile" class="muted"></p><span id="badge" class="pill hidden">👑 Super Admin</span><span id="acting" class="pill hidden"></span><button id="logoutTop" class="ghost">Abmelden</button></div>
+<nav><button id="bCheck" class="ghost active">📋 Checklisten</button><button id="bTpl" class="ghost">📂 Vorlagen</button><button id="bSettings" class="ghost">⚙️ Einstellungen</button><button id="bAdmin" class="ghost hidden">👥 Admin</button></nav>
+
 <div id="vCheck"><div class="card"><h2>📋 Checklisten</h2><button id="refreshCheck" class="ghost">Aktualisieren</button><div id="checkList" class="muted"></div></div><div id="checkDetail" class="card hidden"></div></div>
+
 <div id="vTpl" class="hidden">
 <div class="card"><h2>➕ Vorlage erstellen</h2><input id="tplTitle" placeholder="Titel"><input id="tplDesc" placeholder="Beschreibung"><input id="tplIcon" placeholder="Icon, z.B. 🏊"><textarea id="tplText" placeholder="Kategorie&#10;- Eintrag&#10;- Eintrag&#10;&#10;Weitere Kategorie&#10;- Eintrag"></textarea><button id="createTpl">Vorlage speichern</button></div>
 <div class="card"><h2>📂 Vorlagen</h2><button id="seedMore" class="ghost">Standardvorlagen ergänzen</button><div id="tplList" class="muted"></div></div><div id="tplDetail" class="card hidden"></div>
 </div>
+
+<div id="vSettings" class="hidden">
+<div class="card"><h2>⚙️ Einstellungen</h2><p class="muted">Supabase-Verbindung ist gespeichert. Hier kannst du sie bei Bedarf ändern.</p><button id="showConfig" class="ghost">Supabase Verbindung anzeigen</button><button id="hideConfig" class="ghost">Supabase Verbindung ausblenden</button></div>
+</div>
+
 <div id="vAdmin" class="hidden"><div class="card"><h2>👥 Benutzer</h2><p class="muted small">Benutzer zuerst in Supabase Authentication erstellen, danach hier mit UUID hinzufügen.</p><input id="newUserId" placeholder="Auth User UUID"><input id="newUserEmail" placeholder="E-Mail"><input id="newUserName" placeholder="Name"><select id="newUserRole"><option value="user">User</option><option value="admin">Admin</option><option value="super_admin">Super Admin</option></select><button id="addUser">Benutzer hinzufügen</button><button id="stopActing" class="ghost">Nicht mehr als User arbeiten</button><div id="users" class="muted"></div></div></div>
 </section>
 </main>
 <script>
-let sb,user,orgId,isSuper=false,actingAs=null,actingName="";
+let sb,user,orgId,isSuper=false,actingAs=null;
 const $=id=>document.getElementById(id), q=t=>document.createElement(t);
 function cfg(){return{url:localStorage.getItem("supabaseUrl")||"",key:localStorage.getItem("supabaseKey")||""}}
 function owner(){return actingAs||user.id}
-function setActing(id,name){actingAs=id;actingName=name;if(id){$("acting").textContent="Arbeitet als: "+name;$("acting").classList.remove("hidden")}else{$("acting").classList.add("hidden")}loadChecklists();loadTemplates();}
-function makeClient(){let c=cfg();$("url").value=c.url;$("key").value=c.key;if(!c.url||!c.key)return false;if(!window.supabase){$("cfgMsg").textContent="Supabase-Bibliothek nicht geladen.";return false}sb=window.supabase.createClient(c.url,c.key);$("login").classList.remove("hidden");return true}
-function show(v){["Check","Tpl","Admin"].forEach(x=>{$("v"+x).classList.toggle("hidden",x!==v);$("b"+x).classList.toggle("active",x===v)});if(v==="Admin")loadUsers()}
+function setActing(id,name){actingAs=id;if(id){$("acting").textContent="Arbeitet als: "+name;$("acting").classList.remove("hidden")}else{$("acting").classList.add("hidden")}loadChecklists();loadTemplates();}
+function makeClient(){let c=cfg();$("url").value=c.url;$("key").value=c.key;if(!c.url||!c.key)return false;if(!window.supabase){$("cfgMsg").textContent="Supabase-Bibliothek nicht geladen.";return false}sb=window.supabase.createClient(c.url,c.key);$("login").classList.remove("hidden");$("config").classList.add("hidden");return true}
+function show(v){["Check","Tpl","Settings","Admin"].forEach(x=>{$("v"+x).classList.toggle("hidden",x!==v);$("b"+x).classList.toggle("active",x===v)});if(v==="Admin")loadUsers()}
 function btn(t,fn,cls){let b=q("button");b.textContent=t;if(cls)b.className=cls;b.onclick=fn;return b}
 $("saveCfg").onclick=()=>{let u=$("url").value.trim().replace(/\/rest\/v1\/?$/,"").replace(/\/$/,""),k=$("key").value.trim();localStorage.setItem("supabaseUrl",u);localStorage.setItem("supabaseKey",k);$("cfgMsg").textContent="Gespeichert.";makeClient();session()}
+$("showConfig").onclick=()=>$("config").classList.remove("hidden");$("hideConfig").onclick=()=>$("config").classList.add("hidden");
 $("doLogin").onclick=async()=>{let{error}=await sb.auth.signInWithPassword({email:$("email").value.trim(),password:$("pw").value});$("msg").textContent=error?error.message:"Angemeldet";if(!error)load()}
-$("doLogout").onclick=async()=>{await sb.auth.signOut();$("app").classList.add("hidden")}
-$("bCheck").onclick=()=>show("Check");$("bTpl").onclick=()=>show("Tpl");$("bAdmin").onclick=()=>show("Admin");$("refreshCheck").onclick=loadChecklists;$("createTpl").onclick=createTemplate;$("addUser").onclick=addUser;$("seedMore").onclick=seedStandardTemplates;$("stopActing").onclick=()=>setActing(null,"");
+async function logout(){await sb.auth.signOut();$("app").classList.add("hidden");$("login").classList.remove("hidden");$("config").classList.add("hidden")}
+$("doLogout").onclick=logout;$("logoutTop").onclick=logout;
+$("bCheck").onclick=()=>show("Check");$("bTpl").onclick=()=>show("Tpl");$("bSettings").onclick=()=>show("Settings");$("bAdmin").onclick=()=>show("Admin");$("refreshCheck").onclick=loadChecklists;$("createTpl").onclick=createTemplate;$("addUser").onclick=addUser;$("seedMore").onclick=seedStandardTemplates;$("stopActing").onclick=()=>setActing(null,"");
 async function session(){if(!sb)return;let{data}=await sb.auth.getSession();if(data.session)load()}
 async function load(){
- $("subtitle").textContent="Dashboard";$("app").classList.remove("hidden");
+ $("subtitle").textContent="Dashboard";$("app").classList.remove("hidden");$("login").classList.add("hidden");$("config").classList.add("hidden");
  let u=await sb.auth.getUser();user=u.data.user;
  let p=await sb.from("profiles").select("*").eq("id",user.id).single();$("profile").textContent=(p.data?p.data.display_name:user.email)+" · "+user.email;
  let m=await sb.from("organization_members").select("organization_id,role").eq("user_id",user.id);orgId=m.data?.[0]?.organization_id;isSuper=(m.data||[]).some(x=>x.role==="super_admin");$("badge").classList.toggle("hidden",!isSuper);$("bAdmin").classList.toggle("hidden",!isSuper);
@@ -76,8 +87,9 @@ async function createTemplate(){let title=$("tplTitle").value.trim(); if(!title)
 async function loadTemplates(){
  let box=$("tplList");let{data,error}=await sb.from("templates").select("*").is("deleted_at",null).order("title"); if(error){box.textContent=error.message;return}
  box.innerHTML=data?.length?"":"Keine Vorlagen.";
- (data||[]).forEach(t=>{let d=q("div");d.className="item";d.innerHTML=`<b>${t.icon||"📂"} ${t.title}</b><br><span class=muted>${t.description||""}</span><br>`;d.append(btn("Checkliste erstellen",()=>makeChecklist(t)),btn("Öffnen",()=>openTemplate(t.id),"ghost"));box.appendChild(d)})
+ (data||[]).forEach(t=>{let d=q("div");d.className="item";d.innerHTML=`<b>${t.icon||"📂"} ${t.title}</b><br><span class=muted>${t.description||""}</span><br>`;d.append(btn("Checkliste erstellen",()=>makeChecklist(t)),btn("Öffnen",()=>openTemplate(t.id),"ghost"),btn("Vorlage löschen",()=>deleteTemplate(t.id),"danger"));box.appendChild(d)})
 }
+async function deleteTemplate(id){if(!confirm("Vorlage wirklich löschen? Bestehende Checklisten bleiben erhalten."))return;let e=await sb.from("templates").update({deleted_at:new Date().toISOString(),deleted_by:user.id}).eq("id",id);if(e.error)return alert(e.error.message);await loadTemplates();$("tplDetail").classList.add("hidden")}
 async function openTemplate(id){
  let box=$("tplDetail");box.classList.remove("hidden");box.innerHTML="Lade...";
  let t=await sb.from("templates").select("*").eq("id",id).single();box.innerHTML=`<h2>${t.data.icon||"📂"} ${t.data.title}</h2><p class=muted>${t.data.description||""}</p>`;
@@ -99,13 +111,12 @@ async function loadChecklists(){
 async function openChecklist(id){
  let box=$("checkDetail");box.classList.remove("hidden");box.innerHTML="Lade...";
  let c=await sb.from("checklists").select("*").eq("id",id).single();box.innerHTML=`<h2>${c.data.icon||"📋"} ${c.data.title}</h2><p class=muted>${c.data.description||""}</p>`;
- let add=btn("Eintrag hinzufügen",()=>addChecklistItem(id),"ghost");box.appendChild(add);
  let cats=await sb.from("checklist_categories").select("*").eq("checklist_id",id).order("sort_order");
  let total=0,done=0,content=q("div");
- for(const cat of cats.data||[]){let w=q("div");w.className="cat";w.innerHTML=`<h3>${cat.title}</h3>`;let items=await sb.from("checklist_items").select("*").eq("category_id",cat.id).order("sort_order");(items.data||[]).forEach(it=>{total++;if(it.is_checked)done++;let row=q("label");row.className="checkrow";let cb=q("input");cb.type="checkbox";cb.checked=it.is_checked;let sp=q("span");sp.textContent=it.title;if(it.is_checked)sp.className="done";cb.onchange=async()=>{sp.className=cb.checked?"done":"";await sb.from("checklist_items").update({is_checked:cb.checked,checked_at:cb.checked?new Date().toISOString():null,checked_by:cb.checked?user.id:null}).eq("id",it.id);openChecklist(id)};row.append(cb,sp);w.appendChild(row)});content.appendChild(w)}
- let pct=total?Math.round(done/total*100):0;let prog=q("div");prog.innerHTML=`<div class=progress><div class=bar style="width:${pct}%"></div></div><p class="muted small">${done}/${total} erledigt (${pct}%)</p>`;box.insertBefore(prog,add.nextSibling);box.appendChild(content)
+ for(const cat of cats.data||[]){let w=q("div");w.className="cat";w.innerHTML=`<h3>${cat.title}</h3>`;let items=await sb.from("checklist_items").select("*").eq("category_id",cat.id).order("sort_order");(items.data||[]).forEach(it=>{total++;if(it.is_checked)done++;let row=q("label");row.className="checkrow";let cb=q("input");cb.type="checkbox";cb.checked=it.is_checked;let sp=q("span");sp.textContent=it.title;if(it.is_checked)sp.className="done";cb.onchange=async()=>{sp.className=cb.checked?"done":"";await sb.from("checklist_items").update({is_checked:cb.checked,checked_at:cb.checked?new Date().toISOString():null,checked_by:cb.checked?user.id:null}).eq("id",it.id);openChecklist(id)};row.append(cb,sp);w.appendChild(row)});
+ let add=q("div");add.className="inlineAdd";let input=q("input");input.placeholder="Neuer Eintrag in "+cat.title;let plus=btn("+",async()=>{let title=input.value.trim();if(!title)return;let e=await sb.from("checklist_items").insert({category_id:cat.id,title,sort_order:999,is_checked:false});if(e.error)return alert(e.error.message);openChecklist(id)});add.append(input,plus);w.appendChild(add);content.appendChild(w)}
+ let pct=total?Math.round(done/total*100):0;let prog=q("div");prog.innerHTML=`<div class=progress><div class=bar style="width:${pct}%"></div></div><p class="muted small">${done}/${total} erledigt (${pct}%)</p>`;box.appendChild(prog);box.appendChild(content);
 }
-async function addChecklistItem(checklistId){let catName=prompt("Kategorie:","Sonstiges");let title=prompt("Eintrag:"); if(!catName||!title)return;let cats=await sb.from("checklist_categories").select("*").eq("checklist_id",checklistId).eq("title",catName).limit(1);let cat=cats.data?.[0];if(!cat){let c=await sb.from("checklist_categories").insert({checklist_id:checklistId,title:catName,sort_order:999}).select().single();if(c.error)return alert(c.error.message);cat=c.data}let e=await sb.from("checklist_items").insert({category_id:cat.id,title,sort_order:999});if(e.error)return alert(e.error.message);openChecklist(checklistId)}
 async function archiveChecklist(id){if(!confirm("Archivieren?"))return;let e=await sb.from("checklists").update({archived:true,deleted_at:new Date().toISOString(),deleted_by:user.id}).eq("id",id);if(e.error)return alert(e.error.message);loadChecklists();$("checkDetail").classList.add("hidden")}
 async function duplicateChecklist(id){let c=await sb.from("checklists").select("*").eq("id",id).single();let title=prompt("Name der Kopie:",c.data.title+" Kopie");if(!title)return;let r=await sb.from("checklists").insert({organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,title,description:c.data.description,icon:c.data.icon}).select().single();if(r.error)return alert(r.error.message);let cats=await sb.from("checklist_categories").select("*").eq("checklist_id",id).order("sort_order");for(const cat of cats.data||[]){let nc=await sb.from("checklist_categories").insert({checklist_id:r.data.id,title:cat.title,sort_order:cat.sort_order}).select().single();let items=await sb.from("checklist_items").select("*").eq("category_id",cat.id).order("sort_order");if(items.data?.length){await sb.from("checklist_items").insert(items.data.map(i=>({category_id:nc.data.id,title:i.title,sort_order:i.sort_order,is_checked:false})))}}await loadChecklists()}
 async function loadUsers(){let box=$("users");let{data,error}=await sb.from("profiles").select("*").order("display_name");if(error){box.textContent=error.message;return}box.innerHTML="";(data||[]).forEach(u=>{let d=q("div");d.className="item";d.innerHTML=`<b>${u.display_name}</b><br><span class=muted>${u.email}</span><br>`;d.append(btn("Als User arbeiten",()=>{setActing(u.id,u.display_name);show("Check")},"ghost"));box.appendChild(d)})}
