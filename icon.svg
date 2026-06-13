@@ -1,1 +1,61 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="96" fill="#2563eb"/><text x="50%" y="58%" text-anchor="middle" font-size="220" font-family="Arial">✅</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#312e81"/>
+    </linearGradient>
+    <linearGradient id="crema" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c2410c"/>
+      <stop offset="100%" stop-color="#7c2d12"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#818cf8"/>
+    </linearGradient>
+    <!-- Rhine curve subtle glow -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background rounded square -->
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+
+  <!-- Subtle Rhine river curve (Basel reference) — thin arc in background -->
+  <path d="M 60 420 Q 180 360 256 300 Q 330 240 450 260"
+        fill="none" stroke="rgba(99,102,241,0.2)" stroke-width="28" stroke-linecap="round"/>
+
+  <!-- Espresso cup body -->
+  <path d="M 155 210 L 175 330 Q 178 348 200 350 L 312 350 Q 334 348 337 330 L 357 210 Z"
+        fill="#1e1b4b" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+
+  <!-- Espresso crema / coffee surface -->
+  <ellipse cx="256" cy="212" rx="102" ry="18" fill="url(#crema)" opacity="0.95"/>
+  <!-- Crema highlight -->
+  <ellipse cx="240" cy="206" rx="52" ry="7" fill="rgba(251,191,36,0.35)"/>
+
+  <!-- Cup saucer -->
+  <ellipse cx="256" cy="358" rx="120" ry="14" fill="#1e1b4b" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+  <ellipse cx="256" cy="354" rx="108" ry="10" fill="#27244f"/>
+
+  <!-- Cup handle -->
+  <path d="M 350 255 Q 405 255 405 295 Q 405 335 350 335"
+        fill="none" stroke="#27244f" stroke-width="18" stroke-linecap="round"/>
+  <path d="M 350 255 Q 398 255 398 295 Q 398 335 350 335"
+        fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="14" stroke-linecap="round"/>
+
+  <!-- Checkmark badge (overlapping top-right) -->
+  <circle cx="358" cy="168" r="58" fill="url(#accent)" filter="url(#glow)"/>
+  <circle cx="358" cy="168" r="53" fill="url(#accent)"/>
+  <!-- Check -->
+  <polyline points="331,168 350,188 387,148"
+            fill="none" stroke="white" stroke-width="14"
+            stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Steam lines above cup -->
+  <path d="M 210 185 Q 200 165 210 145 Q 220 125 210 108"
+        fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 256 180 Q 246 158 256 138 Q 266 118 256 100"
+        fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="5" stroke-linecap="round"/>
+</svg>

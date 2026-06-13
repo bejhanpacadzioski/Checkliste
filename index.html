@@ -11,16 +11,26 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#f1f5f9;--surface:#fff;--border:#e2e8f0;--text:#0f172a;--muted:#64748b;--accent:#6366f1;--accent2:#818cf8;--danger:#ef4444;--success:#22c55e;--sidebar-w:240px;--r:16px;--shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06);--shadow-lg:0 8px 32px rgba(0,0,0,.14)}
+:root{
+  --bg:#f1f5f9;--surface:#fff;--border:#e2e8f0;--text:#0f172a;--muted:#64748b;
+  --accent:#6366f1;--accent2:#818cf8;--danger:#ef4444;--success:#22c55e;
+  --sidebar-w:240px;--r:16px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06);
+  --shadow-lg:0 8px 32px rgba(0,0,0,.14);
+}
 @media(prefers-color-scheme:dark){:root{--bg:#0f172a;--surface:#1e293b;--border:#334155;--text:#f1f5f9;--muted:#94a3b8}}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.5}
+
+/* Shell */
 #shell{display:flex;min-height:100dvh}
+
+/* Sidebar */
 #sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100dvh;overflow-y:auto;padding:20px 12px;transition:transform .25s ease}
 .sidebar-logo{display:flex;align-items:center;gap:10px;padding:0 8px 20px;border-bottom:1px solid var(--border);margin-bottom:16px}
 .sidebar-logo svg{width:28px;height:28px;flex-shrink:0}
 .sidebar-logo .lname{font-weight:700;font-size:15px;letter-spacing:-.3px}
-.sidebar-logo .lsub{font-size:11px;color:var(--muted);font-weight:400;display:block;letter-spacing:0}
+.sidebar-logo .lsub{font-size:11px;color:var(--muted);font-weight:400;display:block}
 nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;font-size:14px;font-weight:500;color:var(--muted);cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:background .15s,color .15s;font-family:inherit}
 .nav-item:hover{background:var(--bg);color:var(--text)}
@@ -35,6 +45,8 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 .acting-badge{display:none;align-items:center;gap:6px;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;color:var(--accent);margin-bottom:8px}
 .acting-badge.show{display:flex}
 .acting-badge button{background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);line-height:1;padding:0}
+
+/* Main */
 #main{flex:1;min-width:0;display:flex;flex-direction:column}
 #topbar{display:none;align-items:center;gap:10px;padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:30}
 #topbar .logo-text{font-weight:700;font-size:16px;flex:1}
@@ -43,50 +55,93 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 .page-title{font-size:22px;font-weight:700;letter-spacing:-.4px}
 .page-sub{font-size:14px;color:var(--muted);margin-top:2px}
 #content{padding:20px 24px 32px;flex:1}
+
+/* Checklist cards */
 .cl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-top:18px}
 .cl-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:16px 18px;cursor:pointer;transition:box-shadow .18s,transform .18s,border-color .18s;display:flex;gap:14px;align-items:flex-start}
 .cl-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px);border-color:var(--accent)}
+.cl-card.done-card{border-color:rgba(34,197,94,.4);background:linear-gradient(135deg,var(--surface) 0%,rgba(34,197,94,.04) 100%)}
 .cl-ring{flex-shrink:0;width:52px;height:52px}
 .cl-ring svg{width:52px;height:52px}
 .cl-body{flex:1;min-width:0}
 .cl-title{font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cl-desc{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cl-meta{font-size:12px;color:var(--muted);margin-top:6px}
+.cl-meta{font-size:12px;color:var(--muted);margin-top:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cl-date{font-size:11px;color:var(--muted);opacity:.7}
+.cl-done-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:#16a34a;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:99px;padding:2px 8px}
 .cl-actions{display:flex;gap:6px;margin-top:10px}
 .cl-actions button{font-size:12px;padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;font-family:inherit;font-weight:500;transition:background .15s,color .15s}
 .cl-actions button:hover{background:var(--bg);color:var(--text)}
 .cl-actions .btn-arch:hover{background:#fef2f2;color:var(--danger);border-color:#fca5a5}
+
+/* Detail panel */
 #detailOverlay{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:100;opacity:0;pointer-events:none;transition:opacity .22s ease}
 #detailOverlay.open{opacity:1;pointer-events:all}
 #detailPanel{position:fixed;top:0;right:0;bottom:0;width:min(520px,100vw);background:var(--surface);border-left:1px solid var(--border);box-shadow:var(--shadow-lg);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .26s cubic-bezier(.4,0,.2,1);z-index:101}
 #detailOverlay.open #detailPanel{transform:translateX(0)}
-.detail-header{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0}
-.detail-close{background:none;border:none;cursor:pointer;color:var(--muted);padding:4px;display:flex;border-radius:8px;transition:background .15s;flex-shrink:0}
+.detail-header{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.detail-close{background:none;border:none;cursor:pointer;color:var(--muted);padding:6px;display:flex;border-radius:8px;transition:background .15s;flex-shrink:0}
 .detail-close:hover{background:var(--bg)}
-.detail-title{font-size:17px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.detail-body{flex:1;overflow-y:auto;padding:20px}
-.detail-progress-bar{height:6px;background:var(--border);border-radius:99px;overflow:hidden;margin:8px 0 4px}
+.detail-title-wrap{flex:1;min-width:0}
+.detail-title{font-size:16px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;border-radius:6px;padding:2px 4px;transition:background .15s;display:block}
+.detail-title:hover{background:var(--bg)}
+.detail-title-edit{font-size:16px;font-weight:700;border:none;outline:none;background:var(--bg);border-radius:6px;padding:2px 4px;width:100%;font-family:inherit;color:var(--text);display:none}
+.detail-title-edit.active{display:block}
+.detail-title.editing{display:none}
+.detail-header-actions{display:flex;gap:6px;flex-shrink:0}
+.detail-body{flex:1;overflow-y:auto;padding:20px;-webkit-overflow-scrolling:touch}
+
+/* Progress */
+.progress-wrap{margin-bottom:20px}
+.detail-progress-bar{height:7px;background:var(--border);border-radius:99px;overflow:hidden;margin:8px 0 5px}
 .detail-progress-bar .bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px;transition:width .4s ease}
+.detail-progress-bar .bar.complete{background:linear-gradient(90deg,#16a34a,#22c55e)}
 .detail-progress-label{font-size:13px;color:var(--muted)}
+
+/* Category blocks */
 .cat-block{margin-bottom:18px}
-.cat-block h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:8px}
+.cat-header{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.cat-header h3{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);flex:1}
+.cat-del-btn{background:none;border:none;cursor:pointer;color:transparent;font-size:15px;padding:2px 5px;border-radius:6px;transition:color .15s,background .15s;line-height:1}
+.cat-header:hover .cat-del-btn{color:var(--muted)}
+.cat-del-btn:hover{color:var(--danger)!important;background:#fef2f2}
 .cat-inner{background:var(--bg);border-radius:12px;overflow:hidden}
-.checkrow{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:1px solid var(--border)}
+.checkrow{display:flex;align-items:center;gap:10px;padding:11px 14px;border-top:1px solid var(--border);position:relative}
 .checkrow:first-child{border-top:none}
 .checkrow input[type=checkbox]{width:20px;height:20px;flex-shrink:0;cursor:pointer;accent-color:var(--accent)}
-.checkrow label{cursor:pointer;flex:1;font-size:14px;transition:color .15s}
+.checkrow label{cursor:pointer;flex:1;font-size:14px;transition:color .15s;word-break:break-word}
 .checkrow label.done{text-decoration:line-through;color:var(--muted)}
+.item-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:2px 4px;line-height:1;border-radius:5px;transition:color .15s,background .15s;flex-shrink:0;opacity:0}
+.checkrow:hover .item-del{opacity:1}
+.item-del:hover{color:var(--danger);background:#fef2f2}
+/* Touch devices: always show delete */
+@media(hover:none){.item-del{opacity:.4}}
 .inline-add{display:flex;gap:8px;align-items:center;padding:10px 14px;border-top:1px solid var(--border)}
 .inline-add input{flex:1;border:none;background:transparent;font-size:13px;color:var(--text);font-family:inherit;outline:none}
 .inline-add input::placeholder{color:var(--muted)}
-.inline-add button{background:var(--accent);color:#fff;border:none;width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s}
+.inline-add button{background:var(--accent);color:#fff;border:none;width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s,transform .1s}
+.inline-add button:active{transform:scale(.9)}
 .inline-add button:hover{opacity:.85}
+.empty-cat-hint{padding:14px;font-size:13px;color:var(--muted);text-align:center;font-style:italic}
+
+/* Completion banner */
+.complete-banner{
+  display:flex;align-items:center;gap:10px;
+  background:linear-gradient(135deg,rgba(34,197,94,.12),rgba(22,163,74,.08));
+  border:1px solid rgba(34,197,94,.3);border-radius:12px;
+  padding:12px 14px;margin-bottom:18px;
+  font-weight:600;font-size:14px;color:#16a34a;
+  animation:fadeIn .4s ease;
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+
+/* Templates */
 .tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:18px}
 .tpl-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:16px 18px}
 .tpl-card-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .tpl-icon{font-size:24px;line-height:1}
 .tpl-name{font-weight:600;font-size:15px}
-.tpl-desc{font-size:12px;color:var(--muted);margin-bottom:12px}
+.tpl-desc{font-size:12px;color:var(--muted);margin-bottom:12px;min-height:16px}
 .tpl-actions{display:flex;gap:6px;flex-wrap:wrap}
 #tplEditorWrap{display:none;margin-top:20px}
 #tplEditorWrap.show{display:block}
@@ -95,44 +150,60 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 .cat-editor{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px}
 .cat-editor-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .cat-editor-head h4{flex:1;font-size:14px;font-weight:600;margin:0}
+
+/* Admin */
 .user-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--border)}
 .user-row:first-child{border-top:none}
 .user-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .user-info{flex:1;min-width:0}
 .user-info .uname{font-weight:600;font-size:14px}
 .user-info .uemail{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Buttons */
 .btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:10px;padding:9px 16px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity .15s,transform .1s}
 .btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
 .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
-.btn-primary:hover{opacity:.9}
+.btn-primary:hover:not(:disabled){opacity:.9}
 .btn-ghost{background:none;border:1px solid var(--border);color:var(--text)}
 .btn-ghost:hover{background:var(--bg)}
 .btn-danger{background:#fef2f2;border:1px solid #fca5a5;color:var(--danger)}
 .btn-danger:hover{background:#fee2e2}
 .btn-sm{padding:6px 12px;font-size:13px;border-radius:8px}
+.btn-icon{padding:7px;border-radius:9px}
+
+/* Forms */
 .form-group{margin-bottom:14px}
-.form-group label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+.form-group label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
 .form-group input,.form-group select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s}
 .form-group input:focus,.form-group select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.12)}
+
+/* Modal */
 #modalOverlay{position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s ease}
 #modalOverlay.open{opacity:1;pointer-events:all}
 .modal-box{background:var(--surface);border-radius:20px;box-shadow:var(--shadow-lg);padding:24px;width:100%;max-width:400px;transform:scale(.95) translateY(10px);transition:transform .22s ease}
 #modalOverlay.open .modal-box{transform:scale(1) translateY(0)}
-.modal-title{font-size:17px;font-weight:700;margin-bottom:6px}
+.modal-title{font-size:17px;font-weight:700;margin-bottom:4px}
 .modal-sub{font-size:14px;color:var(--muted);margin-bottom:4px}
 .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
-#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#0f172a;color:#f8fafc;border-radius:12px;padding:11px 20px;font-size:14px;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,.3);z-index:300;opacity:0;transition:opacity .2s,transform .2s;white-space:nowrap;pointer-events:none}
+
+/* Toast */
+#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:#0f172a;color:#f8fafc;border-radius:12px;padding:11px 20px;font-size:14px;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,.3);z-index:300;opacity:0;transition:opacity .2s,transform .2s;white-space:nowrap;pointer-events:none;display:flex;align-items:center;gap:8px}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Loader */
 #loader{position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:250;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
 #loader.show{opacity:1;pointer-events:all}
 .loader-box{background:var(--surface);border-radius:16px;padding:20px 28px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-lg);font-weight:600;font-size:15px}
 .spinner{width:22px;height:22px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* Login */
 #loginScreen{display:none;min-height:100dvh;align-items:center;justify-content:center;background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);padding:20px}
 #loginScreen.show{display:flex}
 .login-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:36px 32px;width:100%;max-width:380px;backdrop-filter:blur(20px)}
 .login-logo{margin-bottom:28px;text-align:center}
-.login-logo svg{width:44px;height:44px;margin-bottom:10px}
+.login-logo img,.login-logo svg{width:56px;height:56px;margin-bottom:12px;border-radius:14px}
 .login-logo h1{font-size:22px;font-weight:700;color:#f1f5f9;letter-spacing:-.4px}
 .login-logo p{font-size:13px;color:#94a3b8;margin-top:4px}
 .login-box .form-group label{color:#94a3b8}
@@ -140,40 +211,77 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 .login-box .form-group input:focus{border-color:var(--accent);background:rgba(255,255,255,.08)}
 #loginBtn{width:100%;padding:12px;font-size:15px;margin-top:4px;border-radius:12px}
 #loginMsg{text-align:center;font-size:13px;color:#ef4444;margin-top:10px;min-height:18px}
+
+/* Empty state */
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center}
 .empty-icon{font-size:48px;margin-bottom:14px;opacity:.5}
 .empty-title{font-size:16px;font-weight:600;margin-bottom:6px}
 .empty-sub{font-size:14px;color:var(--muted);margin-bottom:20px}
+
+/* Confetti canvas */
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:400;opacity:0;transition:opacity .5s}
+#confetti.show{opacity:1}
+
+/* Bottom nav (mobile) */
 #bottomNav{display:none}
+
+/* Responsive */
 @media(max-width:768px){
   #sidebar{position:fixed;top:0;left:0;bottom:0;z-index:50;transform:translateX(-100%);box-shadow:var(--shadow-lg)}
   #sidebar.open{transform:translateX(0)}
   #sidebarBackdrop{display:none;position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:49}
   #sidebarBackdrop.show{display:block}
   #topbar{display:flex}
-  #main{padding-bottom:70px}
+  #main{padding-bottom:72px}
   .page-header{padding:16px 16px 0}
-  #content{padding:16px}
+  #content{padding:14px}
   #bottomNav{display:grid;grid-template-columns:repeat(3,1fr);position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--border);padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:40}
-  .bnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:500;color:var(--muted);font-family:inherit;border-radius:10px;transition:background .15s,color .15s}
+  .bnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:500;color:var(--muted);font-family:inherit;border-radius:10px;transition:color .15s}
   .bnav-item svg{width:22px;height:22px}
   .bnav-item.active{color:var(--accent)}
   .bnav-item.hidden{display:none}
   .cl-grid,.tpl-grid{grid-template-columns:1fr}
   .page-title{font-size:19px}
-  #detailPanel{width:100vw;border-left:none;border-radius:20px 20px 0 0;top:auto;height:92dvh;transform:translateY(100%)}
+  #detailPanel{width:100vw;border-left:none;border-radius:20px 20px 0 0;top:auto;height:94dvh;transform:translateY(100%)}
   #detailOverlay.open #detailPanel{transform:translateY(0)}
+  .detail-header{padding:16px 14px 12px}
+  /* Drag handle on mobile */
+  #detailPanel::before{content:'';display:block;width:40px;height:4px;border-radius:99px;background:var(--border);margin:0 auto 14px;flex-shrink:0}
+  .detail-header-actions .btn-sm{padding:5px 10px;font-size:12px}
 }
 </style>
 </head>
 <body>
 
+<!-- Login -->
 <div id="loginScreen">
   <div class="login-box">
     <div class="login-logo">
-      <svg viewBox="0 0 44 44" fill="none"><rect width="44" height="44" rx="12" fill="url(#lg)"/><path d="M14 22h6m0 0 4-6 4 6M20 22v6" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="lg" x1="0" y1="0" x2="44" y2="44"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#818cf8"/></linearGradient></defs></svg>
+      <!-- Inline icon SVG on login screen -->
+      <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="border-radius:14px">
+        <defs>
+          <linearGradient id="lbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1e1b4b"/><stop offset="100%" stop-color="#312e81"/></linearGradient>
+          <linearGradient id="lcr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c2410c"/><stop offset="100%" stop-color="#7c2d12"/></linearGradient>
+          <linearGradient id="lac" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#818cf8"/></linearGradient>
+          <filter id="lglow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <rect width="512" height="512" rx="112" fill="url(#lbg)"/>
+        <path d="M 60 420 Q 180 360 256 300 Q 330 240 450 260" fill="none" stroke="rgba(99,102,241,0.2)" stroke-width="28" stroke-linecap="round"/>
+        <path d="M 155 210 L 175 330 Q 178 348 200 350 L 312 350 Q 334 348 337 330 L 357 210 Z" fill="#1e1b4b" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+        <ellipse cx="256" cy="212" rx="102" ry="18" fill="url(#lcr)" opacity="0.95"/>
+        <ellipse cx="240" cy="206" rx="52" ry="7" fill="rgba(251,191,36,0.35)"/>
+        <ellipse cx="256" cy="358" rx="120" ry="14" fill="#1e1b4b" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+        <ellipse cx="256" cy="354" rx="108" ry="10" fill="#27244f"/>
+        <path d="M 350 255 Q 405 255 405 295 Q 405 335 350 335" fill="none" stroke="#27244f" stroke-width="18" stroke-linecap="round"/>
+        <path d="M 350 255 Q 398 255 398 295 Q 398 335 350 335" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="14" stroke-linecap="round"/>
+        <circle cx="358" cy="168" r="58" fill="url(#lac)" filter="url(#lglow)"/>
+        <circle cx="358" cy="168" r="53" fill="url(#lac)"/>
+        <polyline points="331,168 350,188 387,148" fill="none" stroke="white" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M 210 185 Q 200 165 210 145 Q 220 125 210 108" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="5" stroke-linecap="round"/>
+        <path d="M 256 180 Q 246 158 256 138 Q 266 118 256 100" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="5" stroke-linecap="round"/>
+      </svg>
       <h1>Checklists</h1>
-      <p>Melde dich an, um fortzufahren</p>
+      <p>by Bejhan · Anmelden</p>
     </div>
     <div class="form-group"><label>E-Mail</label><input id="loginEmail" type="email" autocomplete="email" placeholder="name@domain.ch"></div>
     <div class="form-group"><label>Passwort</label><input id="loginPw" type="password" autocomplete="current-password" placeholder="••••••••"></div>
@@ -182,17 +290,35 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
   </div>
 </div>
 
+<!-- App shell -->
 <div id="shell" style="display:none">
   <div id="sidebarBackdrop"></div>
   <aside id="sidebar">
     <div class="sidebar-logo">
-      <svg viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="8" fill="url(#slg)"/><path d="M9 14h4m0 0 3-4 3 4M13 14v4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="slg" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#818cf8"/></linearGradient></defs></svg>
+      <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="border-radius:7px">
+        <defs>
+          <linearGradient id="sbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1e1b4b"/><stop offset="100%" stop-color="#312e81"/></linearGradient>
+          <linearGradient id="scr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c2410c"/><stop offset="100%" stop-color="#7c2d12"/></linearGradient>
+          <linearGradient id="sac" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#818cf8"/></linearGradient>
+        </defs>
+        <rect width="512" height="512" rx="112" fill="url(#sbg)"/>
+        <path d="M 60 420 Q 180 360 256 300 Q 330 240 450 260" fill="none" stroke="rgba(99,102,241,0.2)" stroke-width="28" stroke-linecap="round"/>
+        <path d="M 155 210 L 175 330 Q 178 348 200 350 L 312 350 Q 334 348 337 330 L 357 210 Z" fill="#1e1b4b" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+        <ellipse cx="256" cy="212" rx="102" ry="18" fill="url(#scr)" opacity="0.95"/>
+        <ellipse cx="240" cy="206" rx="52" ry="7" fill="rgba(251,191,36,0.35)"/>
+        <ellipse cx="256" cy="358" rx="120" ry="14" fill="#1e1b4b"/>
+        <ellipse cx="256" cy="354" rx="108" ry="10" fill="#27244f"/>
+        <path d="M 350 255 Q 405 255 405 295 Q 405 335 350 335" fill="none" stroke="#27244f" stroke-width="18" stroke-linecap="round"/>
+        <circle cx="358" cy="168" r="53" fill="url(#sac)"/>
+        <polyline points="331,168 350,188 387,148" fill="none" stroke="white" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M 210 185 Q 200 165 210 145 Q 220 125 210 108" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="5" stroke-linecap="round"/>
+      </svg>
       <div><span class="lname">Checklists</span><span class="lsub">by Bejhan</span></div>
     </div>
     <div class="acting-badge" id="actingBadge">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
       <span id="actingName">—</span>
-      <button id="stopActing" title="Beenden">✕</button>
+      <button id="stopActing">✕</button>
     </div>
     <nav class="snav">
       <button class="nav-item active" id="bCheck">
@@ -214,31 +340,39 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 
   <div id="main">
     <header id="topbar">
-      <button id="menuBtn" aria-label="Menü"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+      <button id="menuBtn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
       <span class="logo-text">Checklists</span>
     </header>
-
     <div id="content">
+
+      <!-- Checklists view -->
       <div id="vCheck">
         <div class="page-header">
-          <div><h1 class="page-title">Checklisten</h1><p class="page-sub" id="checkSub">Lade…</p></div>
-          <button class="btn btn-ghost btn-sm" id="refreshCheck"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>Aktualisieren</button>
+          <div><h1 class="page-title">Checklisten</h1><p class="page-sub" id="checkSub"></p></div>
+          <button class="btn btn-ghost btn-sm" id="refreshCheck">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+            Aktualisieren
+          </button>
         </div>
         <div id="checkList" style="margin-top:18px"></div>
       </div>
 
+      <!-- Templates view -->
       <div id="vTpl" style="display:none">
         <div class="page-header">
-          <div><h1 class="page-title">Vorlagen</h1><p class="page-sub">Vorlagen verwalten und Checklisten erstellen</p></div>
+          <div><h1 class="page-title">Vorlagen</h1><p class="page-sub">Vorlagen verwalten</p></div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="btn btn-ghost btn-sm" id="seedMore">Standardvorlagen</button>
-            <button class="btn btn-primary btn-sm" id="newTpl"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Neue Vorlage</button>
+            <button class="btn btn-primary btn-sm" id="newTpl">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Neue Vorlage
+            </button>
           </div>
         </div>
         <div id="tplList" style="margin-top:18px"></div>
         <div id="tplEditorWrap"><div class="editor-card" id="tplEditor"></div></div>
       </div>
 
+      <!-- Admin view -->
       <div id="vAdmin" style="display:none">
         <div class="page-header"><div><h1 class="page-title">Admin</h1><p class="page-sub">Benutzer verwalten</p></div></div>
         <div style="margin-top:18px" class="editor-card">
@@ -263,23 +397,37 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
   </nav>
 </div>
 
+<!-- Detail Panel -->
 <div id="detailOverlay">
   <div id="detailPanel">
     <div class="detail-header">
-      <button class="detail-close" id="detailClose"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-      <span class="detail-title" id="detailTitle">—</span>
-      <button class="btn btn-ghost btn-sm" id="detailAddCat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Kategorie</button>
-      <button class="btn btn-danger btn-sm" id="detailArchive">Archivieren</button>
+      <button class="detail-close" id="detailClose">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+      <div class="detail-title-wrap">
+        <span class="detail-title" id="detailTitle" title="Klicken zum Bearbeiten">—</span>
+        <input class="detail-title-edit" id="detailTitleEdit" type="text">
+      </div>
+      <div class="detail-header-actions">
+        <button class="btn btn-ghost btn-sm" id="detailAddCat" title="Neue Kategorie">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Kategorie
+        </button>
+        <button class="btn btn-danger btn-sm" id="detailArchive">Archivieren</button>
+      </div>
     </div>
     <div class="detail-body" id="detailBody"></div>
   </div>
 </div>
 
+<!-- Modal -->
 <div id="modalOverlay">
   <div class="modal-box">
     <div class="modal-title" id="modalTitle"></div>
     <div class="modal-sub" id="modalSub"></div>
-    <div class="form-group" id="modalInputWrap" style="display:none"><label id="modalInputLabel">Wert</label><input id="modalInput" type="text"></div>
+    <div class="form-group" id="modalInputWrap" style="display:none">
+      <label id="modalInputLabel">Wert</label>
+      <input id="modalInput" type="text">
+    </div>
     <div class="modal-actions">
       <button class="btn btn-ghost btn-sm" id="modalCancel">Abbrechen</button>
       <button class="btn btn-primary btn-sm" id="modalConfirm">OK</button>
@@ -287,9 +435,11 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
   </div>
 </div>
 
+<!-- Confetti canvas -->
+<canvas id="confetti"></canvas>
+
 <div id="toast"></div>
 <div id="loader"><div class="loader-box"><div class="spinner"></div><span id="loaderText">Lade…</span></div></div>
-
 
 <script>
 const SUPABASE_URL="https://hcxqhyswdaycfnxivhnm.supabase.co";
@@ -298,33 +448,83 @@ let sb,user,orgId,isSuper=false,actingAs=null,currentTpl=null,currentChecklistId
 const $=id=>document.getElementById(id),q=t=>document.createElement(t);
 
 /* ── Toast ── */
-function toast(msg,dur=2200){const el=$("toast");el.textContent=msg;el.classList.add("show");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),dur)}
+function toast(msg,dur=2400){
+  const el=$("toast");el.innerHTML=msg;el.classList.add("show");
+  clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),dur);
+}
 
-/* ── Loader: only for non-modal ops ── */
+/* ── Loader ── */
 function loading(on,txt="Lade…"){$("loaderText").textContent=txt;$("loader").classList.toggle("show",on)}
 
-/* ── Modal (replaces prompt/confirm — never wrap in loading()) ── */
+/* ── Modal ── */
 function showModal({title,sub="",input=null,danger=false,confirmLabel="OK"}){
   return new Promise(resolve=>{
     $("modalTitle").textContent=title;$("modalSub").textContent=sub;
     const wrap=$("modalInputWrap");
-    if(input){wrap.style.display="";$("modalInputLabel").textContent=input.label||"";$("modalInput").value=input.value||"";$("modalInput").placeholder=input.placeholder||"";setTimeout(()=>$("modalInput").focus(),100)}
+    if(input){wrap.style.display="";$("modalInputLabel").textContent=input.label||"";$("modalInput").value=input.value||"";$("modalInput").placeholder=input.placeholder||"";setTimeout(()=>$("modalInput").focus(),80)}
     else{wrap.style.display="none"}
     $("modalConfirm").textContent=confirmLabel;
     $("modalConfirm").className="btn btn-sm "+(danger?"btn-danger":"btn-primary");
     $("modalOverlay").classList.add("open");
-    const close=val=>{$("modalOverlay").classList.remove("open");$("modalConfirm").onclick=null;$("modalCancel").onclick=null;resolve(val)};
+    const close=val=>{$("modalOverlay").classList.remove("open");$("modalConfirm").onclick=null;$("modalCancel").onclick=null;$("modalInput").onkeydown=null;resolve(val)};
     $("modalConfirm").onclick=()=>close(input?$("modalInput").value.trim():true);
     $("modalCancel").onclick=()=>close(null);
-    $("modalInput").onkeydown=e=>{if(e.key==="Enter")close(input?$("modalInput").value.trim():true)};
+    $("modalInput").onkeydown=e=>{if(e.key==="Enter")close(input?$("modalInput").value.trim():true);if(e.key==="Escape")close(null)};
   })
 }
 
+/* ── Escape key closes panel/modal ── */
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"){
+    if($("modalOverlay").classList.contains("open")){$("modalOverlay").classList.remove("open");return}
+    if($("detailOverlay").classList.contains("open")){closeDetailPanel();return}
+  }
+});
+
 /* ── Progress ring ── */
-function ringSVG(pct,size=52){
+function ringSVG(pct){
   const r=20,c=2*Math.PI*r,offset=c-(pct/100)*c;
   const color=pct===100?"#22c55e":"#6366f1";
-  return `<svg width="${size}" height="${size}" viewBox="0 0 48 48"><circle cx="24" cy="24" r="${r}" fill="none" stroke="#e2e8f0" stroke-width="4"/><circle cx="24" cy="24" r="${r}" fill="none" stroke="${color}" stroke-width="4" stroke-dasharray="${c.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}" stroke-linecap="round" transform="rotate(-90 24 24)"/><text x="24" y="28" text-anchor="middle" font-size="11" font-weight="700" fill="${color}" font-family="Inter,sans-serif">${pct}%</text></svg>`
+  const track=pct===100?"rgba(34,197,94,.2)":"#e2e8f0";
+  return `<svg width="52" height="52" viewBox="0 0 48 48"><circle cx="24" cy="24" r="${r}" fill="none" stroke="${track}" stroke-width="4"/><circle cx="24" cy="24" r="${r}" fill="none" stroke="${color}" stroke-width="4" stroke-dasharray="${c.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}" stroke-linecap="round" transform="rotate(-90 24 24)"/><text x="24" y="28" text-anchor="middle" font-size="11" font-weight="700" fill="${color}" font-family="Inter,sans-serif">${pct}%</text></svg>`
+}
+
+/* ── Confetti ── */
+function celebrate(){
+  const canvas=$("confetti");canvas.classList.add("show");
+  const ctx=canvas.getContext("2d");
+  canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+  const colors=["#6366f1","#818cf8","#22c55e","#f59e0b","#ec4899","#06b6d4"];
+  const pieces=Array.from({length:80},()=>({
+    x:Math.random()*canvas.width,y:-20,
+    vx:(Math.random()-.5)*4,vy:Math.random()*4+2,
+    r:Math.random()*6+3,color:colors[Math.floor(Math.random()*colors.length)],
+    angle:Math.random()*360,va:(Math.random()-.5)*8,life:1
+  }));
+  let frame=0;
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;p.angle+=p.va;p.life-=.012;
+      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.angle*Math.PI/180);
+      ctx.globalAlpha=Math.max(0,p.life);ctx.fillStyle=p.color;
+      ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r);ctx.restore();
+    });
+    frame++;if(frame<120)requestAnimationFrame(draw);
+    else{canvas.classList.remove("show");ctx.clearRect(0,0,canvas.width,canvas.height)}
+  }
+  draw();
+}
+
+/* ── XSS helpers ── */
+function escHtml(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function escAttr(s){return String(s).replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
+
+/* ── Format date ── */
+function fmtDate(iso){
+  if(!iso)return"";
+  const d=new Date(iso);
+  return d.toLocaleDateString("de-CH",{day:"2-digit",month:"2-digit",year:"2-digit"});
 }
 
 /* ── Navigation ── */
@@ -337,24 +537,44 @@ function show(v){
   closeSidebar();
   if(v==="Admin")loadUsers();
 }
-
-/* ── Sidebar (mobile) ── */
 function openSidebar(){$("sidebar").classList.add("open");$("sidebarBackdrop").classList.add("show")}
 function closeSidebar(){$("sidebar").classList.remove("open");$("sidebarBackdrop").classList.remove("show")}
 
-/* ── Detail Panel ── */
+/* ── Detail panel ── */
 function openDetailPanel(id){
   currentChecklistId=id;panelDirty=false;
   $("detailOverlay").classList.add("open");
   document.body.style.overflow="hidden";
+  // Reset title edit state
+  $("detailTitle").classList.remove("editing");$("detailTitleEdit").classList.remove("active");
   loadDetailPanel(id);
 }
 function closeDetailPanel(){
   $("detailOverlay").classList.remove("open");
   document.body.style.overflow="";
-  // Only reload list if something actually changed in the panel
   if(panelDirty)loadChecklists();
   panelDirty=false;
+}
+
+/* ── Inline title editing ── */
+function initTitleEdit(id,currentTitle){
+  const titleEl=$("detailTitle"),editEl=$("detailTitleEdit");
+  titleEl.onclick=()=>{
+    editEl.value=currentTitle;
+    titleEl.classList.add("editing");editEl.classList.add("active");
+    editEl.focus();editEl.select();
+  };
+  const saveTitle=async()=>{
+    const val=editEl.value.trim();
+    titleEl.classList.remove("editing");editEl.classList.remove("active");
+    if(!val||val===currentTitle)return;
+    await sb.from("checklists").update({title:val,updated_by:user.id}).eq("id",id);
+    currentTitle=val;
+    titleEl.textContent=val;
+    panelDirty=true;toast("Titel gespeichert");
+  };
+  editEl.onblur=saveTitle;
+  editEl.onkeydown=e=>{if(e.key==="Enter")saveTitle();if(e.key==="Escape"){titleEl.classList.remove("editing");editEl.classList.remove("active")}};
 }
 
 function owner(){return actingAs||user.id}
@@ -366,9 +586,7 @@ function setActing(id,name){
 }
 
 /* ── Auth ── */
-function initClient(){
-  sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
-}
+function initClient(){sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}})}
 
 async function doLogin(){
   const email=$("loginEmail").value.trim(),pw=$("loginPw").value;
@@ -376,20 +594,10 @@ async function doLogin(){
   const{error}=await sb.auth.signInWithPassword({email,password:pw});
   $("loginBtn").textContent="Anmelden";$("loginBtn").disabled=false;
   if(error){$("loginMsg").textContent=error.message;return}
-  $("loginMsg").textContent="";
-  await loadApp();
+  $("loginMsg").textContent="";await loadApp();
 }
-
-async function doLogout(){
-  await sb.auth.signOut();
-  $("shell").style.display="none";$("loginScreen").classList.add("show");
-  toast("Abgemeldet");
-}
-
-async function checkSession(){
-  const{data}=await sb.auth.getSession();
-  if(data.session)await loadApp();else $("loginScreen").classList.add("show");
-}
+async function doLogout(){await sb.auth.signOut();$("shell").style.display="none";$("loginScreen").classList.add("show");toast("Abgemeldet")}
+async function checkSession(){const{data}=await sb.auth.getSession();if(data.session)await loadApp();else $("loginScreen").classList.add("show")}
 
 async function loadApp(){
   loading(true,"Lade App…");
@@ -410,37 +618,42 @@ async function loadApp(){
 /* ── Checklists ── */
 async function loadChecklists(){
   const box=$("checkList");
-  box.innerHTML=`<div style="display:flex;justify-content:center;padding:40px"><div class="spinner"></div></div>`;
+  box.innerHTML=`<div style="display:flex;justify-content:center;padding:48px"><div class="spinner"></div></div>`;
   const{data,error}=await sb.from("checklists").select("*").is("deleted_at",null).order("created_at",{ascending:false});
   if(error){box.textContent=error.message;return}
-  $("checkSub").textContent=data?.length?`${data.length} Checklist${data.length!==1?"en":""}`:""
-  if(!data?.length){
+  const count=data?.length||0;
+  $("checkSub").textContent=count?`${count} Checklist${count!==1?"en":""}`:""
+  if(!count){
     box.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Noch keine Checklisten</div><div class="empty-sub">Erstelle eine Checkliste aus einer Vorlage.</div><button class="btn btn-primary" id="goTpl">Zu den Vorlagen</button></div>`;
     $("goTpl").onclick=()=>show("Tpl");return;
   }
-
-  // Fetch all items in one query instead of N*2 queries
-  const allCatIds=[];
-  const checklistIds=(data||[]).map(cl=>cl.id);
-  const allCats=await sb.from("checklist_categories").select("id,checklist_id").in("checklist_id",checklistIds);
-  (allCats.data||[]).forEach(c=>allCatIds.push(c.id));
-  const allItems=allCatIds.length?await sb.from("checklist_items").select("category_id,is_checked").in("category_id",allCatIds):{data:[]};
-
-  // Build progress map
-  const catToChecklist={};(allCats.data||[]).forEach(c=>catToChecklist[c.id]=c.checklist_id);
-  const progressMap={};checklistIds.forEach(id=>progressMap[id]={done:0,total:0});
-  (allItems.data||[]).forEach(it=>{
-    const clId=catToChecklist[it.category_id];if(!clId)return;
-    progressMap[clId].total++;
-    if(it.is_checked)progressMap[clId].done++;
-  });
+  // One query for all categories, one for all items
+  const clIds=data.map(cl=>cl.id);
+  const allCats=await sb.from("checklist_categories").select("id,checklist_id").in("checklist_id",clIds);
+  const catIds=(allCats.data||[]).map(c=>c.id);
+  const allItems=catIds.length?await sb.from("checklist_items").select("category_id,is_checked").in("category_id",catIds):{data:[]};
+  const catToCl={};(allCats.data||[]).forEach(c=>catToCl[c.id]=c.checklist_id);
+  const prog={};clIds.forEach(id=>prog[id]={done:0,total:0});
+  (allItems.data||[]).forEach(it=>{const cl=catToCl[it.category_id];if(!cl)return;prog[cl].total++;if(it.is_checked)prog[cl].done++});
 
   const grid=q("div");grid.className="cl-grid";
   (data||[]).forEach(cl=>{
-    const{done,total}=progressMap[cl.id]||{done:0,total:0};
+    const{done,total}=prog[cl.id]||{done:0,total:0};
     const pct=total?Math.round(done/total*100):0;
-    const card=q("div");card.className="cl-card";
-    card.innerHTML=`<div class="cl-ring">${ringSVG(pct)}</div><div class="cl-body"><div class="cl-title">${cl.icon||"📋"} ${escHtml(cl.title)}</div><div class="cl-desc">${escHtml(cl.description||"Keine Beschreibung")}</div><div class="cl-meta">${done}/${total} erledigt</div><div class="cl-actions"><button class="btn-dup">Duplizieren</button><button class="btn-arch">Archivieren</button></div></div>`;
+    const isComplete=total>0&&pct===100;
+    const card=q("div");card.className="cl-card"+(isComplete?" done-card":"");
+    card.innerHTML=`
+      <div class="cl-ring">${ringSVG(pct)}</div>
+      <div class="cl-body">
+        <div class="cl-title">${cl.icon||"📋"} ${escHtml(cl.title)}</div>
+        <div class="cl-desc">${escHtml(cl.description||"Keine Beschreibung")}</div>
+        <div class="cl-meta">
+          <span>${done}/${total} erledigt</span>
+          ${isComplete?'<span class="cl-done-badge"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg>Fertig</span>':''}
+          <span class="cl-date">${fmtDate(cl.created_at)}</span>
+        </div>
+        <div class="cl-actions"><button class="btn-dup">Duplizieren</button><button class="btn-arch">Archivieren</button></div>
+      </div>`;
     card.querySelector(".btn-dup").onclick=e=>{e.stopPropagation();duplicateChecklist(cl.id)};
     card.querySelector(".btn-arch").onclick=e=>{e.stopPropagation();archiveChecklist(cl.id)};
     card.onclick=()=>openDetailPanel(cl.id);
@@ -452,44 +665,61 @@ async function loadChecklists(){
 /* ── Detail panel ── */
 async function loadDetailPanel(id){
   const body=$("detailBody");
-  body.innerHTML=`<div style="display:flex;justify-content:center;padding:40px"><div class="spinner"></div></div>`;
+  body.innerHTML=`<div style="display:flex;justify-content:center;padding:48px"><div class="spinner"></div></div>`;
   const[clRes,catsRes]=await Promise.all([
     sb.from("checklists").select("*").eq("id",id).single(),
     sb.from("checklist_categories").select("*").eq("checklist_id",id).order("sort_order")
   ]);
-  $("detailTitle").textContent=`${clRes.data.icon||"📋"} ${clRes.data.title}`;
+  const cl=clRes.data;
+  $("detailTitle").textContent=`${cl.icon||"📋"} ${cl.title}`;
+  $("detailTitle").title="Titel klicken zum Bearbeiten";
   $("detailArchive").onclick=()=>archiveChecklist(id,true);
+  initTitleEdit(id,cl.title);
 
-  // Fetch all items for all categories in one query
   const catIds=(catsRes.data||[]).map(c=>c.id);
   const itemsRes=catIds.length?await sb.from("checklist_items").select("*").in("category_id",catIds).order("sort_order"):{data:[]};
-  const itemsByCat={};
-  (itemsRes.data||[]).forEach(it=>{(itemsByCat[it.category_id]=itemsByCat[it.category_id]||[]).push(it)});
-
+  const itemsByCat={};(itemsRes.data||[]).forEach(it=>{(itemsByCat[it.category_id]=itemsByCat[it.category_id]||[]).push(it)});
   let total=0,done=0;
   (itemsRes.data||[]).forEach(it=>{total++;if(it.is_checked)done++});
   const pct=total?Math.round(done/total*100):0;
+  const wasComplete=pct===100;
 
-  body.innerHTML=`<div style="margin-bottom:18px"><div class="detail-progress-bar"><div class="bar" style="width:${pct}%"></div></div><div class="detail-progress-label">${done} von ${total} erledigt · ${pct}%</div></div>`;
+  function buildProgress(dn,tot){
+    const p=tot?Math.round(dn/tot*100):0;
+    const complete=p===100&&tot>0;
+    return `<div class="progress-wrap">
+      ${complete?`<div class="complete-banner"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l5 5L20 7"/></svg>Alle Punkte erledigt – super!</div>`:""}
+      <div class="detail-progress-bar"><div class="bar${complete?" complete":""}" style="width:${p}%"></div></div>
+      <div class="detail-progress-label">${dn} von ${tot} erledigt · ${p}%</div>
+    </div>`;
+  }
 
-  // Helper to update progress bar without reloading
+  body.innerHTML=buildProgress(done,total);
+
   function refreshProgress(){
     const allCbs=body.querySelectorAll('input[type=checkbox]');
     const tot=allCbs.length,dn=[...allCbs].filter(c=>c.checked).length;
-    const p=tot?Math.round(dn/tot*100):0;
-    body.querySelector(".bar").style.width=p+"%";
-    body.querySelector(".detail-progress-label").textContent=`${dn} von ${tot} erledigt · ${p}%`;
+    const nowComplete=dn===tot&&tot>0;
+    body.querySelector(".progress-wrap").outerHTML=buildProgress(dn,tot);
+    // Re-insert since outerHTML replaced it
+    body.insertAdjacentHTML("afterbegin",buildProgress(dn,tot));
+    body.querySelector(".progress-wrap+.progress-wrap")?.remove();
+    if(nowComplete&&!wasComplete)celebrate();
   }
 
-  for(const cat of catsRes.data||[]){
+  if(!catsRes.data?.length){
+    body.innerHTML+=`<div class="empty-cat-hint">Noch keine Kategorien. Klicke oben auf „+ Kategorie", um loszulegen.</div>`;
+    return;
+  }
+
+  for(const cat of catsRes.data){
     const block=q("div");block.className="cat-block";
-    const catHead=q("div");catHead.style.cssText="display:flex;align-items:center;gap:8px;margin-bottom:8px";
-    const catTitle=q("h3");catTitle.textContent=cat.title;catTitle.style.cssText="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);flex:1";
-    const catDel=q("button");catDel.className="btn btn-ghost btn-sm";catDel.style.cssText="padding:3px 8px;font-size:12px;color:var(--muted)";catDel.textContent="×";
+    const catHead=q("div");catHead.className="cat-header";
+    const catTitle=q("h3");catTitle.textContent=cat.title;
+    const catDel=q("button");catDel.className="cat-del-btn";catDel.textContent="×";catDel.title="Kategorie löschen";
     catDel.onclick=async()=>{
-      const ok=await showModal({title:`Kategorie "${cat.title}" löschen?`,sub:"Alle Einträge dieser Kategorie werden gelöscht.",confirmLabel:"Löschen",danger:true});
-      if(!ok)return;
-      loading(true,"Lösche…");
+      const ok=await showModal({title:`Kategorie löschen?`,sub:`"${cat.title}" und alle Einträge darin werden gelöscht.`,confirmLabel:"Löschen",danger:true});
+      if(!ok)return;loading(true,"Lösche…");
       await sb.from("checklist_items").delete().eq("category_id",cat.id);
       await sb.from("checklist_categories").delete().eq("id",cat.id);
       loading(false);toast("Kategorie gelöscht");panelDirty=true;loadDetailPanel(id);
@@ -498,57 +728,24 @@ async function loadDetailPanel(id){
 
     const inner=q("div");inner.className="cat-inner";
     const items=itemsByCat[cat.id]||[];
+
     items.forEach(it=>{
-      const row=q("div");row.className="checkrow";
-      const cb=q("input");cb.type="checkbox";cb.checked=it.is_checked;cb.id="cb-"+it.id;
-      const lbl=q("label");lbl.htmlFor="cb-"+it.id;lbl.textContent=it.title;
-      if(it.is_checked)lbl.classList.add("done");
-      // Delete button per item
-      const delBtn=q("button");delBtn.className="item-del";delBtn.innerHTML="×";delBtn.title="Eintrag löschen";
-      delBtn.onclick=async(e)=>{
-        e.stopPropagation();
-        const ok=await showModal({title:`"${it.title}" löschen?`,confirmLabel:"Löschen",danger:true});
-        if(!ok)return;
-        loading(true,"Lösche…");
-        await sb.from("checklist_items").delete().eq("id",it.id);
-        loading(false);toast("Eintrag gelöscht");panelDirty=true;row.remove();refreshProgress();
-      };
-      cb.onchange=async()=>{
-        lbl.classList.toggle("done",cb.checked);
-        await sb.from("checklist_items").update({is_checked:cb.checked,checked_at:cb.checked?new Date().toISOString():null,checked_by:cb.checked?user.id:null}).eq("id",it.id);
-        toast(cb.checked?"✓ Erledigt":"Zurückgesetzt");
-        panelDirty=true;
-        refreshProgress();
-      };
-      row.append(cb,lbl,delBtn);inner.appendChild(row);
+      inner.appendChild(makeCheckrow(it,id,inner,refreshProgress));
     });
+
     const addRow=q("div");addRow.className="inline-add";
     const inp=q("input");inp.placeholder="Neuer Eintrag…";
-    const plusBtn=q("button");plusBtn.innerHTML="+";
+    const plusBtn=q("button");plusBtn.innerHTML=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><path d="M12 5v14M5 12h14"/></svg>`;
     const doAdd=async()=>{
       const title=inp.value.trim();if(!title)return;
+      plusBtn.disabled=true;
       loading(true,"Speichere…");
       const res=await sb.from("checklist_items").insert({category_id:cat.id,title,sort_order:Date.now()%100000,is_checked:false}).select().single();
-      loading(false);if(res.error){alert(res.error.message);return}
+      loading(false);plusBtn.disabled=false;
+      if(res.error){alert(res.error.message);return}
       inp.value="";toast("Eintrag hinzugefügt");panelDirty=true;
-      // Add row inline without full reload
-      const newIt=res.data;
-      const newRow=q("div");newRow.className="checkrow";
-      const ncb=q("input");ncb.type="checkbox";ncb.id="cb-"+newIt.id;
-      const nlbl=q("label");nlbl.htmlFor="cb-"+newIt.id;nlbl.textContent=newIt.title;
-      const nDel=q("button");nDel.className="item-del";nDel.innerHTML="×";nDel.title="Eintrag löschen";
-      nDel.onclick=async(e)=>{
-        e.stopPropagation();
-        const ok=await showModal({title:`"${newIt.title}" löschen?`,confirmLabel:"Löschen",danger:true});
-        if(!ok)return;
-        loading(true,"Lösche…");await sb.from("checklist_items").delete().eq("id",newIt.id);loading(false);toast("Eintrag gelöscht");panelDirty=true;newRow.remove();refreshProgress();
-      };
-      ncb.onchange=async()=>{
-        nlbl.classList.toggle("done",ncb.checked);
-        await sb.from("checklist_items").update({is_checked:ncb.checked,checked_at:ncb.checked?new Date().toISOString():null,checked_by:ncb.checked?user.id:null}).eq("id",newIt.id);
-        toast(ncb.checked?"✓ Erledigt":"Zurückgesetzt");panelDirty=true;refreshProgress();
-      };
-      newRow.append(ncb,nlbl,nDel);inner.insertBefore(newRow,addRow);refreshProgress();
+      inner.insertBefore(makeCheckrow(res.data,id,inner,refreshProgress),addRow);
+      refreshProgress();inp.focus();
     };
     plusBtn.onclick=doAdd;inp.onkeydown=e=>{if(e.key==="Enter")doAdd()};
     addRow.append(inp,plusBtn);inner.appendChild(addRow);
@@ -556,31 +753,48 @@ async function loadDetailPanel(id){
   }
 }
 
+function makeCheckrow(it,checklistId,container,refreshProgress){
+  const row=q("div");row.className="checkrow";
+  const cb=q("input");cb.type="checkbox";cb.checked=it.is_checked;cb.id="cb-"+it.id;
+  const lbl=q("label");lbl.htmlFor="cb-"+it.id;lbl.textContent=it.title;
+  if(it.is_checked)lbl.classList.add("done");
+  const delBtn=q("button");delBtn.className="item-del";delBtn.innerHTML="×";delBtn.title="Löschen";
+  delBtn.onclick=async e=>{
+    e.stopPropagation();
+    const ok=await showModal({title:`Eintrag löschen?`,sub:`"${it.title}"`,confirmLabel:"Löschen",danger:true});
+    if(!ok)return;
+    loading(true,"Lösche…");await sb.from("checklist_items").delete().eq("id",it.id);loading(false);
+    toast("Eintrag gelöscht");panelDirty=true;row.remove();refreshProgress();
+  };
+  cb.onchange=async()=>{
+    lbl.classList.toggle("done",cb.checked);
+    await sb.from("checklist_items").update({is_checked:cb.checked,checked_at:cb.checked?new Date().toISOString():null,checked_by:cb.checked?user.id:null}).eq("id",it.id);
+    toast(cb.checked?"✓ Erledigt":"↩ Zurückgesetzt");panelDirty=true;refreshProgress();
+  };
+  row.append(cb,lbl,delBtn);return row;
+}
+
 async function addChecklistCategory(){
   if(!currentChecklistId)return;
-  const title=await showModal({title:"Neue Kategorie",input:{label:"Name",placeholder:"z.B. Ausrüstung"}});
-  if(!title)return;
-  loading(true,"Speichere…");
+  const title=await showModal({title:"Neue Kategorie",input:{label:"Name",placeholder:"z.B. Dokumente"}});
+  if(!title)return;loading(true,"Speichere…");
   await sb.from("checklist_categories").insert({checklist_id:currentChecklistId,title,sort_order:Date.now()%100000});
   loading(false);toast("Kategorie hinzugefügt");panelDirty=true;loadDetailPanel(currentChecklistId);
 }
 
 async function archiveChecklist(id,fromPanel=false){
-  const ok=await showModal({title:"Archivieren?",sub:"Die Checkliste wird archiviert und ausgeblendet.",confirmLabel:"Archivieren",danger:true});
-  if(!ok)return;
-  loading(true,"Archiviere…");
+  const ok=await showModal({title:"Archivieren?",sub:"Die Checkliste wird ausgeblendet.",confirmLabel:"Archivieren",danger:true});
+  if(!ok)return;loading(true,"Archiviere…");
   await sb.from("checklists").update({archived:true,deleted_at:new Date().toISOString(),deleted_by:user.id}).eq("id",id);
   loading(false);toast("Archiviert");
   if(fromPanel){panelDirty=true;closeDetailPanel()}else loadChecklists();
 }
 
 async function duplicateChecklist(id){
-  // No run() wrapper — contains modal, must stay outside loader
   const c=await sb.from("checklists").select("*").eq("id",id).single();
   if(c.error){alert(c.error.message);return}
   const title=await showModal({title:"Checkliste duplizieren",input:{label:"Name der Kopie",value:c.data.title+" Kopie"}});
-  if(!title)return;
-  loading(true,"Dupliziere…");
+  if(!title)return;loading(true,"Dupliziere…");
   const r=await sb.from("checklists").insert({organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,title,description:c.data.description,icon:c.data.icon}).select().single();
   if(r.error){alert(r.error.message);loading(false);return}
   const cats=await sb.from("checklist_categories").select("*").eq("checklist_id",id).order("sort_order");
@@ -589,13 +803,13 @@ async function duplicateChecklist(id){
     const items=await sb.from("checklist_items").select("*").eq("category_id",cat.id).order("sort_order");
     if(items.data?.length)await sb.from("checklist_items").insert(items.data.map(i=>({category_id:nc.data.id,title:i.title,sort_order:i.sort_order,is_checked:false})));
   }
-  loading(false);await loadChecklists();toast("Dupliziert ✓");
+  loading(false);await loadChecklists();toast("✓ Dupliziert");
 }
 
 /* ── Templates ── */
 async function loadTemplates(){
   const box=$("tplList");
-  box.innerHTML=`<div style="display:flex;justify-content:center;padding:40px"><div class="spinner"></div></div>`;
+  box.innerHTML=`<div style="display:flex;justify-content:center;padding:48px"><div class="spinner"></div></div>`;
   const{data,error}=await sb.from("templates").select("*").is("deleted_at",null).order("title");
   if(error){box.textContent=error.message;return}
   if(!data?.length){box.innerHTML=`<div class="empty-state"><div class="empty-icon">📂</div><div class="empty-title">Noch keine Vorlagen</div><div class="empty-sub">Erstelle eine eigene Vorlage oder füge Standardvorlagen hinzu.</div></div>`;return}
@@ -603,11 +817,11 @@ async function loadTemplates(){
   (data||[]).forEach(t=>{
     const card=q("div");card.className="tpl-card";
     card.innerHTML=`<div class="tpl-card-head"><span class="tpl-icon">${t.icon||"📂"}</span><span class="tpl-name">${escHtml(t.title)}</span></div><div class="tpl-desc">${escHtml(t.description||"")}</div><div class="tpl-actions"></div>`;
-    const actions=card.querySelector(".tpl-actions");
+    const a=card.querySelector(".tpl-actions");
     const b1=q("button");b1.className="btn btn-primary btn-sm";b1.textContent="Checkliste erstellen";b1.onclick=()=>makeChecklist(t);
     const b2=q("button");b2.className="btn btn-ghost btn-sm";b2.textContent="Bearbeiten";b2.onclick=()=>openTemplateEditor(t.id);
     const b3=q("button");b3.className="btn btn-danger btn-sm";b3.textContent="Löschen";b3.onclick=()=>deleteTemplate(t.id);
-    actions.append(b1,b2,b3);grid.appendChild(card);
+    a.append(b1,b2,b3);grid.appendChild(card);
   });
   box.innerHTML="";box.appendChild(grid);
 }
@@ -628,18 +842,19 @@ async function openTemplateEditor(id){
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
       <button class="btn btn-primary btn-sm" id="saveTpl">Speichern</button>
-      <button class="btn btn-ghost btn-sm" id="addCat">+ Kategorie hinzufügen</button>
+      <button class="btn btn-ghost btn-sm" id="addCat">+ Kategorie</button>
       <button class="btn btn-ghost btn-sm" id="closeTplEditor">Schliessen</button>
     </div>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Erstelle zuerst Kategorien, dann Punkte direkt darunter.</p>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Erst Kategorien erstellen, dann Punkte hinzufügen.</p>
     <div id="edCats"></div>`;
-    $("saveTpl").onclick=()=>run("Speichere…",saveTemplateMeta);
+    $("saveTpl").onclick=()=>run2("Speichere…",saveTemplateMeta);
     $("addCat").onclick=()=>addTemplateCategory();
     $("closeTplEditor").onclick=()=>wrap.classList.remove("show");
     if(id){const cats=await sb.from("template_categories").select("*").eq("template_id",id).order("sort_order");for(const c of cats.data||[])await renderTplCategory(c)}
     wrap.scrollIntoView({behavior:"smooth",block:"start"});
   }finally{loading(false)}
 }
+async function run2(label,fn){loading(true,label);try{return await fn()}catch(e){alert(e.message||e)}finally{loading(false)}}
 
 async function saveTemplateMeta(){
   const data={organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,title:$("edTitle").value.trim(),description:$("edDesc").value.trim(),icon:$("edIcon").value.trim()||"📂",is_global:isSuper};
@@ -652,11 +867,9 @@ async function saveTemplateMeta(){
 async function addTemplateCategory(){
   if(!currentTpl){const ok=await saveTemplateMeta();if(!ok||!currentTpl)return}
   const title=await showModal({title:"Neue Kategorie",input:{label:"Name",placeholder:"z.B. Ausrüstung"}});
-  if(!title)return;
-  loading(true,"Speichere…");
+  if(!title)return;loading(true,"Speichere…");
   const r=await sb.from("template_categories").insert({template_id:currentTpl,title,sort_order:Date.now()%100000}).select().single();
-  loading(false);
-  if(r.error){alert(r.error.message);return}
+  loading(false);if(r.error){alert(r.error.message);return}
   await renderTplCategory(r.data);toast("Kategorie hinzugefügt");
 }
 
@@ -665,12 +878,12 @@ async function renderTplCategory(c){
   wrap.innerHTML=`<div class="cat-editor-head"><h4>${escHtml(c.title)}</h4></div><div id="tplitems-${c.id}"></div>`;
   const del=q("button");del.className="btn btn-danger btn-sm";del.textContent="Löschen";
   del.onclick=async()=>{
-    const ok=await showModal({title:`Kategorie "${c.title}" löschen?`,confirmLabel:"Löschen",danger:true});
+    const ok=await showModal({title:`"${c.title}" löschen?`,confirmLabel:"Löschen",danger:true});
     if(!ok)return;loading(true,"Lösche…");await sb.from("template_categories").delete().eq("id",c.id);loading(false);wrap.remove();toast("Kategorie gelöscht");
   };
   wrap.querySelector(".cat-editor-head").appendChild(del);
   const addRow=q("div");addRow.className="inline-add";addRow.style.cssText="border:1px solid var(--border);border-radius:10px;padding:6px 10px;margin-top:8px";
-  const inp=q("input");inp.placeholder="Neuer Punkt in "+c.title;
+  const inp=q("input");inp.placeholder="Neuer Punkt…";
   const plus=q("button");plus.innerHTML="+";
   const doAdd=async()=>{
     const title=inp.value.trim();if(!title){toast("Bitte Punkt eingeben");return}
@@ -698,18 +911,15 @@ async function loadTplItems(catId){
 }
 
 async function deleteTemplate(id){
-  const ok=await showModal({title:"Vorlage löschen?",sub:"Diese Aktion kann nicht rückgängig gemacht werden.",confirmLabel:"Löschen",danger:true});
-  if(!ok)return;
-  loading(true,"Lösche…");
+  const ok=await showModal({title:"Vorlage löschen?",sub:"Kann nicht rückgängig gemacht werden.",confirmLabel:"Löschen",danger:true});
+  if(!ok)return;loading(true,"Lösche…");
   await sb.from("templates").update({deleted_at:new Date().toISOString(),deleted_by:user.id}).eq("id",id);
   loading(false);await loadTemplates();$("tplEditorWrap").classList.remove("show");toast("Vorlage gelöscht");
 }
 
 async function makeChecklist(t){
-  // No run() wrapper — contains modal
   const title=await showModal({title:"Checkliste erstellen",input:{label:"Titel",value:t.title+" "+new Date().toLocaleDateString("de-CH")}});
-  if(!title)return;
-  loading(true,"Erstelle…");
+  if(!title)return;loading(true,"Erstelle…");
   const r=await sb.from("checklists").insert({organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,template_id:t.id,title,description:t.description,icon:t.icon}).select().single();
   if(r.error){alert(r.error.message);loading(false);return}
   const cats=await sb.from("template_categories").select("*").eq("template_id",t.id).order("sort_order");
@@ -753,25 +963,14 @@ async function seedStandardTemplates(){
   for(const t of templates)await createTemplateFromSeed(t);
   loading(false);await loadTemplates();toast("Standardvorlagen ergänzt");
 }
-
 async function createTemplateFromSeed(t){
   const r=await sb.from("templates").insert({organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,title:t[0],description:t[1],icon:t[2],is_global:isSuper}).select().single();
-  if(r.error)return;
-  let cur=null,n=10,i=10;
+  if(r.error)return;let cur=null,n=10,i=10;
   for(const line of t[3].split(/\n/).map(x=>x.trim()).filter(Boolean)){
     if(line.startsWith("-")){if(cur)await sb.from("template_items").insert({category_id:cur,title:line.replace(/^-\s*/,""),sort_order:i});i+=10}
     else{const c=await sb.from("template_categories").insert({template_id:r.data.id,title:line,sort_order:n}).select().single();cur=c.data.id;n+=10;i=10}
   }
 }
-
-/* ── XSS helpers ── */
-function escHtml(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
-function escAttr(s){return String(s).replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
-
-/* ── CSS for item delete button ── */
-const style=document.createElement("style");
-style.textContent=`.item-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:0 4px;line-height:1;opacity:0;transition:opacity .15s,color .15s;flex-shrink:0}.checkrow:hover .item-del{opacity:1}.item-del:hover{color:var(--danger)}`;
-document.head.appendChild(style);
 
 /* ── Event wiring ── */
 document.addEventListener("DOMContentLoaded",()=>{
@@ -797,7 +996,6 @@ document.addEventListener("DOMContentLoaded",()=>{
   $("detailOverlay").onclick=e=>{if(e.target===$("detailOverlay"))closeDetailPanel()};
   checkSession();
 });
-
 if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js");
 </script>
 </body>
