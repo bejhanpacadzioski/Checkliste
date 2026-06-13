@@ -290,16 +290,20 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 <div id="toast"></div>
 <div id="loader"><div class="loader-box"><div class="spinner"></div><span id="loaderText">Lade…</span></div></div>
 
+
 <script>
 const SUPABASE_URL="https://hcxqhyswdaycfnxivhnm.supabase.co";
 const SUPABASE_KEY="sb_publishable_WwSZT4nIB1hRbDhxF2uZpg_bxnq2BM2";
-let sb,user,orgId,isSuper=false,actingAs=null,currentTpl=null,currentChecklistId=null;
+let sb,user,orgId,isSuper=false,actingAs=null,currentTpl=null,currentChecklistId=null,panelDirty=false;
 const $=id=>document.getElementById(id),q=t=>document.createElement(t);
 
+/* ── Toast ── */
 function toast(msg,dur=2200){const el=$("toast");el.textContent=msg;el.classList.add("show");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),dur)}
-function loading(on,txt="Lade…"){$("loaderText").textContent=txt;$("loader").classList.toggle("show",on)}
-async function run(label,fn){loading(true,label);try{return await fn()}catch(e){alert(e.message||e);throw e}finally{loading(false)}}
 
+/* ── Loader: only for non-modal ops ── */
+function loading(on,txt="Lade…"){$("loaderText").textContent=txt;$("loader").classList.toggle("show",on)}
+
+/* ── Modal (replaces prompt/confirm — never wrap in loading()) ── */
 function showModal({title,sub="",input=null,danger=false,confirmLabel="OK"}){
   return new Promise(resolve=>{
     $("modalTitle").textContent=title;$("modalSub").textContent=sub;
@@ -312,15 +316,18 @@ function showModal({title,sub="",input=null,danger=false,confirmLabel="OK"}){
     const close=val=>{$("modalOverlay").classList.remove("open");$("modalConfirm").onclick=null;$("modalCancel").onclick=null;resolve(val)};
     $("modalConfirm").onclick=()=>close(input?$("modalInput").value.trim():true);
     $("modalCancel").onclick=()=>close(null);
+    $("modalInput").onkeydown=e=>{if(e.key==="Enter")close(input?$("modalInput").value.trim():true)};
   })
 }
 
+/* ── Progress ring ── */
 function ringSVG(pct,size=52){
   const r=20,c=2*Math.PI*r,offset=c-(pct/100)*c;
   const color=pct===100?"#22c55e":"#6366f1";
-  return `<svg width="${size}" height="${size}" viewBox="0 0 48 48"><circle cx="24" cy="24" r="${r}" fill="none" stroke="#e2e8f0" stroke-width="4"/><circle cx="24" cy="24" r="${r}" fill="none" stroke="${color}" stroke-width="4" stroke-dasharray="${c}" stroke-dashoffset="${offset}" stroke-linecap="round" transform="rotate(-90 24 24)"/><text x="24" y="28" text-anchor="middle" font-size="11" font-weight="700" fill="${color}" font-family="Inter,sans-serif">${pct}%</text></svg>`
+  return `<svg width="${size}" height="${size}" viewBox="0 0 48 48"><circle cx="24" cy="24" r="${r}" fill="none" stroke="#e2e8f0" stroke-width="4"/><circle cx="24" cy="24" r="${r}" fill="none" stroke="${color}" stroke-width="4" stroke-dasharray="${c.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}" stroke-linecap="round" transform="rotate(-90 24 24)"/><text x="24" y="28" text-anchor="middle" font-size="11" font-weight="700" fill="${color}" font-family="Inter,sans-serif">${pct}%</text></svg>`
 }
 
+/* ── Navigation ── */
 function show(v){
   ["Check","Tpl","Admin"].forEach(x=>{
     $("v"+x).style.display=x===v?"":"none";
@@ -331,11 +338,13 @@ function show(v){
   if(v==="Admin")loadUsers();
 }
 
+/* ── Sidebar (mobile) ── */
 function openSidebar(){$("sidebar").classList.add("open");$("sidebarBackdrop").classList.add("show")}
 function closeSidebar(){$("sidebar").classList.remove("open");$("sidebarBackdrop").classList.remove("show")}
 
+/* ── Detail Panel ── */
 function openDetailPanel(id){
-  currentChecklistId=id;
+  currentChecklistId=id;panelDirty=false;
   $("detailOverlay").classList.add("open");
   document.body.style.overflow="hidden";
   loadDetailPanel(id);
@@ -343,7 +352,9 @@ function openDetailPanel(id){
 function closeDetailPanel(){
   $("detailOverlay").classList.remove("open");
   document.body.style.overflow="";
-  loadChecklists();
+  // Only reload list if something actually changed in the panel
+  if(panelDirty)loadChecklists();
+  panelDirty=false;
 }
 
 function owner(){return actingAs||user.id}
@@ -354,23 +365,31 @@ function setActing(id,name){
   loadChecklists();loadTemplates();
 }
 
+/* ── Auth ── */
 function initClient(){
   sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 }
 
 async function doLogin(){
   const email=$("loginEmail").value.trim(),pw=$("loginPw").value;
-  $("loginBtn").textContent="Anmelden…";
+  $("loginBtn").textContent="Anmelden…";$("loginBtn").disabled=true;
   const{error}=await sb.auth.signInWithPassword({email,password:pw});
-  $("loginBtn").textContent="Anmelden";
+  $("loginBtn").textContent="Anmelden";$("loginBtn").disabled=false;
   if(error){$("loginMsg").textContent=error.message;return}
   $("loginMsg").textContent="";
   await loadApp();
 }
 
-async function doLogout(){await sb.auth.signOut();$("shell").style.display="none";$("loginScreen").classList.add("show");toast("Abgemeldet")}
+async function doLogout(){
+  await sb.auth.signOut();
+  $("shell").style.display="none";$("loginScreen").classList.add("show");
+  toast("Abgemeldet");
+}
 
-async function checkSession(){const{data}=await sb.auth.getSession();if(data.session)await loadApp();else $("loginScreen").classList.add("show")}
+async function checkSession(){
+  const{data}=await sb.auth.getSession();
+  if(data.session)await loadApp();else $("loginScreen").classList.add("show");
+}
 
 async function loadApp(){
   loading(true,"Lade App…");
@@ -384,10 +403,11 @@ async function loadApp(){
     orgId=m.data?.[0]?.organization_id;
     isSuper=(m.data||[]).some(x=>x.role==="super_admin");
     [$("bAdmin"),$("bbAdmin")].forEach(el=>{if(el)el.classList.toggle("hidden",!isSuper)});
-    await loadTemplates();await loadChecklists();
+    await Promise.all([loadTemplates(),loadChecklists()]);
   }finally{loading(false)}
 }
 
+/* ── Checklists ── */
 async function loadChecklists(){
   const box=$("checkList");
   box.innerHTML=`<div style="display:flex;justify-content:center;padding:40px"><div class="spinner"></div></div>`;
@@ -398,22 +418,30 @@ async function loadChecklists(){
     box.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Noch keine Checklisten</div><div class="empty-sub">Erstelle eine Checkliste aus einer Vorlage.</div><button class="btn btn-primary" id="goTpl">Zu den Vorlagen</button></div>`;
     $("goTpl").onclick=()=>show("Tpl");return;
   }
-  const progressMap={};
-  await Promise.all((data||[]).map(async cl=>{
-    const cats=await sb.from("checklist_categories").select("id").eq("checklist_id",cl.id);
-    if(!cats.data?.length){progressMap[cl.id]={done:0,total:0};return}
-    const catIds=cats.data.map(c=>c.id);
-    const items=await sb.from("checklist_items").select("is_checked").in("category_id",catIds);
-    const total=items.data?.length||0,done=(items.data||[]).filter(i=>i.is_checked).length;
-    progressMap[cl.id]={done,total};
-  }));
+
+  // Fetch all items in one query instead of N*2 queries
+  const allCatIds=[];
+  const checklistIds=(data||[]).map(cl=>cl.id);
+  const allCats=await sb.from("checklist_categories").select("id,checklist_id").in("checklist_id",checklistIds);
+  (allCats.data||[]).forEach(c=>allCatIds.push(c.id));
+  const allItems=allCatIds.length?await sb.from("checklist_items").select("category_id,is_checked").in("category_id",allCatIds):{data:[]};
+
+  // Build progress map
+  const catToChecklist={};(allCats.data||[]).forEach(c=>catToChecklist[c.id]=c.checklist_id);
+  const progressMap={};checklistIds.forEach(id=>progressMap[id]={done:0,total:0});
+  (allItems.data||[]).forEach(it=>{
+    const clId=catToChecklist[it.category_id];if(!clId)return;
+    progressMap[clId].total++;
+    if(it.is_checked)progressMap[clId].done++;
+  });
+
   const grid=q("div");grid.className="cl-grid";
   (data||[]).forEach(cl=>{
     const{done,total}=progressMap[cl.id]||{done:0,total:0};
     const pct=total?Math.round(done/total*100):0;
     const card=q("div");card.className="cl-card";
-    card.innerHTML=`<div class="cl-ring">${ringSVG(pct)}</div><div class="cl-body"><div class="cl-title">${cl.icon||"📋"} ${cl.title}</div><div class="cl-desc">${cl.description||"Keine Beschreibung"}</div><div class="cl-meta">${done}/${total} erledigt</div><div class="cl-actions"><button class="btn-dup">Duplizieren</button><button class="btn-arch">Archivieren</button></div></div>`;
-    card.querySelector(".btn-dup").onclick=e=>{e.stopPropagation();run("Dupliziere…",()=>duplicateChecklist(cl.id))};
+    card.innerHTML=`<div class="cl-ring">${ringSVG(pct)}</div><div class="cl-body"><div class="cl-title">${cl.icon||"📋"} ${escHtml(cl.title)}</div><div class="cl-desc">${escHtml(cl.description||"Keine Beschreibung")}</div><div class="cl-meta">${done}/${total} erledigt</div><div class="cl-actions"><button class="btn-dup">Duplizieren</button><button class="btn-arch">Archivieren</button></div></div>`;
+    card.querySelector(".btn-dup").onclick=e=>{e.stopPropagation();duplicateChecklist(cl.id)};
     card.querySelector(".btn-arch").onclick=e=>{e.stopPropagation();archiveChecklist(cl.id)};
     card.onclick=()=>openDetailPanel(cl.id);
     grid.appendChild(card);
@@ -421,42 +449,78 @@ async function loadChecklists(){
   box.innerHTML="";box.appendChild(grid);
 }
 
+/* ── Detail panel ── */
 async function loadDetailPanel(id){
   const body=$("detailBody");
   body.innerHTML=`<div style="display:flex;justify-content:center;padding:40px"><div class="spinner"></div></div>`;
-  const c=await sb.from("checklists").select("*").eq("id",id).single();
-  $("detailTitle").textContent=`${c.data.icon||"📋"} ${c.data.title}`;
+  const[clRes,catsRes]=await Promise.all([
+    sb.from("checklists").select("*").eq("id",id).single(),
+    sb.from("checklist_categories").select("*").eq("checklist_id",id).order("sort_order")
+  ]);
+  $("detailTitle").textContent=`${clRes.data.icon||"📋"} ${clRes.data.title}`;
   $("detailArchive").onclick=()=>archiveChecklist(id,true);
-  const cats=await sb.from("checklist_categories").select("*").eq("checklist_id",id).order("sort_order");
-  let total=0,done=0;const catItems=[];
-  for(const cat of cats.data||[]){
-    const items=await sb.from("checklist_items").select("*").eq("category_id",cat.id).order("sort_order");
-    catItems.push({cat,items:items.data||[]});
-    total+=items.data?.length||0;
-    done+=(items.data||[]).filter(i=>i.is_checked).length;
-  }
+
+  // Fetch all items for all categories in one query
+  const catIds=(catsRes.data||[]).map(c=>c.id);
+  const itemsRes=catIds.length?await sb.from("checklist_items").select("*").in("category_id",catIds).order("sort_order"):{data:[]};
+  const itemsByCat={};
+  (itemsRes.data||[]).forEach(it=>{(itemsByCat[it.category_id]=itemsByCat[it.category_id]||[]).push(it)});
+
+  let total=0,done=0;
+  (itemsRes.data||[]).forEach(it=>{total++;if(it.is_checked)done++});
   const pct=total?Math.round(done/total*100):0;
+
   body.innerHTML=`<div style="margin-bottom:18px"><div class="detail-progress-bar"><div class="bar" style="width:${pct}%"></div></div><div class="detail-progress-label">${done} von ${total} erledigt · ${pct}%</div></div>`;
-  for(const{cat,items}of catItems){
+
+  // Helper to update progress bar without reloading
+  function refreshProgress(){
+    const allCbs=body.querySelectorAll('input[type=checkbox]');
+    const tot=allCbs.length,dn=[...allCbs].filter(c=>c.checked).length;
+    const p=tot?Math.round(dn/tot*100):0;
+    body.querySelector(".bar").style.width=p+"%";
+    body.querySelector(".detail-progress-label").textContent=`${dn} von ${tot} erledigt · ${p}%`;
+  }
+
+  for(const cat of catsRes.data||[]){
     const block=q("div");block.className="cat-block";
+    const catHead=q("div");catHead.style.cssText="display:flex;align-items:center;gap:8px;margin-bottom:8px";
+    const catTitle=q("h3");catTitle.textContent=cat.title;catTitle.style.cssText="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);flex:1";
+    const catDel=q("button");catDel.className="btn btn-ghost btn-sm";catDel.style.cssText="padding:3px 8px;font-size:12px;color:var(--muted)";catDel.textContent="×";
+    catDel.onclick=async()=>{
+      const ok=await showModal({title:`Kategorie "${cat.title}" löschen?`,sub:"Alle Einträge dieser Kategorie werden gelöscht.",confirmLabel:"Löschen",danger:true});
+      if(!ok)return;
+      loading(true,"Lösche…");
+      await sb.from("checklist_items").delete().eq("category_id",cat.id);
+      await sb.from("checklist_categories").delete().eq("id",cat.id);
+      loading(false);toast("Kategorie gelöscht");panelDirty=true;loadDetailPanel(id);
+    };
+    catHead.append(catTitle,catDel);block.appendChild(catHead);
+
     const inner=q("div");inner.className="cat-inner";
-    block.innerHTML=`<h3>${cat.title}</h3>`;
+    const items=itemsByCat[cat.id]||[];
     items.forEach(it=>{
       const row=q("div");row.className="checkrow";
       const cb=q("input");cb.type="checkbox";cb.checked=it.is_checked;cb.id="cb-"+it.id;
       const lbl=q("label");lbl.htmlFor="cb-"+it.id;lbl.textContent=it.title;
       if(it.is_checked)lbl.classList.add("done");
+      // Delete button per item
+      const delBtn=q("button");delBtn.className="item-del";delBtn.innerHTML="×";delBtn.title="Eintrag löschen";
+      delBtn.onclick=async(e)=>{
+        e.stopPropagation();
+        const ok=await showModal({title:`"${it.title}" löschen?`,confirmLabel:"Löschen",danger:true});
+        if(!ok)return;
+        loading(true,"Lösche…");
+        await sb.from("checklist_items").delete().eq("id",it.id);
+        loading(false);toast("Eintrag gelöscht");panelDirty=true;row.remove();refreshProgress();
+      };
       cb.onchange=async()=>{
         lbl.classList.toggle("done",cb.checked);
         await sb.from("checklist_items").update({is_checked:cb.checked,checked_at:cb.checked?new Date().toISOString():null,checked_by:cb.checked?user.id:null}).eq("id",it.id);
         toast(cb.checked?"✓ Erledigt":"Zurückgesetzt");
-        const allCbs=body.querySelectorAll('input[type=checkbox]');
-        const tot=allCbs.length,dn=[...allCbs].filter(c=>c.checked).length;
-        const p=tot?Math.round(dn/tot*100):0;
-        body.querySelector(".bar").style.width=p+"%";
-        body.querySelector(".detail-progress-label").textContent=`${dn} von ${tot} erledigt · ${p}%`;
+        panelDirty=true;
+        refreshProgress();
       };
-      row.append(cb,lbl);inner.appendChild(row);
+      row.append(cb,lbl,delBtn);inner.appendChild(row);
     });
     const addRow=q("div");addRow.className="inline-add";
     const inp=q("input");inp.placeholder="Neuer Eintrag…";
@@ -464,8 +528,27 @@ async function loadDetailPanel(id){
     const doAdd=async()=>{
       const title=inp.value.trim();if(!title)return;
       loading(true,"Speichere…");
-      await sb.from("checklist_items").insert({category_id:cat.id,title,sort_order:Date.now()%100000,is_checked:false});
-      loading(false);inp.value="";toast("Eintrag hinzugefügt");loadDetailPanel(id);
+      const res=await sb.from("checklist_items").insert({category_id:cat.id,title,sort_order:Date.now()%100000,is_checked:false}).select().single();
+      loading(false);if(res.error){alert(res.error.message);return}
+      inp.value="";toast("Eintrag hinzugefügt");panelDirty=true;
+      // Add row inline without full reload
+      const newIt=res.data;
+      const newRow=q("div");newRow.className="checkrow";
+      const ncb=q("input");ncb.type="checkbox";ncb.id="cb-"+newIt.id;
+      const nlbl=q("label");nlbl.htmlFor="cb-"+newIt.id;nlbl.textContent=newIt.title;
+      const nDel=q("button");nDel.className="item-del";nDel.innerHTML="×";nDel.title="Eintrag löschen";
+      nDel.onclick=async(e)=>{
+        e.stopPropagation();
+        const ok=await showModal({title:`"${newIt.title}" löschen?`,confirmLabel:"Löschen",danger:true});
+        if(!ok)return;
+        loading(true,"Lösche…");await sb.from("checklist_items").delete().eq("id",newIt.id);loading(false);toast("Eintrag gelöscht");panelDirty=true;newRow.remove();refreshProgress();
+      };
+      ncb.onchange=async()=>{
+        nlbl.classList.toggle("done",ncb.checked);
+        await sb.from("checklist_items").update({is_checked:ncb.checked,checked_at:ncb.checked?new Date().toISOString():null,checked_by:ncb.checked?user.id:null}).eq("id",newIt.id);
+        toast(ncb.checked?"✓ Erledigt":"Zurückgesetzt");panelDirty=true;refreshProgress();
+      };
+      newRow.append(ncb,nlbl,nDel);inner.insertBefore(newRow,addRow);refreshProgress();
     };
     plusBtn.onclick=doAdd;inp.onkeydown=e=>{if(e.key==="Enter")doAdd()};
     addRow.append(inp,plusBtn);inner.appendChild(addRow);
@@ -479,7 +562,7 @@ async function addChecklistCategory(){
   if(!title)return;
   loading(true,"Speichere…");
   await sb.from("checklist_categories").insert({checklist_id:currentChecklistId,title,sort_order:Date.now()%100000});
-  loading(false);toast("Kategorie hinzugefügt");loadDetailPanel(currentChecklistId);
+  loading(false);toast("Kategorie hinzugefügt");panelDirty=true;loadDetailPanel(currentChecklistId);
 }
 
 async function archiveChecklist(id,fromPanel=false){
@@ -488,11 +571,13 @@ async function archiveChecklist(id,fromPanel=false){
   loading(true,"Archiviere…");
   await sb.from("checklists").update({archived:true,deleted_at:new Date().toISOString(),deleted_by:user.id}).eq("id",id);
   loading(false);toast("Archiviert");
-  if(fromPanel)closeDetailPanel();else loadChecklists();
+  if(fromPanel){panelDirty=true;closeDetailPanel()}else loadChecklists();
 }
 
 async function duplicateChecklist(id){
+  // No run() wrapper — contains modal, must stay outside loader
   const c=await sb.from("checklists").select("*").eq("id",id).single();
+  if(c.error){alert(c.error.message);return}
   const title=await showModal({title:"Checkliste duplizieren",input:{label:"Name der Kopie",value:c.data.title+" Kopie"}});
   if(!title)return;
   loading(true,"Dupliziere…");
@@ -504,9 +589,10 @@ async function duplicateChecklist(id){
     const items=await sb.from("checklist_items").select("*").eq("category_id",cat.id).order("sort_order");
     if(items.data?.length)await sb.from("checklist_items").insert(items.data.map(i=>({category_id:nc.data.id,title:i.title,sort_order:i.sort_order,is_checked:false})));
   }
-  loading(false);await loadChecklists();toast("Dupliziert");
+  loading(false);await loadChecklists();toast("Dupliziert ✓");
 }
 
+/* ── Templates ── */
 async function loadTemplates(){
   const box=$("tplList");
   box.innerHTML=`<div style="display:flex;justify-content:center;padding:40px"><div class="spinner"></div></div>`;
@@ -516,11 +602,11 @@ async function loadTemplates(){
   const grid=q("div");grid.className="tpl-grid";
   (data||[]).forEach(t=>{
     const card=q("div");card.className="tpl-card";
-    card.innerHTML=`<div class="tpl-card-head"><span class="tpl-icon">${t.icon||"📂"}</span><span class="tpl-name">${t.title}</span></div><div class="tpl-desc">${t.description||""}</div><div class="tpl-actions"></div>`;
+    card.innerHTML=`<div class="tpl-card-head"><span class="tpl-icon">${t.icon||"📂"}</span><span class="tpl-name">${escHtml(t.title)}</span></div><div class="tpl-desc">${escHtml(t.description||"")}</div><div class="tpl-actions"></div>`;
     const actions=card.querySelector(".tpl-actions");
-    const b1=q("button");b1.className="btn btn-primary btn-sm";b1.textContent="Checkliste erstellen";b1.onclick=()=>run("Erstelle…",()=>makeChecklist(t));
+    const b1=q("button");b1.className="btn btn-primary btn-sm";b1.textContent="Checkliste erstellen";b1.onclick=()=>makeChecklist(t);
     const b2=q("button");b2.className="btn btn-ghost btn-sm";b2.textContent="Bearbeiten";b2.onclick=()=>openTemplateEditor(t.id);
-    const b3=q("button");b3.className="btn btn-danger btn-sm";b3.textContent="Löschen";b3.onclick=()=>run("Lösche…",()=>deleteTemplate(t.id));
+    const b3=q("button");b3.className="btn btn-danger btn-sm";b3.textContent="Löschen";b3.onclick=()=>deleteTemplate(t.id);
     actions.append(b1,b2,b3);grid.appendChild(card);
   });
   box.innerHTML="";box.appendChild(grid);
@@ -536,9 +622,9 @@ async function openTemplateEditor(id){
     if(id){const r=await sb.from("templates").select("*").eq("id",id).single();tpl=r.data}
     box.innerHTML=`<h2>${id?"Vorlage bearbeiten":"Neue Vorlage"}</h2>
     <div style="display:grid;gap:4px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));margin-bottom:14px">
-      <div class="form-group"><label>Titel</label><input id="edTitle" value="${(tpl.title||"").replaceAll('"','&quot;')}"></div>
-      <div class="form-group"><label>Beschreibung</label><input id="edDesc" value="${(tpl.description||"").replaceAll('"','&quot;')}"></div>
-      <div class="form-group"><label>Icon</label><input id="edIcon" value="${tpl.icon||"📂"}" style="max-width:80px"></div>
+      <div class="form-group"><label>Titel</label><input id="edTitle" value="${escAttr(tpl.title||"")}"></div>
+      <div class="form-group"><label>Beschreibung</label><input id="edDesc" value="${escAttr(tpl.description||"")}"></div>
+      <div class="form-group"><label>Icon</label><input id="edIcon" value="${escAttr(tpl.icon||"📂")}" style="max-width:80px"></div>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
       <button class="btn btn-primary btn-sm" id="saveTpl">Speichern</button>
@@ -567,14 +653,16 @@ async function addTemplateCategory(){
   if(!currentTpl){const ok=await saveTemplateMeta();if(!ok||!currentTpl)return}
   const title=await showModal({title:"Neue Kategorie",input:{label:"Name",placeholder:"z.B. Ausrüstung"}});
   if(!title)return;
+  loading(true,"Speichere…");
   const r=await sb.from("template_categories").insert({template_id:currentTpl,title,sort_order:Date.now()%100000}).select().single();
+  loading(false);
   if(r.error){alert(r.error.message);return}
   await renderTplCategory(r.data);toast("Kategorie hinzugefügt");
 }
 
 async function renderTplCategory(c){
   const wrap=q("div");wrap.className="cat-editor";wrap.id="tplcat-"+c.id;
-  wrap.innerHTML=`<div class="cat-editor-head"><h4>${c.title}</h4></div><div id="tplitems-${c.id}"></div>`;
+  wrap.innerHTML=`<div class="cat-editor-head"><h4>${escHtml(c.title)}</h4></div><div id="tplitems-${c.id}"></div>`;
   const del=q("button");del.className="btn btn-danger btn-sm";del.textContent="Löschen";
   del.onclick=async()=>{
     const ok=await showModal({title:`Kategorie "${c.title}" löschen?`,confirmLabel:"Löschen",danger:true});
@@ -601,7 +689,10 @@ async function loadTplItems(catId){
     const row=q("div");row.style.cssText="display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--border)";
     const sp=q("span");sp.textContent="• "+it.title;sp.style.flex="1";sp.style.fontSize="14px";
     const del=q("button");del.className="btn btn-ghost btn-sm";del.textContent="×";del.style.cssText="padding:4px 8px;color:var(--danger);border-color:#fca5a5";
-    del.onclick=async()=>{loading(true,"Lösche…");await sb.from("template_items").delete().eq("id",it.id);loading(false);toast("Punkt gelöscht");loadTplItems(catId)};
+    del.onclick=async()=>{
+      const ok=await showModal({title:`"${it.title}" löschen?`,confirmLabel:"Löschen",danger:true});
+      if(!ok)return;loading(true,"Lösche…");await sb.from("template_items").delete().eq("id",it.id);loading(false);toast("Punkt gelöscht");row.remove();
+    };
     row.append(sp,del);box.appendChild(row);
   });
 }
@@ -609,11 +700,13 @@ async function loadTplItems(catId){
 async function deleteTemplate(id){
   const ok=await showModal({title:"Vorlage löschen?",sub:"Diese Aktion kann nicht rückgängig gemacht werden.",confirmLabel:"Löschen",danger:true});
   if(!ok)return;
+  loading(true,"Lösche…");
   await sb.from("templates").update({deleted_at:new Date().toISOString(),deleted_by:user.id}).eq("id",id);
-  await loadTemplates();$("tplEditorWrap").classList.remove("show");toast("Vorlage gelöscht");
+  loading(false);await loadTemplates();$("tplEditorWrap").classList.remove("show");toast("Vorlage gelöscht");
 }
 
 async function makeChecklist(t){
+  // No run() wrapper — contains modal
   const title=await showModal({title:"Checkliste erstellen",input:{label:"Titel",value:t.title+" "+new Date().toLocaleDateString("de-CH")}});
   if(!title)return;
   loading(true,"Erstelle…");
@@ -628,6 +721,7 @@ async function makeChecklist(t){
   loading(false);await loadChecklists();show("Check");openDetailPanel(r.data.id);toast("Checkliste erstellt");
 }
 
+/* ── Admin ── */
 async function loadUsers(){
   const box=$("users");box.innerHTML="";
   const{data,error}=await sb.from("profiles").select("*").order("display_name");
@@ -635,7 +729,7 @@ async function loadUsers(){
   (data||[]).forEach(u=>{
     const row=q("div");row.className="user-row";
     const av=q("div");av.className="user-avatar";av.textContent=(u.display_name||u.email||"?")[0].toUpperCase();
-    const info=q("div");info.className="user-info";info.innerHTML=`<div class="uname">${u.display_name||"—"}</div><div class="uemail">${u.email||"—"}</div>`;
+    const info=q("div");info.className="user-info";info.innerHTML=`<div class="uname">${escHtml(u.display_name||"—")}</div><div class="uemail">${escHtml(u.email||"—")}</div>`;
     const btn=q("button");btn.className="btn btn-ghost btn-sm";btn.textContent="Als User arbeiten";
     btn.onclick=()=>{setActing(u.id,u.display_name);show("Check")};
     row.append(av,info,btn);box.appendChild(row);
@@ -670,6 +764,16 @@ async function createTemplateFromSeed(t){
   }
 }
 
+/* ── XSS helpers ── */
+function escHtml(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function escAttr(s){return String(s).replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
+
+/* ── CSS for item delete button ── */
+const style=document.createElement("style");
+style.textContent=`.item-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:0 4px;line-height:1;opacity:0;transition:opacity .15s,color .15s;flex-shrink:0}.checkrow:hover .item-del{opacity:1}.item-del:hover{color:var(--danger)}`;
+document.head.appendChild(style);
+
+/* ── Event wiring ── */
 document.addEventListener("DOMContentLoaded",()=>{
   initClient();
   $("loginBtn").onclick=doLogin;
@@ -684,7 +788,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   $("bbCheck").onclick=()=>show("Check");
   $("bbTpl").onclick=()=>show("Tpl");
   $("bbAdmin").onclick=()=>show("Admin");
-  $("refreshCheck").onclick=()=>run("Aktualisiere…",loadChecklists);
+  $("refreshCheck").onclick=()=>{loading(true,"Aktualisiere…");loadChecklists().finally(()=>loading(false))};
   $("newTpl").onclick=()=>openTemplateEditor(null);
   $("seedMore").onclick=()=>seedStandardTemplates();
   $("addUser").onclick=addUser;
