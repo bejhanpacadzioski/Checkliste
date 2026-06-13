@@ -23,9 +23,9 @@ nav{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:13px}.active{background:va
 </style>
 </head>
 <body>
-<header><h1>Checklists by Bejhan</h1><div class="sub" id="subtitle">Final UI</div></header>
+<header><h1>Checklists by Bejhan</h1><div class="sub" id="subtitle">Final feste Verbindung</div></header>
 <main>
-<section id="config" class="card">
+<section id="config" class="card hidden">
 <h2>Supabase verbinden</h2>
 <label>Supabase URL</label><input id="url" placeholder="https://xxxxx.supabase.co">
 <label>Anon/Public Key</label><input id="key" placeholder="sb_publishable...">
@@ -48,23 +48,25 @@ nav{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:13px}.active{background:va
 </div>
 
 <div id="vSettings" class="hidden">
-<div class="card"><h2>⚙️ Einstellungen</h2><p class="muted">Supabase-Verbindung ist gespeichert. Hier kannst du sie bei Bedarf ändern.</p><button id="showConfig" class="ghost">Supabase Verbindung anzeigen</button><button id="hideConfig" class="ghost">Supabase Verbindung ausblenden</button></div>
+<div class="card"><h2>⚙️ Einstellungen</h2><p class="muted">Die Supabase-Verbindung ist fest in der App hinterlegt. Du bleibst auf diesem Gerät eingeloggt, bis du dich abmeldest.</p></div>
 </div>
 
 <div id="vAdmin" class="hidden"><div class="card"><h2>👥 Benutzer</h2><p class="muted small">Benutzer zuerst in Supabase Authentication erstellen, danach hier mit UUID hinzufügen.</p><input id="newUserId" placeholder="Auth User UUID"><input id="newUserEmail" placeholder="E-Mail"><input id="newUserName" placeholder="Name"><select id="newUserRole"><option value="user">User</option><option value="admin">Admin</option><option value="super_admin">Super Admin</option></select><button id="addUser">Benutzer hinzufügen</button><button id="stopActing" class="ghost">Nicht mehr als User arbeiten</button><div id="users" class="muted"></div></div></div>
 </section>
 </main>
 <script>
+const FIXED_SUPABASE_URL="https://hcxqhyswdaycfnxivhnm.supabase.co";
+const FIXED_SUPABASE_KEY="sb_publishable_WwSZT4nIB1hRbDhxF2uZpg_bxnq2BM2";
 let sb,user,orgId,isSuper=false,actingAs=null;
 const $=id=>document.getElementById(id), q=t=>document.createElement(t);
-function cfg(){return{url:localStorage.getItem("supabaseUrl")||"",key:localStorage.getItem("supabaseKey")||""}}
+function cfg(){return{url:FIXED_SUPABASE_URL,key:FIXED_SUPABASE_KEY}}
 function owner(){return actingAs||user.id}
 function setActing(id,name){actingAs=id;if(id){$("acting").textContent="Arbeitet als: "+name;$("acting").classList.remove("hidden")}else{$("acting").classList.add("hidden")}loadChecklists();loadTemplates();}
-function makeClient(){let c=cfg();$("url").value=c.url;$("key").value=c.key;if(!c.url||!c.key)return false;if(!window.supabase){$("cfgMsg").textContent="Supabase-Bibliothek nicht geladen.";return false}sb=window.supabase.createClient(c.url,c.key);$("login").classList.remove("hidden");$("config").classList.add("hidden");return true}
+function makeClient(){let c=cfg();$("url").value=c.url;$("key").value=c.key;if(!c.url||!c.key)return false;if(!window.supabase){$("cfgMsg").textContent="Supabase-Bibliothek nicht geladen.";return false}sb=window.supabase.createClient(c.url,c.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});$("login").classList.remove("hidden");$("config").classList.add("hidden");return true}
 function show(v){["Check","Tpl","Settings","Admin"].forEach(x=>{$("v"+x).classList.toggle("hidden",x!==v);$("b"+x).classList.toggle("active",x===v)});if(v==="Admin")loadUsers()}
 function btn(t,fn,cls){let b=q("button");b.textContent=t;if(cls)b.className=cls;b.onclick=fn;return b}
 $("saveCfg").onclick=()=>{let u=$("url").value.trim().replace(/\/rest\/v1\/?$/,"").replace(/\/$/,""),k=$("key").value.trim();localStorage.setItem("supabaseUrl",u);localStorage.setItem("supabaseKey",k);$("cfgMsg").textContent="Gespeichert.";makeClient();session()}
-$("showConfig").onclick=()=>$("config").classList.remove("hidden");$("hideConfig").onclick=()=>$("config").classList.add("hidden");
+
 $("doLogin").onclick=async()=>{let{error}=await sb.auth.signInWithPassword({email:$("email").value.trim(),password:$("pw").value});$("msg").textContent=error?error.message:"Angemeldet";if(!error)load()}
 async function logout(){await sb.auth.signOut();$("app").classList.add("hidden");$("login").classList.remove("hidden");$("config").classList.add("hidden")}
 $("doLogout").onclick=logout;$("logoutTop").onclick=logout;
