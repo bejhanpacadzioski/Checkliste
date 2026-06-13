@@ -1,133 +1,689 @@
-<!DOCTYPE html><html lang="de"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Checklists by Bejhan</title><link rel="manifest" href="manifest.json"><meta name="theme-color" content="#2563eb">
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Checklists by Bejhan</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#6366f1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#f6f7fb;--card:#fff;--text:#111827;--muted:#6b7280;--border:#e5e7eb;--p:#2563eb;--d:#dc2626;--g:#16a34a;--warn:#f59e0b}
-@media(prefers-color-scheme:dark){:root{--bg:#111827;--card:#1f2937;--text:#f9fafb;--muted:#9ca3af;--border:#374151}}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--text);padding-bottom:78px}
-header{padding:16px;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
-main{padding:12px;max-width:980px;margin:auto}h1{font-size:22px;margin:0}h2{font-size:21px;margin:0 0 12px}.sub,.muted{color:var(--muted)}
-.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:15px;margin-bottom:13px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
-input,button,select{font-size:17px;border-radius:14px;padding:13px;min-height:48px}input,select{width:100%;border:1px solid var(--border);background:var(--card);color:var(--text);margin:6px 0 11px}
-button{border:0;background:var(--p);color:white;font-weight:800;margin:3px;min-width:48px}.ghost{background:transparent;color:var(--text);border:1px solid var(--border)}.danger{background:var(--d)}.ok{background:var(--g)}
-.hidden{display:none!important}.row{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.item{padding:14px 0;border-top:1px solid var(--border)}.item:first-child{border-top:0}.pill{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;background:var(--bg);border:1px solid var(--border);margin-right:4px}
-nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:8px;z-index:20}
-nav button{font-size:14px;min-height:54px;padding:8px}.active{background:var(--p)!important;color:white!important}.cat{margin-top:12px;padding:12px;border:1px solid var(--border);border-radius:16px;background:var(--bg)}
-.checkrow{display:flex;align-items:center;gap:12px;padding:11px 0}.checkrow input[type=checkbox]{width:28px;height:28px;margin:0}.done{text-decoration:line-through;color:var(--muted)}
-.progress{height:10px;background:var(--border);border-radius:99px;overflow:hidden;margin:8px 0}.bar{height:100%;background:var(--g);width:0%}
-.inlineAdd{display:flex;gap:8px;margin-top:10px}.inlineAdd input{margin:0}.inlineAdd button{white-space:nowrap}.mini{padding:8px 10px;font-size:14px;min-height:38px}
-#toast{position:fixed;left:12px;right:12px;bottom:88px;background:#111827;color:white;border-radius:16px;padding:14px 16px;z-index:60;box-shadow:0 6px 24px rgba(0,0,0,.25);font-weight:700;text-align:center}
-#loader{position:fixed;inset:0;background:rgba(0,0,0,.32);display:flex;align-items:center;justify-content:center;z-index:50}
-#loader .box{background:var(--card);color:var(--text);padding:22px;border-radius:18px;box-shadow:0 8px 30px rgba(0,0,0,.25);font-weight:800}
-.spinner{width:28px;height:28px;border:4px solid var(--border);border-top-color:var(--p);border-radius:50%;display:inline-block;animation:spin .8s linear infinite;vertical-align:middle;margin-right:10px}@keyframes spin{to{transform:rotate(360deg)}}
-@media(min-width:760px){body{padding-bottom:0}nav{position:static;display:flex;margin-bottom:13px;border:0;background:transparent;padding:0}nav button{font-size:16px;min-height:48px}}
-</style></head><body>
-<header><h1>Checklists by Bejhan</h1><div class="sub" id="subtitle">Mobile</div></header>
-<div id="toast" class="hidden"></div><div id="loader" class="hidden"><div class="box"><span class="spinner"></span><span id="loaderText">Lade...</span></div></div>
-<main>
-<section id="login" class="card hidden"><h2>Anmelden</h2><label>E-Mail</label><input id="email" type="email"><label>Passwort</label><input id="pw" type="password"><button id="doLogin">Anmelden</button><button id="doLogout" class="ghost">Abmelden</button><p id="msg" class="muted"></p></section>
-<section id="app" class="hidden">
-<div class="card"><h2>Dashboard</h2><p id="profile" class="muted"></p><span id="badge" class="pill hidden">👑 Super Admin</span><span id="acting" class="pill hidden"></span><button id="logoutTop" class="ghost">Abmelden</button></div>
-<nav><button id="bCheck" class="ghost active">📋<br>Checklisten</button><button id="bTpl" class="ghost">📂<br>Vorlagen</button><button id="bAdmin" class="ghost hidden">👥<br>Admin</button></nav>
+:root{--bg:#f1f5f9;--surface:#fff;--border:#e2e8f0;--text:#0f172a;--muted:#64748b;--accent:#6366f1;--accent2:#818cf8;--danger:#ef4444;--success:#22c55e;--sidebar-w:240px;--r:16px;--shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06);--shadow-lg:0 8px 32px rgba(0,0,0,.14)}
+@media(prefers-color-scheme:dark){:root{--bg:#0f172a;--surface:#1e293b;--border:#334155;--text:#f1f5f9;--muted:#94a3b8}}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.5}
+#shell{display:flex;min-height:100dvh}
+#sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100dvh;overflow-y:auto;padding:20px 12px;transition:transform .25s ease}
+.sidebar-logo{display:flex;align-items:center;gap:10px;padding:0 8px 20px;border-bottom:1px solid var(--border);margin-bottom:16px}
+.sidebar-logo svg{width:28px;height:28px;flex-shrink:0}
+.sidebar-logo .lname{font-weight:700;font-size:15px;letter-spacing:-.3px}
+.sidebar-logo .lsub{font-size:11px;color:var(--muted);font-weight:400;display:block;letter-spacing:0}
+nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;font-size:14px;font-weight:500;color:var(--muted);cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:background .15s,color .15s;font-family:inherit}
+.nav-item:hover{background:var(--bg);color:var(--text)}
+.nav-item.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.nav-item svg{width:18px;height:18px;flex-shrink:0}
+.nav-item.hidden{display:none}
+.suser{border-top:1px solid var(--border);padding-top:14px;margin-top:8px;font-size:13px;color:var(--muted)}
+.suser .uname{font-weight:600;color:var(--text);font-size:14px;display:block;margin-bottom:2px}
+.suser .uemail{font-size:12px;word-break:break-all}
+.suser button{margin-top:10px;width:100%;background:none;border:1px solid var(--border);border-radius:8px;padding:7px;font-size:13px;color:var(--muted);cursor:pointer;font-family:inherit;transition:background .15s}
+.suser button:hover{background:var(--bg);color:var(--text)}
+.acting-badge{display:none;align-items:center;gap:6px;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;color:var(--accent);margin-bottom:8px}
+.acting-badge.show{display:flex}
+.acting-badge button{background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);line-height:1;padding:0}
+#main{flex:1;min-width:0;display:flex;flex-direction:column}
+#topbar{display:none;align-items:center;gap:10px;padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:30}
+#topbar .logo-text{font-weight:700;font-size:16px;flex:1}
+#menuBtn{background:none;border:none;cursor:pointer;color:var(--text);padding:4px;display:flex}
+.page-header{padding:24px 24px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.page-title{font-size:22px;font-weight:700;letter-spacing:-.4px}
+.page-sub{font-size:14px;color:var(--muted);margin-top:2px}
+#content{padding:20px 24px 32px;flex:1}
+.cl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-top:18px}
+.cl-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:16px 18px;cursor:pointer;transition:box-shadow .18s,transform .18s,border-color .18s;display:flex;gap:14px;align-items:flex-start}
+.cl-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px);border-color:var(--accent)}
+.cl-ring{flex-shrink:0;width:52px;height:52px}
+.cl-ring svg{width:52px;height:52px}
+.cl-body{flex:1;min-width:0}
+.cl-title{font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cl-desc{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cl-meta{font-size:12px;color:var(--muted);margin-top:6px}
+.cl-actions{display:flex;gap:6px;margin-top:10px}
+.cl-actions button{font-size:12px;padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;font-family:inherit;font-weight:500;transition:background .15s,color .15s}
+.cl-actions button:hover{background:var(--bg);color:var(--text)}
+.cl-actions .btn-arch:hover{background:#fef2f2;color:var(--danger);border-color:#fca5a5}
+#detailOverlay{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:100;opacity:0;pointer-events:none;transition:opacity .22s ease}
+#detailOverlay.open{opacity:1;pointer-events:all}
+#detailPanel{position:fixed;top:0;right:0;bottom:0;width:min(520px,100vw);background:var(--surface);border-left:1px solid var(--border);box-shadow:var(--shadow-lg);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .26s cubic-bezier(.4,0,.2,1);z-index:101}
+#detailOverlay.open #detailPanel{transform:translateX(0)}
+.detail-header{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0}
+.detail-close{background:none;border:none;cursor:pointer;color:var(--muted);padding:4px;display:flex;border-radius:8px;transition:background .15s;flex-shrink:0}
+.detail-close:hover{background:var(--bg)}
+.detail-title{font-size:17px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.detail-body{flex:1;overflow-y:auto;padding:20px}
+.detail-progress-bar{height:6px;background:var(--border);border-radius:99px;overflow:hidden;margin:8px 0 4px}
+.detail-progress-bar .bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px;transition:width .4s ease}
+.detail-progress-label{font-size:13px;color:var(--muted)}
+.cat-block{margin-bottom:18px}
+.cat-block h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:8px}
+.cat-inner{background:var(--bg);border-radius:12px;overflow:hidden}
+.checkrow{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:1px solid var(--border)}
+.checkrow:first-child{border-top:none}
+.checkrow input[type=checkbox]{width:20px;height:20px;flex-shrink:0;cursor:pointer;accent-color:var(--accent)}
+.checkrow label{cursor:pointer;flex:1;font-size:14px;transition:color .15s}
+.checkrow label.done{text-decoration:line-through;color:var(--muted)}
+.inline-add{display:flex;gap:8px;align-items:center;padding:10px 14px;border-top:1px solid var(--border)}
+.inline-add input{flex:1;border:none;background:transparent;font-size:13px;color:var(--text);font-family:inherit;outline:none}
+.inline-add input::placeholder{color:var(--muted)}
+.inline-add button{background:var(--accent);color:#fff;border:none;width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s}
+.inline-add button:hover{opacity:.85}
+.tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:18px}
+.tpl-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:16px 18px}
+.tpl-card-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.tpl-icon{font-size:24px;line-height:1}
+.tpl-name{font-weight:600;font-size:15px}
+.tpl-desc{font-size:12px;color:var(--muted);margin-bottom:12px}
+.tpl-actions{display:flex;gap:6px;flex-wrap:wrap}
+#tplEditorWrap{display:none;margin-top:20px}
+#tplEditorWrap.show{display:block}
+.editor-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:20px}
+.editor-card h2{font-size:17px;font-weight:700;margin-bottom:16px}
+.cat-editor{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px}
+.cat-editor-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.cat-editor-head h4{flex:1;font-size:14px;font-weight:600;margin:0}
+.user-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--border)}
+.user-row:first-child{border-top:none}
+.user-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.user-info{flex:1;min-width:0}
+.user-info .uname{font-weight:600;font-size:14px}
+.user-info .uemail{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:10px;padding:9px 16px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity .15s,transform .1s}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.btn-primary:hover{opacity:.9}
+.btn-ghost{background:none;border:1px solid var(--border);color:var(--text)}
+.btn-ghost:hover{background:var(--bg)}
+.btn-danger{background:#fef2f2;border:1px solid #fca5a5;color:var(--danger)}
+.btn-danger:hover{background:#fee2e2}
+.btn-sm{padding:6px 12px;font-size:13px;border-radius:8px}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+.form-group input,.form-group select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s}
+.form-group input:focus,.form-group select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.12)}
+#modalOverlay{position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s ease}
+#modalOverlay.open{opacity:1;pointer-events:all}
+.modal-box{background:var(--surface);border-radius:20px;box-shadow:var(--shadow-lg);padding:24px;width:100%;max-width:400px;transform:scale(.95) translateY(10px);transition:transform .22s ease}
+#modalOverlay.open .modal-box{transform:scale(1) translateY(0)}
+.modal-title{font-size:17px;font-weight:700;margin-bottom:6px}
+.modal-sub{font-size:14px;color:var(--muted);margin-bottom:4px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#0f172a;color:#f8fafc;border-radius:12px;padding:11px 20px;font-size:14px;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,.3);z-index:300;opacity:0;transition:opacity .2s,transform .2s;white-space:nowrap;pointer-events:none}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#loader{position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:250;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+#loader.show{opacity:1;pointer-events:all}
+.loader-box{background:var(--surface);border-radius:16px;padding:20px 28px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-lg);font-weight:600;font-size:15px}
+.spinner{width:22px;height:22px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loginScreen{display:none;min-height:100dvh;align-items:center;justify-content:center;background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);padding:20px}
+#loginScreen.show{display:flex}
+.login-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:36px 32px;width:100%;max-width:380px;backdrop-filter:blur(20px)}
+.login-logo{margin-bottom:28px;text-align:center}
+.login-logo svg{width:44px;height:44px;margin-bottom:10px}
+.login-logo h1{font-size:22px;font-weight:700;color:#f1f5f9;letter-spacing:-.4px}
+.login-logo p{font-size:13px;color:#94a3b8;margin-top:4px}
+.login-box .form-group label{color:#94a3b8}
+.login-box .form-group input{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:#f1f5f9}
+.login-box .form-group input:focus{border-color:var(--accent);background:rgba(255,255,255,.08)}
+#loginBtn{width:100%;padding:12px;font-size:15px;margin-top:4px;border-radius:12px}
+#loginMsg{text-align:center;font-size:13px;color:#ef4444;margin-top:10px;min-height:18px}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center}
+.empty-icon{font-size:48px;margin-bottom:14px;opacity:.5}
+.empty-title{font-size:16px;font-weight:600;margin-bottom:6px}
+.empty-sub{font-size:14px;color:var(--muted);margin-bottom:20px}
+#bottomNav{display:none}
+@media(max-width:768px){
+  #sidebar{position:fixed;top:0;left:0;bottom:0;z-index:50;transform:translateX(-100%);box-shadow:var(--shadow-lg)}
+  #sidebar.open{transform:translateX(0)}
+  #sidebarBackdrop{display:none;position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:49}
+  #sidebarBackdrop.show{display:block}
+  #topbar{display:flex}
+  #main{padding-bottom:70px}
+  .page-header{padding:16px 16px 0}
+  #content{padding:16px}
+  #bottomNav{display:grid;grid-template-columns:repeat(3,1fr);position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--border);padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:40}
+  .bnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:500;color:var(--muted);font-family:inherit;border-radius:10px;transition:background .15s,color .15s}
+  .bnav-item svg{width:22px;height:22px}
+  .bnav-item.active{color:var(--accent)}
+  .bnav-item.hidden{display:none}
+  .cl-grid,.tpl-grid{grid-template-columns:1fr}
+  .page-title{font-size:19px}
+  #detailPanel{width:100vw;border-left:none;border-radius:20px 20px 0 0;top:auto;height:92dvh;transform:translateY(100%)}
+  #detailOverlay.open #detailPanel{transform:translateY(0)}
+}
+</style>
+</head>
+<body>
 
-<div id="vCheck"><div class="card"><h2>📋 Checklisten</h2><button id="refreshCheck" class="ghost">Aktualisieren</button><div id="checkList" class="muted"></div></div><div id="checkDetail" class="card hidden"></div></div>
-
-<div id="vTpl" class="hidden">
-<div class="card"><h2>📂 Vorlagen</h2><div class="row"><button id="newTpl">➕ Neue Vorlage</button><button id="seedMore" class="ghost">Standardvorlagen ergänzen</button></div><div id="tplList" class="muted"></div></div>
-<div id="tplEditor" class="card hidden"></div>
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <svg viewBox="0 0 44 44" fill="none"><rect width="44" height="44" rx="12" fill="url(#lg)"/><path d="M14 22h6m0 0 4-6 4 6M20 22v6" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="lg" x1="0" y1="0" x2="44" y2="44"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#818cf8"/></linearGradient></defs></svg>
+      <h1>Checklists</h1>
+      <p>Melde dich an, um fortzufahren</p>
+    </div>
+    <div class="form-group"><label>E-Mail</label><input id="loginEmail" type="email" autocomplete="email" placeholder="name@domain.ch"></div>
+    <div class="form-group"><label>Passwort</label><input id="loginPw" type="password" autocomplete="current-password" placeholder="••••••••"></div>
+    <button class="btn btn-primary" id="loginBtn">Anmelden</button>
+    <p id="loginMsg"></p>
+  </div>
 </div>
 
-<div id="vAdmin" class="hidden"><div class="card"><h2>👥 Benutzer</h2><input id="newUserId" placeholder="Auth User UUID"><input id="newUserEmail" placeholder="E-Mail"><input id="newUserName" placeholder="Name"><select id="newUserRole"><option value="user">User</option><option value="admin">Admin</option><option value="super_admin">Super Admin</option></select><button id="addUser">Benutzer hinzufügen</button><button id="stopActing" class="ghost">Nicht mehr als User arbeiten</button><div id="users" class="muted"></div></div></div>
-</section>
-</main>
+<div id="shell" style="display:none">
+  <div id="sidebarBackdrop"></div>
+  <aside id="sidebar">
+    <div class="sidebar-logo">
+      <svg viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="8" fill="url(#slg)"/><path d="M9 14h4m0 0 3-4 3 4M13 14v4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="slg" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#818cf8"/></linearGradient></defs></svg>
+      <div><span class="lname">Checklists</span><span class="lsub">by Bejhan</span></div>
+    </div>
+    <div class="acting-badge" id="actingBadge">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      <span id="actingName">—</span>
+      <button id="stopActing" title="Beenden">✕</button>
+    </div>
+    <nav class="snav">
+      <button class="nav-item active" id="bCheck">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M9 12l2 2 4-4"/></svg>Checklisten
+      </button>
+      <button class="nav-item" id="bTpl">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Vorlagen
+      </button>
+      <button class="nav-item hidden" id="bAdmin">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 11l1.5 1.5L21 9"/></svg>Admin
+      </button>
+    </nav>
+    <div class="suser">
+      <span class="uname" id="sUserName">—</span>
+      <span class="uemail" id="sUserEmail">—</span>
+      <button id="logoutBtn">Abmelden</button>
+    </div>
+  </aside>
+
+  <div id="main">
+    <header id="topbar">
+      <button id="menuBtn" aria-label="Menü"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+      <span class="logo-text">Checklists</span>
+    </header>
+
+    <div id="content">
+      <div id="vCheck">
+        <div class="page-header">
+          <div><h1 class="page-title">Checklisten</h1><p class="page-sub" id="checkSub">Lade…</p></div>
+          <button class="btn btn-ghost btn-sm" id="refreshCheck"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>Aktualisieren</button>
+        </div>
+        <div id="checkList" style="margin-top:18px"></div>
+      </div>
+
+      <div id="vTpl" style="display:none">
+        <div class="page-header">
+          <div><h1 class="page-title">Vorlagen</h1><p class="page-sub">Vorlagen verwalten und Checklisten erstellen</p></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-ghost btn-sm" id="seedMore">Standardvorlagen</button>
+            <button class="btn btn-primary btn-sm" id="newTpl"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Neue Vorlage</button>
+          </div>
+        </div>
+        <div id="tplList" style="margin-top:18px"></div>
+        <div id="tplEditorWrap"><div class="editor-card" id="tplEditor"></div></div>
+      </div>
+
+      <div id="vAdmin" style="display:none">
+        <div class="page-header"><div><h1 class="page-title">Admin</h1><p class="page-sub">Benutzer verwalten</p></div></div>
+        <div style="margin-top:18px" class="editor-card">
+          <h3 style="font-size:15px;font-weight:700;margin-bottom:14px">Neuer Benutzer</h3>
+          <div style="display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">
+            <div class="form-group"><label>Auth UUID</label><input id="newUserId" placeholder="xxxxxxxx-xxxx-…"></div>
+            <div class="form-group"><label>E-Mail</label><input id="newUserEmail" type="email"></div>
+            <div class="form-group"><label>Name</label><input id="newUserName"></div>
+            <div class="form-group"><label>Rolle</label><select id="newUserRole"><option value="user">User</option><option value="admin">Admin</option><option value="super_admin">Super Admin</option></select></div>
+          </div>
+          <button class="btn btn-primary btn-sm" id="addUser">Benutzer hinzufügen</button>
+          <div id="users" style="margin-top:16px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <nav id="bottomNav">
+    <button class="bnav-item active" id="bbCheck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M9 12l2 2 4-4"/></svg>Checklisten</button>
+    <button class="bnav-item" id="bbTpl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Vorlagen</button>
+    <button class="bnav-item hidden" id="bbAdmin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 11l1.5 1.5L21 9"/></svg>Admin</button>
+  </nav>
+</div>
+
+<div id="detailOverlay">
+  <div id="detailPanel">
+    <div class="detail-header">
+      <button class="detail-close" id="detailClose"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      <span class="detail-title" id="detailTitle">—</span>
+      <button class="btn btn-danger btn-sm" id="detailArchive">Archivieren</button>
+    </div>
+    <div class="detail-body" id="detailBody"></div>
+  </div>
+</div>
+
+<div id="modalOverlay">
+  <div class="modal-box">
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-sub" id="modalSub"></div>
+    <div class="form-group" id="modalInputWrap" style="display:none"><label id="modalInputLabel">Wert</label><input id="modalInput" type="text"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-sm" id="modalCancel">Abbrechen</button>
+      <button class="btn btn-primary btn-sm" id="modalConfirm">OK</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<div id="loader"><div class="loader-box"><div class="spinner"></div><span id="loaderText">Lade…</span></div></div>
+
 <script>
-const FIXED_SUPABASE_URL="https://hcxqhyswdaycfnxivhnm.supabase.co";
-const FIXED_SUPABASE_KEY="sb_publishable_WwSZT4nIB1hRbDhxF2uZpg_bxnq2BM2";
-let sb,user,orgId,isSuper=false,actingAs=null,currentTpl=null;
-const $=id=>document.getElementById(id), q=t=>document.createElement(t);
-function toast(t){$("toast").textContent=t;$("toast").classList.remove("hidden");clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>$("toast").classList.add("hidden"),2200)}
-function loading(on,t="Lade..."){$("loaderText").textContent=t;$("loader").classList.toggle("hidden",!on)}
+const SUPABASE_URL="https://hcxqhyswdaycfnxivhnm.supabase.co";
+const SUPABASE_KEY="sb_publishable_WwSZT4nIB1hRbDhxF2uZpg_bxnq2BM2";
+let sb,user,orgId,isSuper=false,actingAs=null,currentTpl=null,currentChecklistId=null;
+const $=id=>document.getElementById(id),q=t=>document.createElement(t);
+
+function toast(msg,dur=2200){const el=$("toast");el.textContent=msg;el.classList.add("show");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),dur)}
+function loading(on,txt="Lade…"){$("loaderText").textContent=txt;$("loader").classList.toggle("show",on)}
 async function run(label,fn){loading(true,label);try{return await fn()}catch(e){alert(e.message||e);throw e}finally{loading(false)}}
+
+function showModal({title,sub="",input=null,danger=false,confirmLabel="OK"}){
+  return new Promise(resolve=>{
+    $("modalTitle").textContent=title;$("modalSub").textContent=sub;
+    const wrap=$("modalInputWrap");
+    if(input){wrap.style.display="";$("modalInputLabel").textContent=input.label||"";$("modalInput").value=input.value||"";$("modalInput").placeholder=input.placeholder||"";setTimeout(()=>$("modalInput").focus(),100)}
+    else{wrap.style.display="none"}
+    $("modalConfirm").textContent=confirmLabel;
+    $("modalConfirm").className="btn btn-sm "+(danger?"btn-danger":"btn-primary");
+    $("modalOverlay").classList.add("open");
+    const close=val=>{$("modalOverlay").classList.remove("open");$("modalConfirm").onclick=null;$("modalCancel").onclick=null;resolve(val)};
+    $("modalConfirm").onclick=()=>close(input?$("modalInput").value.trim():true);
+    $("modalCancel").onclick=()=>close(null);
+  })
+}
+
+function ringSVG(pct,size=52){
+  const r=20,c=2*Math.PI*r,offset=c-(pct/100)*c;
+  const color=pct===100?"#22c55e":"#6366f1";
+  return `<svg width="${size}" height="${size}" viewBox="0 0 48 48"><circle cx="24" cy="24" r="${r}" fill="none" stroke="#e2e8f0" stroke-width="4"/><circle cx="24" cy="24" r="${r}" fill="none" stroke="${color}" stroke-width="4" stroke-dasharray="${c}" stroke-dashoffset="${offset}" stroke-linecap="round" transform="rotate(-90 24 24)"/><text x="24" y="28" text-anchor="middle" font-size="11" font-weight="700" fill="${color}" font-family="Inter,sans-serif">${pct}%</text></svg>`
+}
+
+function show(v){
+  ["Check","Tpl","Admin"].forEach(x=>{
+    $("v"+x).style.display=x===v?"":"none";
+    $("b"+x)?.classList.toggle("active",x===v);
+    $("bb"+x)?.classList.toggle("active",x===v);
+  });
+  closeSidebar();
+  if(v==="Admin")loadUsers();
+}
+
+function openSidebar(){$("sidebar").classList.add("open");$("sidebarBackdrop").classList.add("show")}
+function closeSidebar(){$("sidebar").classList.remove("open");$("sidebarBackdrop").classList.remove("show")}
+
+function openDetailPanel(id){
+  currentChecklistId=id;
+  $("detailOverlay").classList.add("open");
+  document.body.style.overflow="hidden";
+  loadDetailPanel(id);
+}
+function closeDetailPanel(){
+  $("detailOverlay").classList.remove("open");
+  document.body.style.overflow="";
+  loadChecklists();
+}
+
 function owner(){return actingAs||user.id}
-function btn(t,fn,cls){let b=q("button");b.textContent=t;if(cls)b.className=cls;b.onclick=fn;return b}
-function show(v){["Check","Tpl","Admin"].forEach(x=>{$("v"+x).classList.toggle("hidden",x!==v);$("b"+x)?.classList.toggle("active",x===v)});if(v==="Admin")loadUsers()}
-function setActing(id,name){actingAs=id;if(id){$("acting").textContent="Arbeitet als: "+name;$("acting").classList.remove("hidden")}else{$("acting").classList.add("hidden")}loadChecklists();loadTemplates()}
-function client(){sb=window.supabase.createClient(FIXED_SUPABASE_URL,FIXED_SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});$("login").classList.remove("hidden")}
-$("doLogin").onclick=()=>run("Anmeldung...",async()=>{let{error}=await sb.auth.signInWithPassword({email:$("email").value.trim(),password:$("pw").value});$("msg").textContent=error?error.message:"Angemeldet";if(error)return;toast("Angemeldet");await load()})
-async function logout(){await sb.auth.signOut();$("app").classList.add("hidden");$("login").classList.remove("hidden");toast("Abgemeldet")}
-$("doLogout").onclick=logout;$("logoutTop").onclick=logout;$("bCheck").onclick=()=>show("Check");$("bTpl").onclick=()=>show("Tpl");$("bAdmin").onclick=()=>show("Admin");$("refreshCheck").onclick=()=>run("Aktualisiere...",loadChecklists);$("newTpl").onclick=()=>openTemplateEditor(null);$("seedMore").onclick=()=>run("Ergänze Vorlagen...",seedStandardTemplates);$("addUser").onclick=()=>run("Speichere User...",addUser);$("stopActing").onclick=()=>setActing(null,"");
-async function session(){let{data}=await sb.auth.getSession();if(data.session)load()}
-async function load(){return run("Lade App...",async()=>{
-$("app").classList.remove("hidden");$("login").classList.add("hidden");let u=await sb.auth.getUser();user=u.data.user;
-let p=await sb.from("profiles").select("*").eq("id",user.id).single();$("profile").textContent=(p.data?p.data.display_name:user.email)+" · "+user.email;
-let m=await sb.from("organization_members").select("organization_id,role").eq("user_id",user.id);orgId=m.data?.[0]?.organization_id;isSuper=(m.data||[]).some(x=>x.role==="super_admin");$("badge").classList.toggle("hidden",!isSuper);$("bAdmin").classList.toggle("hidden",!isSuper);
-await loadTemplates();await loadChecklists()
-})}
-async function loadTemplates(){
-let box=$("tplList");let{data,error}=await sb.from("templates").select("*").is("deleted_at",null).order("title");if(error){box.textContent=error.message;return}
-box.innerHTML=data?.length?"":"Keine Vorlagen.";
-(data||[]).forEach(t=>{let d=q("div");d.className="item";d.innerHTML=`<b>${t.icon||"📂"} ${t.title}</b><br><span class=muted>${t.description||""}</span><br>`;d.append(btn("Checkliste erstellen",()=>run("Erstelle Checkliste...",()=>makeChecklist(t))),btn("Bearbeiten",()=>openTemplateEditor(t.id),"ghost"),btn("Löschen",()=>run("Lösche Vorlage...",()=>deleteTemplate(t.id)),"danger"));box.appendChild(d)})
+function setActing(id,name){
+  actingAs=id;
+  if(id){$("actingName").textContent=name;$("actingBadge").classList.add("show")}
+  else{$("actingBadge").classList.remove("show")}
+  loadChecklists();loadTemplates();
 }
-async function openTemplateEditor(id){
-loading(true,"Lade Vorlage...");try{
-currentTpl=id;let box=$("tplEditor");box.classList.remove("hidden");box.innerHTML="<h2>"+(id?"Vorlage bearbeiten":"Neue Vorlage")+"</h2>";
-let tpl={title:"",description:"",icon:"📂"}; if(id){let r=await sb.from("templates").select("*").eq("id",id).single();tpl=r.data}
-box.innerHTML+=`<label>Titel</label><input id="edTitle" value="${(tpl.title||"").replaceAll('"','&quot;')}"><label>Beschreibung</label><input id="edDesc" value="${(tpl.description||"").replaceAll('"','&quot;')}"><label>Icon</label><input id="edIcon" value="${tpl.icon||"📂"}"><div class=row><button id=saveTpl>Speichern</button><button id=addCat>➕ Kategorie hinzufügen</button></div><p class="muted">Erstelle zuerst Kategorien. Danach kannst du direkt unter jeder Kategorie Punkte hinzufügen.</p><div id=edCats></div>`;
-$("saveTpl").onclick=()=>run("Speichere Vorlage...",saveTemplateMeta);
-$("addCat").onclick=()=>run("Füge Kategorie hinzu...",addTemplateCategory);
-if(id){let cats=await sb.from("template_categories").select("*").eq("template_id",id).order("sort_order");for(const c of cats.data||[]) await renderTplCategory(c)}
-box.scrollIntoView({behavior:"smooth",block:"start"});
-}finally{loading(false)}
+
+function initClient(){
+  sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 }
-async function saveTemplateMeta(){
-let data={organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,title:$("edTitle").value.trim(),description:$("edDesc").value.trim(),icon:$("edIcon").value.trim()||"📂",is_global:isSuper};
-if(!data.title){toast("Titel fehlt");return false}
-if(currentTpl){let e=await sb.from("templates").update({title:data.title,description:data.description,icon:data.icon,updated_by:user.id}).eq("id",currentTpl);if(e.error)return alert(e.error.message)}
-else{let r=await sb.from("templates").insert(data).select().single();if(r.error)return alert(r.error.message);currentTpl=r.data.id}
-await loadTemplates();toast("Vorlage gespeichert");return true
+
+async function doLogin(){
+  const email=$("loginEmail").value.trim(),pw=$("loginPw").value;
+  $("loginBtn").textContent="Anmelden…";
+  const{error}=await sb.auth.signInWithPassword({email,password:pw});
+  $("loginBtn").textContent="Anmelden";
+  if(error){$("loginMsg").textContent=error.message;return}
+  $("loginMsg").textContent="";
+  await loadApp();
 }
-async function addTemplateCategory(){
-if(!currentTpl){let ok=await saveTemplateMeta(); if(!ok||!currentTpl)return}
-let title=prompt("Name der Kategorie:"); if(!title){toast("Abgebrochen");return}
-let r=await sb.from("template_categories").insert({template_id:currentTpl,title,sort_order:Date.now()%100000}).select().single();if(r.error)return alert(r.error.message);await renderTplCategory(r.data);toast("Kategorie hinzugefügt")
+
+async function doLogout(){await sb.auth.signOut();$("shell").style.display="none";$("loginScreen").classList.add("show");toast("Abgemeldet")}
+
+async function checkSession(){const{data}=await sb.auth.getSession();if(data.session)await loadApp();else $("loginScreen").classList.add("show")}
+
+async function loadApp(){
+  loading(true,"Lade App…");
+  try{
+    $("loginScreen").classList.remove("show");$("shell").style.display="flex";
+    const u=await sb.auth.getUser();user=u.data.user;
+    const p=await sb.from("profiles").select("*").eq("id",user.id).single();
+    $("sUserName").textContent=p.data?.display_name||user.email;
+    $("sUserEmail").textContent=user.email;
+    const m=await sb.from("organization_members").select("organization_id,role").eq("user_id",user.id);
+    orgId=m.data?.[0]?.organization_id;
+    isSuper=(m.data||[]).some(x=>x.role==="super_admin");
+    [$("bAdmin"),$("bbAdmin")].forEach(el=>{if(el)el.classList.toggle("hidden",!isSuper)});
+    await loadTemplates();await loadChecklists();
+  }finally{loading(false)}
 }
-async function renderTplCategory(c){
-let wrap=q("div");wrap.className="cat";wrap.id="tplcat-"+c.id;wrap.innerHTML=`<div class=row><h3 style="flex:1;margin:0">${c.title}</h3></div><div id="tplitems-${c.id}"></div>`;
-let del=btn("Kategorie löschen",async()=>{if(confirm("Kategorie löschen?")){loading(true,"Lösche Kategorie...");await sb.from("template_categories").delete().eq("id",c.id);loading(false);wrap.remove();toast("Kategorie gelöscht")}},"danger mini");wrap.querySelector(".row").appendChild(del);
-let add=q("div");add.className="inlineAdd";let input=q("input");input.placeholder="Neuer Punkt in "+c.title;let plus=btn("+",async()=>{let title=input.value.trim();if(!title){toast("Bitte Punkt eingeben");return}loading(true,"Speichere Punkt...");let e=await sb.from("template_items").insert({category_id:c.id,title,sort_order:Date.now()%100000});loading(false);if(e.error)return alert(e.error.message);input.value="";await loadTplItems(c.id);toast("Punkt hinzugefügt")});add.append(input,plus);wrap.appendChild(add);$("edCats").appendChild(wrap);await loadTplItems(c.id)
-}
-async function loadTplItems(catId){
-let box=$("tplitems-"+catId);if(!box)return;let r=await sb.from("template_items").select("*").eq("category_id",catId).order("sort_order");box.innerHTML="";
-(r.data||[]).forEach(it=>{let row=q("div");row.className="checkrow";let sp=q("span");sp.textContent="• "+it.title;let del=btn("×",async()=>{loading(true,"Lösche Punkt...");await sb.from("template_items").delete().eq("id",it.id);loading(false);toast("Punkt gelöscht");loadTplItems(catId)},"danger mini");row.append(sp,del);box.appendChild(row)})
-}
-async function deleteTemplate(id){if(!confirm("Vorlage löschen?"))return;let e=await sb.from("templates").update({deleted_at:new Date().toISOString(),deleted_by:user.id}).eq("id",id);if(e.error)return alert(e.error.message);await loadTemplates();$("tplEditor").classList.add("hidden");toast("Vorlage gelöscht")}
-async function makeChecklist(t){
-let title=prompt("Titel der Checkliste:",t.title+" "+new Date().toLocaleDateString("de-CH"));if(!title)return;
-let r=await sb.from("checklists").insert({organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,template_id:t.id,title,description:t.description,icon:t.icon}).select().single();if(r.error)return alert(r.error.message);
-let cats=await sb.from("template_categories").select("*").eq("template_id",t.id).order("sort_order");
-for(const c of cats.data||[]){let nc=await sb.from("checklist_categories").insert({checklist_id:r.data.id,title:c.title,sort_order:c.sort_order}).select().single();let items=await sb.from("template_items").select("*").eq("category_id",c.id).order("sort_order");if(items.data?.length)await sb.from("checklist_items").insert(items.data.map(i=>({category_id:nc.data.id,title:i.title,sort_order:i.sort_order,is_checked:false})))}
-await loadChecklists();show("Check");openChecklist(r.data.id);toast("Checkliste erstellt")
-}
+
 async function loadChecklists(){
-let box=$("checkList");let{data,error}=await sb.from("checklists").select("*").is("deleted_at",null).order("created_at",{ascending:false});if(error){box.textContent=error.message;return}
-box.innerHTML=data?.length?"":"Noch keine Checklisten."; (data||[]).forEach(c=>{let d=q("div");d.className="item";d.innerHTML=`<b>${c.icon||"📋"} ${c.title}</b><br><span class=muted>${c.description||""}</span><br>`;d.append(btn("Öffnen",()=>openChecklist(c.id)),btn("Duplizieren",()=>run("Dupliziere...",()=>duplicateChecklist(c.id)),"ghost"),btn("Archivieren",()=>run("Archiviere...",()=>archiveChecklist(c.id)),"ghost"));box.appendChild(d)})
+  const box=$("checkList");
+  box.innerHTML=`<div style="display:flex;justify-content:center;padding:40px"><div class="spinner"></div></div>`;
+  const{data,error}=await sb.from("checklists").select("*").is("deleted_at",null).order("created_at",{ascending:false});
+  if(error){box.textContent=error.message;return}
+  $("checkSub").textContent=data?.length?`${data.length} Checklist${data.length!==1?"en":""}`:""
+  if(!data?.length){
+    box.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Noch keine Checklisten</div><div class="empty-sub">Erstelle eine Checkliste aus einer Vorlage.</div><button class="btn btn-primary" id="goTpl">Zu den Vorlagen</button></div>`;
+    $("goTpl").onclick=()=>show("Tpl");return;
+  }
+  const progressMap={};
+  await Promise.all((data||[]).map(async cl=>{
+    const cats=await sb.from("checklist_categories").select("id").eq("checklist_id",cl.id);
+    if(!cats.data?.length){progressMap[cl.id]={done:0,total:0};return}
+    const catIds=cats.data.map(c=>c.id);
+    const items=await sb.from("checklist_items").select("is_checked").in("category_id",catIds);
+    const total=items.data?.length||0,done=(items.data||[]).filter(i=>i.is_checked).length;
+    progressMap[cl.id]={done,total};
+  }));
+  const grid=q("div");grid.className="cl-grid";
+  (data||[]).forEach(cl=>{
+    const{done,total}=progressMap[cl.id]||{done:0,total:0};
+    const pct=total?Math.round(done/total*100):0;
+    const card=q("div");card.className="cl-card";
+    card.innerHTML=`<div class="cl-ring">${ringSVG(pct)}</div><div class="cl-body"><div class="cl-title">${cl.icon||"📋"} ${cl.title}</div><div class="cl-desc">${cl.description||"Keine Beschreibung"}</div><div class="cl-meta">${done}/${total} erledigt</div><div class="cl-actions"><button class="btn-dup">Duplizieren</button><button class="btn-arch">Archivieren</button></div></div>`;
+    card.querySelector(".btn-dup").onclick=e=>{e.stopPropagation();run("Dupliziere…",()=>duplicateChecklist(cl.id))};
+    card.querySelector(".btn-arch").onclick=e=>{e.stopPropagation();archiveChecklist(cl.id)};
+    card.onclick=()=>openDetailPanel(cl.id);
+    grid.appendChild(card);
+  });
+  box.innerHTML="";box.appendChild(grid);
 }
-async function openChecklist(id){
-loading(true,"Lade Checkliste...");try{
-let box=$("checkDetail");box.classList.remove("hidden");box.innerHTML="";let c=await sb.from("checklists").select("*").eq("id",id).single();box.innerHTML=`<h2>${c.data.icon||"📋"} ${c.data.title}</h2><p class=muted>${c.data.description||""}</p>`;
-let cats=await sb.from("checklist_categories").select("*").eq("checklist_id",id).order("sort_order");let total=0,done=0,content=q("div");
-for(const cat of cats.data||[]){let w=q("div");w.className="cat";w.innerHTML=`<h3>${cat.title}</h3>`;let items=await sb.from("checklist_items").select("*").eq("category_id",cat.id).order("sort_order");(items.data||[]).forEach(it=>{total++;if(it.is_checked)done++;let row=q("label");row.className="checkrow";let cb=q("input");cb.type="checkbox";cb.checked=it.is_checked;let sp=q("span");sp.textContent=it.title;if(it.is_checked)sp.className="done";cb.onchange=async()=>{sp.className=cb.checked?"done":"";await sb.from("checklist_items").update({is_checked:cb.checked,checked_at:cb.checked?new Date().toISOString():null,checked_by:cb.checked?user.id:null}).eq("id",it.id);toast(cb.checked?"Erledigt":"Nicht erledigt");openChecklist(id)};row.append(cb,sp);w.appendChild(row)});
-let add=q("div");add.className="inlineAdd";let input=q("input");input.placeholder="Neuer Eintrag in "+cat.title;let plus=btn("+",async()=>{let title=input.value.trim();if(!title){toast("Bitte Eintrag eingeben");return}loading(true,"Speichere Eintrag...");let e=await sb.from("checklist_items").insert({category_id:cat.id,title,sort_order:Date.now()%100000,is_checked:false});loading(false);if(e.error)return alert(e.error.message);openChecklist(id);toast("Eintrag hinzugefügt")});add.append(input,plus);w.appendChild(add);content.appendChild(w)}
-let pct=total?Math.round(done/total*100):0;box.innerHTML+=`<div class=progress><div class=bar style="width:${pct}%"></div></div><p class="muted">${done}/${total} erledigt (${pct}%)</p>`;box.appendChild(content);box.scrollIntoView({behavior:"smooth",block:"start"});
-}finally{loading(false)}
+
+async function loadDetailPanel(id){
+  const body=$("detailBody");
+  body.innerHTML=`<div style="display:flex;justify-content:center;padding:40px"><div class="spinner"></div></div>`;
+  const c=await sb.from("checklists").select("*").eq("id",id).single();
+  $("detailTitle").textContent=`${c.data.icon||"📋"} ${c.data.title}`;
+  $("detailArchive").onclick=()=>archiveChecklist(id,true);
+  const cats=await sb.from("checklist_categories").select("*").eq("checklist_id",id).order("sort_order");
+  let total=0,done=0;const catItems=[];
+  for(const cat of cats.data||[]){
+    const items=await sb.from("checklist_items").select("*").eq("category_id",cat.id).order("sort_order");
+    catItems.push({cat,items:items.data||[]});
+    total+=items.data?.length||0;
+    done+=(items.data||[]).filter(i=>i.is_checked).length;
+  }
+  const pct=total?Math.round(done/total*100):0;
+  body.innerHTML=`<div style="margin-bottom:18px"><div class="detail-progress-bar"><div class="bar" style="width:${pct}%"></div></div><div class="detail-progress-label">${done} von ${total} erledigt · ${pct}%</div></div>`;
+  for(const{cat,items}of catItems){
+    const block=q("div");block.className="cat-block";
+    const inner=q("div");inner.className="cat-inner";
+    block.innerHTML=`<h3>${cat.title}</h3>`;
+    items.forEach(it=>{
+      const row=q("div");row.className="checkrow";
+      const cb=q("input");cb.type="checkbox";cb.checked=it.is_checked;cb.id="cb-"+it.id;
+      const lbl=q("label");lbl.htmlFor="cb-"+it.id;lbl.textContent=it.title;
+      if(it.is_checked)lbl.classList.add("done");
+      cb.onchange=async()=>{
+        lbl.classList.toggle("done",cb.checked);
+        await sb.from("checklist_items").update({is_checked:cb.checked,checked_at:cb.checked?new Date().toISOString():null,checked_by:cb.checked?user.id:null}).eq("id",it.id);
+        toast(cb.checked?"✓ Erledigt":"Zurückgesetzt");
+        const allCbs=body.querySelectorAll('input[type=checkbox]');
+        const tot=allCbs.length,dn=[...allCbs].filter(c=>c.checked).length;
+        const p=tot?Math.round(dn/tot*100):0;
+        body.querySelector(".bar").style.width=p+"%";
+        body.querySelector(".detail-progress-label").textContent=`${dn} von ${tot} erledigt · ${p}%`;
+      };
+      row.append(cb,lbl);inner.appendChild(row);
+    });
+    const addRow=q("div");addRow.className="inline-add";
+    const inp=q("input");inp.placeholder="Neuer Eintrag…";
+    const plusBtn=q("button");plusBtn.innerHTML="+";
+    const doAdd=async()=>{
+      const title=inp.value.trim();if(!title)return;
+      loading(true,"Speichere…");
+      await sb.from("checklist_items").insert({category_id:cat.id,title,sort_order:Date.now()%100000,is_checked:false});
+      loading(false);inp.value="";toast("Eintrag hinzugefügt");loadDetailPanel(id);
+    };
+    plusBtn.onclick=doAdd;inp.onkeydown=e=>{if(e.key==="Enter")doAdd()};
+    addRow.append(inp,plusBtn);inner.appendChild(addRow);
+    block.appendChild(inner);body.appendChild(block);
+  }
 }
-async function archiveChecklist(id){if(!confirm("Archivieren?"))return;let e=await sb.from("checklists").update({archived:true,deleted_at:new Date().toISOString(),deleted_by:user.id}).eq("id",id);if(e.error)return alert(e.error.message);loadChecklists();$("checkDetail").classList.add("hidden");toast("Archiviert")}
-async function duplicateChecklist(id){let c=await sb.from("checklists").select("*").eq("id",id).single();let title=prompt("Name der Kopie:",c.data.title+" Kopie");if(!title)return;let r=await sb.from("checklists").insert({organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,title,description:c.data.description,icon:c.data.icon}).select().single();if(r.error)return alert(r.error.message);let cats=await sb.from("checklist_categories").select("*").eq("checklist_id",id).order("sort_order");for(const cat of cats.data||[]){let nc=await sb.from("checklist_categories").insert({checklist_id:r.data.id,title:cat.title,sort_order:cat.sort_order}).select().single();let items=await sb.from("checklist_items").select("*").eq("category_id",cat.id).order("sort_order");if(items.data?.length)await sb.from("checklist_items").insert(items.data.map(i=>({category_id:nc.data.id,title:i.title,sort_order:i.sort_order,is_checked:false})))}await loadChecklists();toast("Dupliziert")}
-async function loadUsers(){let box=$("users");let{data,error}=await sb.from("profiles").select("*").order("display_name");if(error){box.textContent=error.message;return}box.innerHTML="";(data||[]).forEach(u=>{let d=q("div");d.className="item";d.innerHTML=`<b>${u.display_name}</b><br><span class=muted>${u.email}</span><br>`;d.append(btn("Als User arbeiten",()=>{setActing(u.id,u.display_name);show("Check")},"ghost"));box.appendChild(d)})}
-async function addUser(){let id=$("newUserId").value.trim(),email=$("newUserEmail").value.trim(),name=$("newUserName").value.trim(),role=$("newUserRole").value;if(!id||!email||!name)return alert("UUID, E-Mail und Name nötig");let p=await sb.from("profiles").upsert({id,email,display_name:name});if(p.error)return alert(p.error.message);let m=await sb.from("organization_members").insert({organization_id:orgId,user_id:id,role});if(m.error)return alert(m.error.message);loadUsers();toast("Benutzer gespeichert")}
-async function seedStandardTemplates(){const templates=[["Camping","Packliste fürs Camping","🏕️","Schlafen\n- Zelt\n- Schlafsack\n- Isomatte\n\nKochen\n- Gaskocher\n- Geschirr\n- Besteck\n- Wasser"],["Wandern","Vorlage für Wanderausflüge","🎒","Ausrüstung\n- Wanderschuhe\n- Rucksack\n- Regenjacke\n\nVerpflegung\n- Wasser\n- Snacks\n- Sandwich"],["Flugreise","Vorlage für Reisen mit Flug","✈️","Dokumente\n- Pass/ID\n- Boardingpass\n- Versicherung\n\nHandgepäck\n- Kopfhörer\n- Ladegerät\n- Powerbank"],["Einkauf","Allgemeine Einkaufsliste","🛒","Lebensmittel\n- Brot\n- Milch\n- Früchte\n\nHaushalt\n- Küchenpapier\n- Müllsäcke"]];for(const t of templates)await createTemplateFromSeed(t);await loadTemplates();toast("Standardvorlagen ergänzt")}
-async function createTemplateFromSeed(t){let r=await sb.from("templates").insert({organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,title:t[0],description:t[1],icon:t[2],is_global:isSuper}).select().single();if(r.error)return;let cur=null,n=10,i=10;for(const line of t[3].split(/\n/).map(x=>x.trim()).filter(Boolean)){if(line.startsWith("-")){if(cur)await sb.from("template_items").insert({category_id:cur,title:line.replace(/^-\s*/,""),sort_order:i}),i+=10}else{let c=await sb.from("template_categories").insert({template_id:r.data.id,title:line,sort_order:n}).select().single();cur=c.data.id;n+=10;i=10}}}
-document.addEventListener("DOMContentLoaded",()=>{client();session()});if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js");
-</script></body></html>
+
+async function archiveChecklist(id,fromPanel=false){
+  const ok=await showModal({title:"Archivieren?",sub:"Die Checkliste wird archiviert und ausgeblendet.",confirmLabel:"Archivieren",danger:true});
+  if(!ok)return;
+  loading(true,"Archiviere…");
+  await sb.from("checklists").update({archived:true,deleted_at:new Date().toISOString(),deleted_by:user.id}).eq("id",id);
+  loading(false);toast("Archiviert");
+  if(fromPanel)closeDetailPanel();else loadChecklists();
+}
+
+async function duplicateChecklist(id){
+  const c=await sb.from("checklists").select("*").eq("id",id).single();
+  const title=await showModal({title:"Checkliste duplizieren",input:{label:"Name der Kopie",value:c.data.title+" Kopie"}});
+  if(!title)return;
+  loading(true,"Dupliziere…");
+  const r=await sb.from("checklists").insert({organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,title,description:c.data.description,icon:c.data.icon}).select().single();
+  if(r.error){alert(r.error.message);loading(false);return}
+  const cats=await sb.from("checklist_categories").select("*").eq("checklist_id",id).order("sort_order");
+  for(const cat of cats.data||[]){
+    const nc=await sb.from("checklist_categories").insert({checklist_id:r.data.id,title:cat.title,sort_order:cat.sort_order}).select().single();
+    const items=await sb.from("checklist_items").select("*").eq("category_id",cat.id).order("sort_order");
+    if(items.data?.length)await sb.from("checklist_items").insert(items.data.map(i=>({category_id:nc.data.id,title:i.title,sort_order:i.sort_order,is_checked:false})));
+  }
+  loading(false);await loadChecklists();toast("Dupliziert");
+}
+
+async function loadTemplates(){
+  const box=$("tplList");
+  box.innerHTML=`<div style="display:flex;justify-content:center;padding:40px"><div class="spinner"></div></div>`;
+  const{data,error}=await sb.from("templates").select("*").is("deleted_at",null).order("title");
+  if(error){box.textContent=error.message;return}
+  if(!data?.length){box.innerHTML=`<div class="empty-state"><div class="empty-icon">📂</div><div class="empty-title">Noch keine Vorlagen</div><div class="empty-sub">Erstelle eine eigene Vorlage oder füge Standardvorlagen hinzu.</div></div>`;return}
+  const grid=q("div");grid.className="tpl-grid";
+  (data||[]).forEach(t=>{
+    const card=q("div");card.className="tpl-card";
+    card.innerHTML=`<div class="tpl-card-head"><span class="tpl-icon">${t.icon||"📂"}</span><span class="tpl-name">${t.title}</span></div><div class="tpl-desc">${t.description||""}</div><div class="tpl-actions"></div>`;
+    const actions=card.querySelector(".tpl-actions");
+    const b1=q("button");b1.className="btn btn-primary btn-sm";b1.textContent="Checkliste erstellen";b1.onclick=()=>run("Erstelle…",()=>makeChecklist(t));
+    const b2=q("button");b2.className="btn btn-ghost btn-sm";b2.textContent="Bearbeiten";b2.onclick=()=>openTemplateEditor(t.id);
+    const b3=q("button");b3.className="btn btn-danger btn-sm";b3.textContent="Löschen";b3.onclick=()=>run("Lösche…",()=>deleteTemplate(t.id));
+    actions.append(b1,b2,b3);grid.appendChild(card);
+  });
+  box.innerHTML="";box.appendChild(grid);
+}
+
+async function openTemplateEditor(id){
+  loading(true,"Lade Vorlage…");
+  try{
+    currentTpl=id;
+    const wrap=$("tplEditorWrap");wrap.classList.add("show");
+    const box=$("tplEditor");
+    let tpl={title:"",description:"",icon:"📂"};
+    if(id){const r=await sb.from("templates").select("*").eq("id",id).single();tpl=r.data}
+    box.innerHTML=`<h2>${id?"Vorlage bearbeiten":"Neue Vorlage"}</h2>
+    <div style="display:grid;gap:4px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));margin-bottom:14px">
+      <div class="form-group"><label>Titel</label><input id="edTitle" value="${(tpl.title||"").replaceAll('"','&quot;')}"></div>
+      <div class="form-group"><label>Beschreibung</label><input id="edDesc" value="${(tpl.description||"").replaceAll('"','&quot;')}"></div>
+      <div class="form-group"><label>Icon</label><input id="edIcon" value="${tpl.icon||"📂"}" style="max-width:80px"></div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+      <button class="btn btn-primary btn-sm" id="saveTpl">Speichern</button>
+      <button class="btn btn-ghost btn-sm" id="addCat">+ Kategorie hinzufügen</button>
+      <button class="btn btn-ghost btn-sm" id="closeTplEditor">Schliessen</button>
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Erstelle zuerst Kategorien, dann Punkte direkt darunter.</p>
+    <div id="edCats"></div>`;
+    $("saveTpl").onclick=()=>run("Speichere…",saveTemplateMeta);
+    $("addCat").onclick=()=>run("Füge Kategorie hinzu…",addTemplateCategory);
+    $("closeTplEditor").onclick=()=>wrap.classList.remove("show");
+    if(id){const cats=await sb.from("template_categories").select("*").eq("template_id",id).order("sort_order");for(const c of cats.data||[])await renderTplCategory(c)}
+    wrap.scrollIntoView({behavior:"smooth",block:"start"});
+  }finally{loading(false)}
+}
+
+async function saveTemplateMeta(){
+  const data={organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,title:$("edTitle").value.trim(),description:$("edDesc").value.trim(),icon:$("edIcon").value.trim()||"📂",is_global:isSuper};
+  if(!data.title){toast("Titel fehlt");return false}
+  if(currentTpl){const e=await sb.from("templates").update({title:data.title,description:data.description,icon:data.icon,updated_by:user.id}).eq("id",currentTpl);if(e.error){alert(e.error.message);return false}}
+  else{const r=await sb.from("templates").insert(data).select().single();if(r.error){alert(r.error.message);return false}currentTpl=r.data.id}
+  await loadTemplates();toast("Vorlage gespeichert");return true;
+}
+
+async function addTemplateCategory(){
+  if(!currentTpl){const ok=await saveTemplateMeta();if(!ok||!currentTpl)return}
+  const title=await showModal({title:"Neue Kategorie",input:{label:"Name",placeholder:"z.B. Ausrüstung"}});
+  if(!title)return;
+  const r=await sb.from("template_categories").insert({template_id:currentTpl,title,sort_order:Date.now()%100000}).select().single();
+  if(r.error){alert(r.error.message);return}
+  await renderTplCategory(r.data);toast("Kategorie hinzugefügt");
+}
+
+async function renderTplCategory(c){
+  const wrap=q("div");wrap.className="cat-editor";wrap.id="tplcat-"+c.id;
+  wrap.innerHTML=`<div class="cat-editor-head"><h4>${c.title}</h4></div><div id="tplitems-${c.id}"></div>`;
+  const del=q("button");del.className="btn btn-danger btn-sm";del.textContent="Löschen";
+  del.onclick=async()=>{
+    const ok=await showModal({title:`Kategorie "${c.title}" löschen?`,confirmLabel:"Löschen",danger:true});
+    if(!ok)return;loading(true,"Lösche…");await sb.from("template_categories").delete().eq("id",c.id);loading(false);wrap.remove();toast("Kategorie gelöscht");
+  };
+  wrap.querySelector(".cat-editor-head").appendChild(del);
+  const addRow=q("div");addRow.className="inline-add";addRow.style.cssText="border:1px solid var(--border);border-radius:10px;padding:6px 10px;margin-top:8px";
+  const inp=q("input");inp.placeholder="Neuer Punkt in "+c.title;
+  const plus=q("button");plus.innerHTML="+";
+  const doAdd=async()=>{
+    const title=inp.value.trim();if(!title){toast("Bitte Punkt eingeben");return}
+    loading(true,"Speichere…");await sb.from("template_items").insert({category_id:c.id,title,sort_order:Date.now()%100000});loading(false);inp.value="";await loadTplItems(c.id);toast("Punkt hinzugefügt");
+  };
+  plus.onclick=doAdd;inp.onkeydown=e=>{if(e.key==="Enter")doAdd()};
+  addRow.append(inp,plus);wrap.appendChild(addRow);
+  $("edCats").appendChild(wrap);await loadTplItems(c.id);
+}
+
+async function loadTplItems(catId){
+  const box=$("tplitems-"+catId);if(!box)return;
+  const r=await sb.from("template_items").select("*").eq("category_id",catId).order("sort_order");
+  box.innerHTML="";
+  (r.data||[]).forEach(it=>{
+    const row=q("div");row.style.cssText="display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--border)";
+    const sp=q("span");sp.textContent="• "+it.title;sp.style.flex="1";sp.style.fontSize="14px";
+    const del=q("button");del.className="btn btn-ghost btn-sm";del.textContent="×";del.style.cssText="padding:4px 8px;color:var(--danger);border-color:#fca5a5";
+    del.onclick=async()=>{loading(true,"Lösche…");await sb.from("template_items").delete().eq("id",it.id);loading(false);toast("Punkt gelöscht");loadTplItems(catId)};
+    row.append(sp,del);box.appendChild(row);
+  });
+}
+
+async function deleteTemplate(id){
+  const ok=await showModal({title:"Vorlage löschen?",sub:"Diese Aktion kann nicht rückgängig gemacht werden.",confirmLabel:"Löschen",danger:true});
+  if(!ok)return;
+  await sb.from("templates").update({deleted_at:new Date().toISOString(),deleted_by:user.id}).eq("id",id);
+  await loadTemplates();$("tplEditorWrap").classList.remove("show");toast("Vorlage gelöscht");
+}
+
+async function makeChecklist(t){
+  const title=await showModal({title:"Checkliste erstellen",input:{label:"Titel",value:t.title+" "+new Date().toLocaleDateString("de-CH")}});
+  if(!title)return;
+  loading(true,"Erstelle…");
+  const r=await sb.from("checklists").insert({organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,template_id:t.id,title,description:t.description,icon:t.icon}).select().single();
+  if(r.error){alert(r.error.message);loading(false);return}
+  const cats=await sb.from("template_categories").select("*").eq("template_id",t.id).order("sort_order");
+  for(const c of cats.data||[]){
+    const nc=await sb.from("checklist_categories").insert({checklist_id:r.data.id,title:c.title,sort_order:c.sort_order}).select().single();
+    const items=await sb.from("template_items").select("*").eq("category_id",c.id).order("sort_order");
+    if(items.data?.length)await sb.from("checklist_items").insert(items.data.map(i=>({category_id:nc.data.id,title:i.title,sort_order:i.sort_order,is_checked:false})));
+  }
+  loading(false);await loadChecklists();show("Check");openDetailPanel(r.data.id);toast("Checkliste erstellt");
+}
+
+async function loadUsers(){
+  const box=$("users");box.innerHTML="";
+  const{data,error}=await sb.from("profiles").select("*").order("display_name");
+  if(error){box.textContent=error.message;return}
+  (data||[]).forEach(u=>{
+    const row=q("div");row.className="user-row";
+    const av=q("div");av.className="user-avatar";av.textContent=(u.display_name||u.email||"?")[0].toUpperCase();
+    const info=q("div");info.className="user-info";info.innerHTML=`<div class="uname">${u.display_name||"—"}</div><div class="uemail">${u.email||"—"}</div>`;
+    const btn=q("button");btn.className="btn btn-ghost btn-sm";btn.textContent="Als User arbeiten";
+    btn.onclick=()=>{setActing(u.id,u.display_name);show("Check")};
+    row.append(av,info,btn);box.appendChild(row);
+  });
+}
+
+async function addUser(){
+  const id=$("newUserId").value.trim(),email=$("newUserEmail").value.trim(),name=$("newUserName").value.trim(),role=$("newUserRole").value;
+  if(!id||!email||!name){toast("UUID, E-Mail und Name nötig");return}
+  loading(true,"Speichere…");
+  const p=await sb.from("profiles").upsert({id,email,display_name:name});
+  if(p.error){alert(p.error.message);loading(false);return}
+  const m=await sb.from("organization_members").insert({organization_id:orgId,user_id:id,role});
+  if(m.error){alert(m.error.message);loading(false);return}
+  loading(false);loadUsers();toast("Benutzer gespeichert");
+}
+
+async function seedStandardTemplates(){
+  const templates=[["Camping","Packliste fürs Camping","🏕️","Schlafen\n- Zelt\n- Schlafsack\n- Isomatte\n\nKochen\n- Gaskocher\n- Geschirr\n- Besteck\n- Wasser"],["Wandern","Vorlage für Wanderausflüge","🎒","Ausrüstung\n- Wanderschuhe\n- Rucksack\n- Regenjacke\n\nVerpflegung\n- Wasser\n- Snacks\n- Sandwich"],["Flugreise","Vorlage für Reisen mit Flug","✈️","Dokumente\n- Pass/ID\n- Boardingpass\n- Versicherung\n\nHandgepäck\n- Kopfhörer\n- Ladegerät\n- Powerbank"],["Einkauf","Allgemeine Einkaufsliste","🛒","Lebensmittel\n- Brot\n- Milch\n- Früchte\n\nHaushalt\n- Küchenpapier\n- Müllsäcke"]];
+  loading(true,"Ergänze Vorlagen…");
+  for(const t of templates)await createTemplateFromSeed(t);
+  loading(false);await loadTemplates();toast("Standardvorlagen ergänzt");
+}
+
+async function createTemplateFromSeed(t){
+  const r=await sb.from("templates").insert({organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,title:t[0],description:t[1],icon:t[2],is_global:isSuper}).select().single();
+  if(r.error)return;
+  let cur=null,n=10,i=10;
+  for(const line of t[3].split(/\n/).map(x=>x.trim()).filter(Boolean)){
+    if(line.startsWith("-")){if(cur)await sb.from("template_items").insert({category_id:cur,title:line.replace(/^-\s*/,""),sort_order:i});i+=10}
+    else{const c=await sb.from("template_categories").insert({template_id:r.data.id,title:line,sort_order:n}).select().single();cur=c.data.id;n+=10;i=10}
+  }
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+  initClient();
+  $("loginBtn").onclick=doLogin;
+  $("loginPw").onkeydown=e=>{if(e.key==="Enter")doLogin()};
+  $("logoutBtn").onclick=doLogout;
+  $("menuBtn").onclick=openSidebar;
+  $("sidebarBackdrop").onclick=closeSidebar;
+  $("stopActing").onclick=()=>setActing(null,"");
+  $("bCheck").onclick=()=>show("Check");
+  $("bTpl").onclick=()=>show("Tpl");
+  $("bAdmin").onclick=()=>show("Admin");
+  $("bbCheck").onclick=()=>show("Check");
+  $("bbTpl").onclick=()=>show("Tpl");
+  $("bbAdmin").onclick=()=>show("Admin");
+  $("refreshCheck").onclick=()=>run("Aktualisiere…",loadChecklists);
+  $("newTpl").onclick=()=>openTemplateEditor(null);
+  $("seedMore").onclick=()=>seedStandardTemplates();
+  $("addUser").onclick=addUser;
+  $("detailClose").onclick=closeDetailPanel;
+  $("detailOverlay").onclick=e=>{if(e.target===$("detailOverlay"))closeDetailPanel()};
+  checkSession();
+});
+
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js");
+</script>
+</body>
+</html>
