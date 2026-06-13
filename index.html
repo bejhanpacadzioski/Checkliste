@@ -89,6 +89,7 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 .detail-title-edit.active{display:block}
 .detail-title.editing{display:none}
 .detail-header-actions{display:flex;gap:6px;flex-shrink:0}
+.detail-header-actions .btn-label{display:inline}
 .detail-body{flex:1;overflow-y:auto;padding:20px;-webkit-overflow-scrolling:touch}
 
 /* Progress */
@@ -244,7 +245,9 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
   .page-title{font-size:19px}
   #detailPanel{width:100vw;border-left:none;border-radius:20px 20px 0 0;top:auto;height:94dvh;transform:translateY(100%)}
   #detailOverlay.open #detailPanel{transform:translateY(0)}
-  .detail-header{padding:16px 14px 12px}
+  .detail-header-actions .btn-label{display:none}
+  .detail-header-actions .btn-sm{padding:7px;border-radius:9px}
+  .detail-header{gap:8px}
   /* Drag handle on mobile */
   #detailPanel::before{content:'';display:block;width:40px;height:4px;border-radius:99px;background:var(--border);margin:0 auto 14px;flex-shrink:0}
   .detail-header-actions .btn-sm{padding:5px 10px;font-size:12px}
@@ -410,9 +413,9 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
       </div>
       <div class="detail-header-actions">
         <button class="btn btn-ghost btn-sm" id="detailAddCat" title="Neue Kategorie">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Kategorie
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg><span class="btn-label">Kategorie</span>
         </button>
-        <button class="btn btn-danger btn-sm" id="detailArchive">Archivieren</button>
+        <button class="btn btn-danger btn-sm" id="detailArchive"><span class="btn-label">Archivieren</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg></button>
       </div>
     </div>
     <div class="detail-body" id="detailBody"></div>
