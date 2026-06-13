@@ -137,7 +137,11 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 @keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 
 /* Templates */
-.tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:18px}
+.tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:12px}
+.tpl-section{margin-bottom:28px}
+.tpl-section-title{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:4px;padding:0 2px}
+.tpl-section-title svg{width:14px;height:14px;flex-shrink:0}
+.tpl-section-divider{height:1px;background:var(--border);margin-bottom:12px}
 .tpl-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:16px 18px}
 .tpl-card-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .tpl-icon{font-size:24px;line-height:1}
@@ -820,18 +824,58 @@ async function loadTemplates(){
   box.innerHTML=`<div style="display:flex;justify-content:center;padding:48px"><div class="spinner"></div></div>`;
   const{data,error}=await sb.from("templates").select("*").is("deleted_at",null).order("title");
   if(error){box.textContent=error.message;return}
-  if(!data?.length){box.innerHTML=`<div class="empty-state"><div class="empty-icon">📂</div><div class="empty-title">Noch keine Vorlagen</div><div class="empty-sub">Erstelle eine eigene Vorlage oder füge Standardvorlagen hinzu.</div></div>`;return}
-  const grid=q("div");grid.className="tpl-grid";
-  (data||[]).forEach(t=>{
-    const card=q("div");card.className="tpl-card";
-    card.innerHTML=`<div class="tpl-card-head"><span class="tpl-icon">${t.icon||"📂"}</span><span class="tpl-name">${escHtml(t.title)}</span></div><div class="tpl-desc">${escHtml(t.description||"")}</div><div class="tpl-actions"></div>`;
-    const a=card.querySelector(".tpl-actions");
-    const b1=q("button");b1.className="btn btn-primary btn-sm";b1.textContent="Checkliste erstellen";b1.onclick=()=>makeChecklist(t);
-    const b2=q("button");b2.className="btn btn-ghost btn-sm";b2.textContent="Bearbeiten";b2.onclick=()=>openTemplateEditor(t.id);
-    const b3=q("button");b3.className="btn btn-danger btn-sm";b3.textContent="Löschen";b3.onclick=()=>deleteTemplate(t.id);
-    a.append(b1,b2,b3);grid.appendChild(card);
-  });
-  box.innerHTML="";box.appendChild(grid);
+
+  // Split into three groups
+  const global=(data||[]).filter(t=>t.is_global);
+  const mine=(data||[]).filter(t=>!t.is_global&&t.owner_id===owner());
+  const others=(data||[]).filter(t=>!t.is_global&&t.owner_id!==owner());
+
+  if(!data?.length){
+    box.innerHTML=`<div class="empty-state"><div class="empty-icon">📂</div><div class="empty-title">Noch keine Vorlagen</div><div class="empty-sub">Erstelle eine eigene Vorlage oder füge Standardvorlagen hinzu.</div></div>`;return;
+  }
+
+  box.innerHTML="";
+
+  function renderSection(title, icon, templates, canEdit){
+    if(!templates.length)return;
+    const section=q("div");section.className="tpl-section";
+    section.innerHTML=`<div class="tpl-section-title">${icon}<span>${title}</span></div><div class="tpl-section-divider"></div>`;
+    const grid=q("div");grid.className="tpl-grid";
+    templates.forEach(t=>{
+      const card=q("div");card.className="tpl-card";
+      card.innerHTML=`<div class="tpl-card-head"><span class="tpl-icon">${t.icon||"📂"}</span><span class="tpl-name">${escHtml(t.title)}</span></div><div class="tpl-desc">${escHtml(t.description||"")}</div><div class="tpl-actions"></div>`;
+      const a=card.querySelector(".tpl-actions");
+      const b1=q("button");b1.className="btn btn-primary btn-sm";b1.textContent="Checkliste erstellen";b1.onclick=()=>makeChecklist(t);
+      a.append(b1);
+      if(canEdit){
+        const b2=q("button");b2.className="btn btn-ghost btn-sm";b2.textContent="Bearbeiten";b2.onclick=()=>openTemplateEditor(t.id);
+        const b3=q("button");b3.className="btn btn-danger btn-sm";b3.textContent="Löschen";b3.onclick=()=>deleteTemplate(t.id);
+        a.append(b2,b3);
+      }
+      grid.appendChild(card);
+    });
+    section.appendChild(grid);
+    box.appendChild(section);
+  }
+
+  renderSection(
+    "Globale Vorlagen",
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a12 12 0 0 1 0 18M12 3a12 12 0 0 0 0 18M3 12h18"/></svg>`,
+    global,
+    isSuper  // nur Super Admin darf globale bearbeiten/löschen
+  );
+  renderSection(
+    "Meine Vorlagen",
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>`,
+    mine,
+    true  // eigene Vorlagen immer editierbar
+  );
+  renderSection(
+    "Vorlagen von anderen",
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6"/><circle cx="17" cy="8" r="3"/><path d="M21 20c0-3.3-2.7-6-6-6"/></svg>`,
+    others,
+    isSuper  // nur Super Admin darf fremde bearbeiten/löschen
+  );
 }
 
 async function openTemplateEditor(id){
