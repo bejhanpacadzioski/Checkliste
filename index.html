@@ -268,6 +268,7 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
     <div class="detail-header">
       <button class="detail-close" id="detailClose"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
       <span class="detail-title" id="detailTitle">—</span>
+      <button class="btn btn-ghost btn-sm" id="detailAddCat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Kategorie</button>
       <button class="btn btn-danger btn-sm" id="detailArchive">Archivieren</button>
     </div>
     <div class="detail-body" id="detailBody"></div>
@@ -472,6 +473,15 @@ async function loadDetailPanel(id){
   }
 }
 
+async function addChecklistCategory(){
+  if(!currentChecklistId)return;
+  const title=await showModal({title:"Neue Kategorie",input:{label:"Name",placeholder:"z.B. Ausrüstung"}});
+  if(!title)return;
+  loading(true,"Speichere…");
+  await sb.from("checklist_categories").insert({checklist_id:currentChecklistId,title,sort_order:Date.now()%100000});
+  loading(false);toast("Kategorie hinzugefügt");loadDetailPanel(currentChecklistId);
+}
+
 async function archiveChecklist(id,fromPanel=false){
   const ok=await showModal({title:"Archivieren?",sub:"Die Checkliste wird archiviert und ausgeblendet.",confirmLabel:"Archivieren",danger:true});
   if(!ok)return;
@@ -538,7 +548,7 @@ async function openTemplateEditor(id){
     <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Erstelle zuerst Kategorien, dann Punkte direkt darunter.</p>
     <div id="edCats"></div>`;
     $("saveTpl").onclick=()=>run("Speichere…",saveTemplateMeta);
-    $("addCat").onclick=()=>run("Füge Kategorie hinzu…",addTemplateCategory);
+    $("addCat").onclick=()=>addTemplateCategory();
     $("closeTplEditor").onclick=()=>wrap.classList.remove("show");
     if(id){const cats=await sb.from("template_categories").select("*").eq("template_id",id).order("sort_order");for(const c of cats.data||[])await renderTplCategory(c)}
     wrap.scrollIntoView({behavior:"smooth",block:"start"});
@@ -679,6 +689,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   $("seedMore").onclick=()=>seedStandardTemplates();
   $("addUser").onclick=addUser;
   $("detailClose").onclick=closeDetailPanel;
+  $("detailAddCat").onclick=()=>addChecklistCategory();
   $("detailOverlay").onclick=e=>{if(e.target===$("detailOverlay"))closeDetailPanel()};
   checkSession();
 });
