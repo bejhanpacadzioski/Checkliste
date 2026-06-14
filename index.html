@@ -352,7 +352,11 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
     <div class="suser">
       <span class="uname" id="sUserName">—</span>
       <span class="uemail" id="sUserEmail">—</span>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px">
+      <button id="changePwBtn" style="width:100%;margin-top:8px;background:none;border:1px solid var(--border);border-radius:8px;padding:7px;font-size:13px;color:var(--muted);cursor:pointer;font-family:inherit;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Passwort ändern
+      </button>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
         <button id="logoutBtn" style="margin-top:0;flex:1;margin-right:8px">Abmelden</button>
         <button id="darkToggle" title="Dark Mode" style="background:none;border:1px solid var(--border);border-radius:8px;padding:7px 9px;cursor:pointer;color:var(--muted);display:flex;align-items:center;transition:background .15s,color .15s;flex-shrink:0">
           <svg id="darkIcon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg>
@@ -468,6 +472,32 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
     <button class="bnav-item" id="bbTpl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Vorlagen</button>
     <button class="bnav-item hidden" id="bbAdmin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 11l1.5 1.5L21 9"/></svg>Admin</button>
   </nav>
+</div>
+
+<!-- Edit User Panel -->
+<div id="editUserOverlay" style="position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:150;opacity:0;pointer-events:none;transition:opacity .22s ease">
+  <div id="editUserPanel" style="position:fixed;top:0;right:0;bottom:0;width:min(420px,100vw);background:var(--surface);border-left:1px solid var(--border);box-shadow:var(--shadow-lg);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .26s cubic-bezier(.4,0,.2,1);z-index:151;overflow-y:auto;padding:24px">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+      <button id="editUserClose" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:6px;border-radius:8px;display:flex;transition:background .15s"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      <h2 style="font-size:18px;font-weight:700;flex:1" id="editUserTitle">Benutzer bearbeiten</h2>
+    </div>
+    <div id="editUserBody"></div>
+  </div>
+</div>
+
+<!-- Change Password Modal (own password) -->
+<div id="changePwOverlay" style="position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s ease">
+  <div style="background:var(--surface);border-radius:20px;box-shadow:var(--shadow-lg);padding:24px;width:100%;max-width:380px;transform:scale(.95) translateY(10px);transition:transform .22s ease" id="changePwBox">
+    <h3 style="font-size:17px;font-weight:700;margin-bottom:4px">Passwort ändern</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:18px">Wähle ein neues Passwort für deinen Account.</p>
+    <div class="form-group"><label>Neues Passwort</label><input id="newPw1" type="password" placeholder="Min. 6 Zeichen"></div>
+    <div class="form-group"><label>Passwort bestätigen</label><input id="newPw2" type="password" placeholder="Wiederholen"></div>
+    <div id="changePwMsg" style="font-size:13px;min-height:18px;margin-bottom:10px"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-ghost btn-sm" id="changePwCancel">Abbrechen</button>
+      <button class="btn btn-primary btn-sm" id="changePwConfirm">Speichern</button>
+    </div>
+  </div>
 </div>
 
 <!-- Detail Panel -->
@@ -1340,22 +1370,74 @@ async function loadUsers(){
   });
 }
 
-async function editUser(u,currentRole){
-  const nameVal=await showModal({title:"Name ändern",input:{label:"Name",value:u.display_name||""}});
-  if(nameVal===null)return;
-  // Ask for role separately
-  const roles=["user","admin","super_admin"];
-  const roleLabels=["User","Admin","Super Admin"];
-  // Show role modal by reusing showModal with a select — inject custom content
-  const roleVal=await showSelectModal("Rolle ändern",currentRole,roles,roleLabels);
-  if(roleVal===null)return;
-  loading(true,"Speichere…");
-  const p=await sb.from("profiles").update({display_name:nameVal}).eq("id",u.id);
-  if(p.error){alert(p.error.message);loading(false);return}
-  const m=await sb.from("organization_members").update({role:roleVal}).eq("user_id",u.id).eq("organization_id",orgId);
-  if(m.error){alert(m.error.message);loading(false);return}
-  loading(false);loadUsers();toast("Benutzer aktualisiert");
+function openEditUserPanel(u,currentRole){
+  const overlay=$("editUserOverlay");const panel=$("editUserPanel");
+  $("editUserTitle").textContent=u.display_name||u.email||"Benutzer bearbeiten";
+  const body=$("editUserBody");
+  body.innerHTML=`
+    <div class="form-group"><label>Name</label><input id="euName" value="${escAttr(u.display_name||"")}"></div>
+    <div class="form-group"><label>E-Mail</label><input id="euEmail" type="email" value="${escAttr(u.email||"")}"></div>
+    <div class="form-group"><label>Rolle</label>
+      <select id="euRole">
+        <option value="user"${currentRole==="user"?" selected":""}>User</option>
+        <option value="admin"${currentRole==="admin"?" selected":""}>Admin</option>
+        <option value="super_admin"${currentRole==="super_admin"?" selected":""}>Super Admin</option>
+      </select>
+    </div>
+    <div style="border-top:1px solid var(--border);padding-top:18px;margin-top:4px">
+      <h4 style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Neues Passwort setzen</h4>
+      <div class="form-group"><label>Neues Passwort</label><input id="euPw" type="password" placeholder="Leer lassen = unverändert"></div>
+      <div class="form-group"><label>Passwort bestätigen</label><input id="euPw2" type="password" placeholder="Wiederholen"></div>
+    </div>
+    <div id="euMsg" style="font-size:13px;min-height:18px;margin-bottom:10px;color:var(--danger)"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-primary" id="euSave" style="flex:1">Speichern</button>
+      <button class="btn btn-ghost" id="euCancel">Abbrechen</button>
+    </div>`;
+
+  const closePanel=()=>{overlay.style.opacity="0";overlay.style.pointerEvents="none";panel.style.transform="translateX(100%)"};
+  $("euCancel").onclick=closePanel;
+  $("editUserClose").onclick=closePanel;
+  overlay.onclick=e=>{if(e.target===overlay)closePanel()};
+
+  $("euSave").onclick=async()=>{
+    const name=$("euName").value.trim();
+    const email=$("euEmail").value.trim();
+    const role=$("euRole").value;
+    const pw=$("euPw").value;
+    const pw2=$("euPw2").value;
+    const msg=$("euMsg");msg.textContent="";
+    if(!name){msg.textContent="Name darf nicht leer sein.";return}
+    if(!email){msg.textContent="E-Mail darf nicht leer sein.";return}
+    if(pw&&pw.length<6){msg.textContent="Passwort muss mindestens 6 Zeichen haben.";return}
+    if(pw&&pw!==pw2){msg.textContent="Passwörter stimmen nicht überein.";return}
+    loading(true,"Speichere…");
+    // Update profile
+    const pRes=await sb.from("profiles").update({display_name:name,email}).eq("id",u.id);
+    if(pRes.error){msg.textContent=pRes.error.message;loading(false);return}
+    // Update role
+    const mRes=await sb.from("organization_members").update({role}).eq("user_id",u.id).eq("organization_id",orgId);
+    if(mRes.error){msg.textContent=mRes.error.message;loading(false);return}
+    // Set password via Edge Function if provided
+    if(pw){
+      const session=await sb.auth.getSession();
+      const token=session.data.session?.access_token;
+      const res=await fetch(`${SUPABASE_URL}/functions/v1/set-user-password`,{
+        method:"POST",
+        headers:{"Content-Type":"application/json","Authorization":`Bearer ${token}`},
+        body:JSON.stringify({user_id:u.id,password:pw})
+      });
+      const json=await res.json();
+      if(!res.ok||json.error){msg.textContent=json.error||"Fehler beim Passwort setzen.";loading(false);return}
+    }
+    loading(false);closePanel();loadUsers();toast("Benutzer aktualisiert");
+  };
+
+  overlay.style.opacity="1";overlay.style.pointerEvents="all";panel.style.transform="translateX(0)";
+  setTimeout(()=>$("euName")?.focus(),100);
 }
+
+async function editUser(u,currentRole){openEditUserPanel(u,currentRole)}
 
 function showSelectModal(title,currentVal,values,labels){
   return new Promise(resolve=>{
@@ -1487,6 +1569,32 @@ async function loadArchivedTemplates(){
   list.innerHTML="";list.appendChild(grid);
 }
 
+/* ── Own password change ── */
+function openChangePwModal(){
+  const overlay=$("changePwOverlay"),box=$("changePwBox");
+  $("newPw1").value="";$("newPw2").value="";$("changePwMsg").textContent="";
+  overlay.style.opacity="1";overlay.style.pointerEvents="all";box.style.transform="scale(1) translateY(0)";
+  closeSidebar();setTimeout(()=>$("newPw1").focus(),80);
+}
+function closeChangePwModal(){
+  const overlay=$("changePwOverlay"),box=$("changePwBox");
+  overlay.style.opacity="0";overlay.style.pointerEvents="none";box.style.transform="scale(.95) translateY(10px)";
+}
+async function submitChangePw(){
+  const pw=$("newPw1").value,pw2=$("newPw2").value,msg=$("changePwMsg");
+  msg.style.color="var(--danger)";msg.textContent="";
+  if(!pw){msg.textContent="Bitte Passwort eingeben.";return}
+  if(pw.length<6){msg.textContent="Mindestens 6 Zeichen.";return}
+  if(pw!==pw2){msg.textContent="Passwörter stimmen nicht überein.";return}
+  loading(true,"Speichere…");
+  const{error}=await sb.auth.updateUser({password:pw});
+  loading(false);
+  if(error){msg.textContent=error.message;return}
+  msg.style.color="var(--success)";msg.textContent="✓ Passwort geändert.";
+  setTimeout(()=>closeChangePwModal(),1200);
+  toast("Passwort geändert");
+}
+
 async function seedStandardTemplates(){
   const templates=[["Camping","Packliste fürs Camping","🏕️","Schlafen\n- Zelt\n- Schlafsack\n- Isomatte\n\nKochen\n- Gaskocher\n- Geschirr\n- Besteck\n- Wasser"],["Wandern","Vorlage für Wanderausflüge","🎒","Ausrüstung\n- Wanderschuhe\n- Rucksack\n- Regenjacke\n\nVerpflegung\n- Wasser\n- Snacks\n- Sandwich"],["Flugreise","Vorlage für Reisen mit Flug","✈️","Dokumente\n- Pass/ID\n- Boardingpass\n- Versicherung\n\nHandgepäck\n- Kopfhörer\n- Ladegerät\n- Powerbank"],["Einkauf","Allgemeine Einkaufsliste","🛒","Lebensmittel\n- Brot\n- Milch\n- Früchte\n\nHaushalt\n- Küchenpapier\n- Müllsäcke"]];
   loading(true,"Prüfe Vorlagen…");
@@ -1514,6 +1622,11 @@ document.addEventListener("DOMContentLoaded",()=>{
   $("loginBtn").onclick=doLogin;
   $("loginPw").onkeydown=e=>{if(e.key==="Enter")doLogin()};
   $("logoutBtn").onclick=doLogout;
+  $("editUserClose").onclick=()=>{$("editUserOverlay").style.opacity="0";$("editUserOverlay").style.pointerEvents="none";$("editUserPanel").style.transform="translateX(100%)"};
+  $("changePwBtn").onclick=()=>openChangePwModal();
+  $("changePwCancel").onclick=()=>closeChangePwModal();
+  $("changePwConfirm").onclick=()=>submitChangePw();
+  $("newPw1").onkeydown=$("newPw2").onkeydown=e=>{if(e.key==="Enter")submitChangePw()};
   $("darkToggle").onclick=toggleDark;
   // Init icon based on current state (light by default)
   applyDark(false);
