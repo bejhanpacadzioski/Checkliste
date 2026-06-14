@@ -1308,8 +1308,10 @@ function openEditUserPanel(u,currentRole){
   $("editUserTitle").textContent=u.display_name||u.email||"Benutzer bearbeiten";
   const body=$("editUserBody");
   body.innerHTML=`
-    <div class="form-group"><label>Name</label><input id="euName" value="${escAttr(u.display_name||"")}"></div>
-    <div class="form-group"><label>E-Mail</label><input id="euEmail" type="email" value="${escAttr(u.email||"")}"></div>
+    <div style="background:var(--bg);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:13px;color:var(--muted)">
+      <span style="font-weight:600;color:var(--text)">${escHtml(u.email||"—")}</span><br>Login-E-Mail (nicht änderbar)
+    </div>
+    <div class="form-group"><label>Benutzername</label><input id="euName" value="${escAttr(u.display_name||"")}"></div>
     <div class="form-group"><label>Rolle</label>
       <select id="euRole">
         <option value="user"${currentRole==="user"?" selected":""}>User</option>
@@ -1335,35 +1337,46 @@ function openEditUserPanel(u,currentRole){
 
   $("euSave").onclick=async()=>{
     const name=$("euName").value.trim();
-    const email=$("euEmail").value.trim();
     const role=$("euRole").value;
     const pw=$("euPw").value;
     const pw2=$("euPw2").value;
-    const msg=$("euMsg");msg.textContent="";
-    if(!name){msg.textContent="Name darf nicht leer sein.";return}
-    if(!email){msg.textContent="E-Mail darf nicht leer sein.";return}
+    const msg=$("euMsg");
+    msg.style.color="var(--danger)";msg.textContent="";
+    if(!name){msg.textContent="Benutzername darf nicht leer sein.";return}
     if(pw&&pw.length<6){msg.textContent="Passwort muss mindestens 6 Zeichen haben.";return}
     if(pw&&pw!==pw2){msg.textContent="Passwörter stimmen nicht überein.";return}
     loading(true,"Speichere…");
-    // Update profile
-    const pRes=await sb.from("profiles").update({display_name:name,email}).eq("id",u.id);
+    // Update profile (only display_name, not email)
+    const pRes=await sb.from("profiles").update({display_name:name}).eq("id",u.id);
     if(pRes.error){msg.textContent=pRes.error.message;loading(false);return}
     // Update role
     const mRes=await sb.from("organization_members").update({role}).eq("user_id",u.id).eq("organization_id",orgId);
     if(mRes.error){msg.textContent=mRes.error.message;loading(false);return}
     // Set password via Edge Function if provided
     if(pw){
-      const session=await sb.auth.getSession();
-      const token=session.data.session?.access_token;
-      const res=await fetch(`${SUPABASE_URL}/functions/v1/set-user-password`,{
-        method:"POST",
-        headers:{"Content-Type":"application/json","Authorization":`Bearer ${token}`},
-        body:JSON.stringify({user_id:u.id,password:pw})
-      });
-      const json=await res.json();
-      if(!res.ok||json.error){msg.textContent=json.error||"Fehler beim Passwort setzen.";loading(false);return}
+      try{
+        const sessionRes=await sb.auth.getSession();
+        const token=sessionRes.data?.session?.access_token;
+        if(!token){msg.textContent="Keine gültige Session — bitte neu einloggen.";loading(false);return}
+        const res=await fetch(`${SUPABASE_URL}/functions/v1/set-user-password`,{
+          method:"POST",
+          headers:{"Content-Type":"application/json","Authorization":`Bearer ${token}`},
+          body:JSON.stringify({user_id:u.id,password:pw})
+        });
+        let json={};
+        try{json=await res.json()}catch(_){}
+        if(!res.ok||json.error){
+          msg.textContent=json.error||`Passwort-Fehler (HTTP ${res.status}). Edge Function deployed?`;
+          loading(false);return;
+        }
+      }catch(err){
+        msg.textContent="Netzwerkfehler: "+err.message;loading(false);return;
+      }
     }
-    loading(false);closePanel();loadUsers();toast("Benutzer aktualisiert");
+    loading(false);
+    msg.style.color="var(--success)";msg.textContent="✓ Gespeichert";
+    setTimeout(()=>closePanel(),800);
+    loadUsers();toast("Benutzer aktualisiert");
   };
 
   overlay.style.opacity="1";overlay.style.pointerEvents="all";panel.style.transform="translateX(0)";
