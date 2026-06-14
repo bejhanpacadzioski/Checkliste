@@ -99,6 +99,17 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 .detail-progress-bar .bar.complete{background:linear-gradient(90deg,#16a34a,#22c55e)}
 .detail-progress-label{font-size:13px;color:var(--muted)}
 
+/* Drag & Drop */
+.drag-handle{display:flex;align-items:center;cursor:grab;color:var(--border);padding:0 4px 0 0;flex-shrink:0;touch-action:none;transition:color .15s}
+.drag-handle:hover,.drag-handle.active{color:var(--muted)}
+.drag-handle:active{cursor:grabbing}
+.cat-drag-handle{display:flex;align-items:center;cursor:grab;color:var(--border);padding:2px 6px 2px 0;touch-action:none;transition:color .15s}
+.cat-drag-handle:hover{color:var(--muted)}
+.cat-drag-handle:active{cursor:grabbing}
+.dragging{opacity:.35;background:var(--accent);border-radius:8px}
+.drag-over-top{box-shadow:0 -2px 0 var(--accent)!important}
+.drag-over-bottom{box-shadow:0 2px 0 var(--accent)!important}
+.drag-ghost{position:fixed;pointer-events:none;z-index:9999;opacity:.85;background:var(--surface);border-radius:10px;box-shadow:var(--shadow-lg);padding:10px 14px;font-size:14px;font-weight:500;max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* Category blocks */
 .cat-block{margin-bottom:18px}
 .cat-header{display:flex;align-items:center;gap:6px;margin-bottom:8px}
@@ -379,12 +390,28 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
           <div><h1 class="page-title">Vorlagen</h1><p class="page-sub">Vorlagen verwalten</p></div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="btn btn-ghost btn-sm" id="seedMore">Standardvorlagen</button>
+            <button class="btn btn-ghost btn-sm" id="showArchivedTpl">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg>
+              Archiviert
+            </button>
             <button class="btn btn-primary btn-sm" id="newTpl">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Neue Vorlage
             </button>
           </div>
         </div>
         <div id="tplList" style="margin-top:18px"></div>
+        <!-- Archived templates section -->
+        <div id="archivedTplSection" style="display:none;margin-top:24px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+            <div class="tpl-section-title" style="flex:1">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg>
+              Archivierte Vorlagen
+            </div>
+            <button class="btn btn-ghost btn-sm" id="closeArchivedTpl">Schliessen</button>
+          </div>
+          <div class="tpl-section-divider"></div>
+          <div id="archivedTplList"></div>
+        </div>
         <div id="tplEditorWrap"><div class="editor-card" id="tplEditor"></div></div>
       </div>
 
@@ -753,9 +780,15 @@ async function loadDetailPanel(id){
     return;
   }
 
+  const catContainer=q("div");catContainer.id="cat-container-"+id;
   for(const cat of catsRes.data){
-    const block=q("div");block.className="cat-block";
+    const block=q("div");block.className="cat-block";block.dataset.catId=cat.id;
     const catHead=q("div");catHead.className="cat-header";
+
+    // Category drag handle
+    const catHandle=q("div");catHandle.className="cat-drag-handle";catHandle.title="Kategorie ziehen zum Sortieren";
+    catHandle.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>`;
+
     const catTitle=q("h3");catTitle.textContent=cat.title;
     const catDel=q("button");catDel.className="cat-del-btn";catDel.textContent="×";catDel.title="Kategorie löschen";
     catDel.onclick=async()=>{
@@ -765,7 +798,8 @@ async function loadDetailPanel(id){
       await sb.from("checklist_categories").delete().eq("id",cat.id);
       loading(false);toast("Kategorie gelöscht");panelDirty=true;loadDetailPanel(id);
     };
-    catHead.append(catTitle,catDel);block.appendChild(catHead);
+    catHead.append(catHandle,catTitle,catDel);block.appendChild(catHead);
+    attachCatDrag(catHandle,block,catContainer,id);
 
     const inner=q("div");inner.className="cat-inner";
     const items=itemsByCat[cat.id]||[];
@@ -790,12 +824,98 @@ async function loadDetailPanel(id){
     };
     plusBtn.onclick=doAdd;inp.onkeydown=e=>{if(e.key==="Enter")doAdd()};
     addRow.append(inp,plusBtn);inner.appendChild(addRow);
-    block.appendChild(inner);body.appendChild(block);
+    block.appendChild(inner);catContainer.appendChild(block);
   }
+  body.appendChild(catContainer);
+}
+
+function attachCatDrag(handle,block,container,checklistId){
+  let longPressTimer=null,dragging=false;
+
+  // Desktop
+  handle.draggable=true;
+  handle.addEventListener("dragstart",e=>{
+    e.dataTransfer.effectAllowed="move";
+    setTimeout(()=>block.classList.add("dragging"),0);
+    container._draggingBlock=block;
+    createGhost(block.querySelector("h3")?.textContent||"",e.clientX,e.clientY);
+  });
+  handle.addEventListener("dragend",()=>{
+    block.classList.remove("dragging");removeGhost();saveCatOrder(container,checklistId);
+  });
+  block.addEventListener("dragover",e=>{
+    if(!container._draggingBlock||container._draggingBlock===block)return;
+    e.preventDefault();
+    const rect=block.getBoundingClientRect();
+    const mid=rect.top+rect.height/2;
+    clearCatDragOver(container);
+    block.classList.add(e.clientY<mid?"drag-over-top":"drag-over-bottom");
+  });
+  block.addEventListener("dragleave",()=>clearCatDragOver(container));
+  block.addEventListener("drop",e=>{
+    e.preventDefault();
+    const src=container._draggingBlock;if(!src||src===block)return;
+    clearCatDragOver(container);
+    const rect=block.getBoundingClientRect();
+    if(e.clientY<rect.top+rect.height/2)container.insertBefore(src,block);
+    else block.after(src);
+  });
+
+  // Touch longpress
+  handle.addEventListener("touchstart",e=>{
+    const touch=e.touches[0];
+    longPressTimer=setTimeout(()=>{
+      dragging=true;handle.classList.add("active");
+      navigator.vibrate&&navigator.vibrate(40);
+      createGhost(block.querySelector("h3")?.textContent||"",touch.clientX,touch.clientY);
+      container._draggingBlock=block;block.classList.add("dragging");
+    },450);
+  },{passive:true});
+  handle.addEventListener("touchmove",e=>{
+    clearTimeout(longPressTimer);if(!dragging)return;
+    e.preventDefault();
+    const touch=e.touches[0];moveGhost(touch.clientX,touch.clientY);
+    const el=document.elementFromPoint(touch.clientX,touch.clientY);
+    const targetBlock=el?.closest(".cat-block");
+    if(targetBlock&&targetBlock!==block&&targetBlock.parentNode===container){
+      clearCatDragOver(container);
+      const rect=targetBlock.getBoundingClientRect();
+      const above=touch.clientY<rect.top+rect.height/2;
+      targetBlock.classList.add(above?"drag-over-top":"drag-over-bottom");
+      container._touchCatTarget={block:targetBlock,above};
+    }
+  },{passive:false});
+  handle.addEventListener("touchend",()=>{
+    clearTimeout(longPressTimer);
+    if(!dragging){dragging=false;return}
+    dragging=false;handle.classList.remove("active");
+    block.classList.remove("dragging");removeGhost();
+    if(container._touchCatTarget){
+      const{block:tgt,above}=container._touchCatTarget;
+      if(above)container.insertBefore(block,tgt);else tgt.after(block);
+      delete container._touchCatTarget;
+    }
+    clearCatDragOver(container);saveCatOrder(container,checklistId);
+  });
+}
+
+function clearCatDragOver(container){
+  container.querySelectorAll(".drag-over-top,.drag-over-bottom").forEach(el=>el.classList.remove("drag-over-top","drag-over-bottom"));
+}
+
+async function saveCatOrder(container,checklistId){
+  const blocks=[...container.querySelectorAll(".cat-block[data-cat-id]")];
+  await Promise.all(blocks.map((b,i)=>sb.from("checklist_categories").update({sort_order:(i+1)*10}).eq("id",b.dataset.catId)));
+  panelDirty=true;
 }
 
 function makeCheckrow(it,checklistId,container,refreshProgress){
-  const row=q("div");row.className="checkrow";
+  const row=q("div");row.className="checkrow";row.dataset.id=it.id;
+
+  // Drag handle
+  const handle=q("div");handle.className="drag-handle";handle.title="Ziehen zum Sortieren";
+  handle.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>`;
+
   const cb=q("input");cb.type="checkbox";cb.checked=it.is_checked;cb.id="cb-"+it.id;
   const lbl=q("label");lbl.htmlFor="cb-"+it.id;lbl.textContent=it.title;
   if(it.is_checked)lbl.classList.add("done");
@@ -812,7 +932,115 @@ function makeCheckrow(it,checklistId,container,refreshProgress){
     await sb.from("checklist_items").update({is_checked:cb.checked,checked_at:cb.checked?new Date().toISOString():null,checked_by:cb.checked?user.id:null}).eq("id",it.id);
     toast(cb.checked?"✓ Erledigt":"↩ Zurückgesetzt");panelDirty=true;refreshProgress();
   };
-  row.append(cb,lbl,delBtn);return row;
+  row.append(handle,cb,lbl,delBtn);
+
+  // Attach drag behaviour
+  attachItemDrag(handle,row,container);
+  return row;
+}
+
+/* ── Drag helpers ── */
+let dragGhost=null;
+
+function attachItemDrag(handle,row,container){
+  let longPressTimer=null;
+  let dragging=false;
+
+  // Desktop drag
+  handle.draggable=true;
+  handle.addEventListener("dragstart",e=>{
+    e.dataTransfer.effectAllowed="move";
+    e.dataTransfer.setData("text/plain","item");
+    setTimeout(()=>row.classList.add("dragging"),0);
+    container._draggingRow=row;
+    createGhost(row.querySelector("label")?.textContent||"",e.clientX,e.clientY);
+  });
+  handle.addEventListener("dragend",()=>{
+    row.classList.remove("dragging");
+    removeGhost();
+    saveItemOrder(container);
+  });
+  row.addEventListener("dragover",e=>{
+    if(!container._draggingRow||container._draggingRow===row)return;
+    e.preventDefault();
+    const rect=row.getBoundingClientRect();
+    const mid=rect.top+rect.height/2;
+    clearDragOver(container);
+    row.classList.add(e.clientY<mid?"drag-over-top":"drag-over-bottom");
+  });
+  row.addEventListener("dragleave",()=>clearDragOver(container));
+  row.addEventListener("drop",e=>{
+    e.preventDefault();
+    const src=container._draggingRow;if(!src||src===row)return;
+    clearDragOver(container);
+    const rect=row.getBoundingClientRect();
+    const mid=rect.top+rect.height/2;
+    if(e.clientY<mid) container.insertBefore(src,row);
+    else row.after(src);
+  });
+
+  // Touch / longpress
+  handle.addEventListener("touchstart",e=>{
+    const touch=e.touches[0];
+    longPressTimer=setTimeout(()=>{
+      dragging=true;
+      handle.classList.add("active");
+      navigator.vibrate&&navigator.vibrate(40);
+      createGhost(row.querySelector("label")?.textContent||"",touch.clientX,touch.clientY);
+      container._draggingRow=row;
+      row.classList.add("dragging");
+    },450);
+  },{passive:true});
+  handle.addEventListener("touchmove",e=>{
+    clearTimeout(longPressTimer);
+    if(!dragging)return;
+    e.preventDefault();
+    const touch=e.touches[0];
+    moveGhost(touch.clientX,touch.clientY);
+    const el=document.elementFromPoint(touch.clientX,touch.clientY);
+    const targetRow=el?.closest(".checkrow");
+    if(targetRow&&targetRow!==row&&targetRow.parentNode===container){
+      clearDragOver(container);
+      const rect=targetRow.getBoundingClientRect();
+      const mid=rect.top+rect.height/2;
+      targetRow.classList.add(touch.clientY<mid?"drag-over-top":"drag-over-bottom");
+      container._touchTarget={row:targetRow,above:touch.clientY<mid};
+    }
+  },{passive:false});
+  handle.addEventListener("touchend",()=>{
+    clearTimeout(longPressTimer);
+    if(!dragging){dragging=false;return}
+    dragging=false;handle.classList.remove("active");
+    row.classList.remove("dragging");removeGhost();
+    if(container._touchTarget){
+      const{row:tgt,above}=container._touchTarget;
+      if(above)container.insertBefore(row,tgt);else tgt.after(row);
+      delete container._touchTarget;
+    }
+    clearDragOver(container);
+    saveItemOrder(container);
+  });
+}
+
+function clearDragOver(container){
+  container.querySelectorAll(".drag-over-top,.drag-over-bottom").forEach(el=>{
+    el.classList.remove("drag-over-top","drag-over-bottom");
+  });
+}
+
+function createGhost(text,x,y){
+  dragGhost=q("div");dragGhost.className="drag-ghost";dragGhost.textContent=text;
+  document.body.appendChild(dragGhost);
+  moveGhost(x,y);
+}
+function moveGhost(x,y){if(dragGhost){dragGhost.style.left=x+14+"px";dragGhost.style.top=y-10+"px"}}
+function removeGhost(){dragGhost?.remove();dragGhost=null}
+
+async function saveItemOrder(container){
+  const rows=[...container.querySelectorAll(".checkrow[data-id]")];
+  const updates=rows.map((r,i)=>sb.from("checklist_items").update({sort_order:(i+1)*10}).eq("id",r.dataset.id));
+  await Promise.all(updates);
+  panelDirty=true;
 }
 
 async function addChecklistCategory(){
@@ -1111,7 +1339,7 @@ function showSelectModal(title,currentVal,values,labels){
   return new Promise(resolve=>{
     $("modalTitle").textContent=title;$("modalSub").textContent="";
     const wrap=$("modalInputWrap");wrap.style.display="";
-    $("modalInputLabel").textContent="Rolle";
+    $("modalInputLabel").textContent=title;
     // Replace input with select temporarily
     const inp=$("modalInput");inp.style.display="none";
     let sel=document.getElementById("modalSelect");
@@ -1181,6 +1409,62 @@ async function addUser(){
   loading(false);
 }
 
+async function loadArchivedTemplates(){
+  const section=$("archivedTplSection");
+  const list=$("archivedTplList");
+  section.style.display="";
+  list.innerHTML=`<div style="display:flex;justify-content:center;padding:24px"><div class="spinner"></div></div>`;
+  section.scrollIntoView({behavior:"smooth",block:"start"});
+
+  // Users see only their own archived; admins/superadmins see all
+  let query=sb.from("templates").select("*,profiles(display_name,email)").not("deleted_at","is",null).order("title");
+  if(!isSuper) query=query.eq("owner_id",user.id);
+
+  const{data,error}=await query;
+  if(error){list.textContent=error.message;return}
+  if(!data?.length){list.innerHTML=`<div class="empty-state" style="padding:28px 0"><div class="empty-icon">🗂️</div><div class="empty-title">Keine archivierten Vorlagen</div></div>`;return}
+
+  const grid=q("div");grid.className="tpl-grid";
+  (data||[]).forEach(t=>{
+    const ownerName=t.profiles?.display_name||t.profiles?.email||"";
+    const card=q("div");card.className="tpl-card";
+    card.style.opacity="0.75";
+    card.innerHTML=`
+      <div class="tpl-card-head"><span class="tpl-icon">${t.icon||"📂"}</span><span class="tpl-name">${escHtml(t.title)}</span></div>
+      <div class="tpl-desc">${escHtml(t.description||"")}${isSuper&&ownerName?` <span style="color:var(--muted);font-size:11px">· ${escHtml(ownerName)}</span>`:""}
+        <div style="margin-top:4px;font-size:11px;color:var(--muted)">Archiviert: ${fmtDate(t.deleted_at)}</div>
+      </div>
+      <div class="tpl-actions"></div>`;
+    const a=card.querySelector(".tpl-actions");
+    // Restore
+    const btnRestore=q("button");btnRestore.className="btn btn-primary btn-sm";
+    btnRestore.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 .49-4.36L1 10"/></svg> Wiederherstellen`;
+    btnRestore.onclick=async()=>{
+      loading(true,"Stelle wieder her…");
+      await sb.from("templates").update({deleted_at:null,deleted_by:null}).eq("id",t.id);
+      loading(false);toast("Vorlage wiederhergestellt");
+      card.remove();await loadTemplates();
+    };
+    // Permanent delete
+    const btnDel=q("button");btnDel.className="btn btn-danger btn-sm";btnDel.textContent="Endgültig löschen";
+    btnDel.onclick=async()=>{
+      const ok=await showModal({title:"Endgültig löschen?",sub:`"${t.title}" wird unwiderruflich gelöscht — alle Kategorien und Punkte werden entfernt.`,confirmLabel:"Löschen",danger:true});
+      if(!ok)return;
+      loading(true,"Lösche…");
+      // Delete items → categories → template
+      const cats=await sb.from("template_categories").select("id").eq("template_id",t.id);
+      const catIds=(cats.data||[]).map(c=>c.id);
+      if(catIds.length)await sb.from("template_items").delete().in("category_id",catIds);
+      await sb.from("template_categories").delete().eq("template_id",t.id);
+      await sb.from("templates").delete().eq("id",t.id);
+      loading(false);toast("Endgültig gelöscht");card.remove();
+    };
+    a.append(btnRestore,btnDel);
+    grid.appendChild(card);
+  });
+  list.innerHTML="";list.appendChild(grid);
+}
+
 async function seedStandardTemplates(){
   const templates=[["Camping","Packliste fürs Camping","🏕️","Schlafen\n- Zelt\n- Schlafsack\n- Isomatte\n\nKochen\n- Gaskocher\n- Geschirr\n- Besteck\n- Wasser"],["Wandern","Vorlage für Wanderausflüge","🎒","Ausrüstung\n- Wanderschuhe\n- Rucksack\n- Regenjacke\n\nVerpflegung\n- Wasser\n- Snacks\n- Sandwich"],["Flugreise","Vorlage für Reisen mit Flug","✈️","Dokumente\n- Pass/ID\n- Boardingpass\n- Versicherung\n\nHandgepäck\n- Kopfhörer\n- Ladegerät\n- Powerbank"],["Einkauf","Allgemeine Einkaufsliste","🛒","Lebensmittel\n- Brot\n- Milch\n- Früchte\n\nHaushalt\n- Küchenpapier\n- Müllsäcke"]];
   loading(true,"Prüfe Vorlagen…");
@@ -1223,6 +1507,8 @@ document.addEventListener("DOMContentLoaded",()=>{
   $("newTpl").onclick=()=>openTemplateEditor(null);
   $("adminClClose").onclick=()=>{$("adminClSection").style.display="none"};
   $("seedMore").onclick=()=>seedStandardTemplates();
+  $("showArchivedTpl").onclick=()=>loadArchivedTemplates();
+  $("closeArchivedTpl").onclick=()=>{$("archivedTplSection").style.display="none"};
   $("addUser").onclick=addUser;
   $("detailClose").onclick=closeDetailPanel;
   $("detailAddCat").onclick=()=>addChecklistCategory();
