@@ -109,7 +109,6 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 .dragging{opacity:.35;background:var(--accent);border-radius:8px}
 .drag-over-top{box-shadow:0 -2px 0 var(--accent)!important}
 .drag-over-bottom{box-shadow:0 2px 0 var(--accent)!important}
-.drag-ghost{position:fixed;pointer-events:none;z-index:9999;opacity:.85;background:var(--surface);border-radius:10px;box-shadow:var(--shadow-lg);padding:10px 14px;font-size:14px;font-weight:500;max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* Category blocks */
 .cat-block{margin-bottom:18px}
 .cat-header{display:flex;align-items:center;gap:6px;margin-bottom:8px}
@@ -882,82 +881,11 @@ async function loadDetailPanel(id){
 }
 
 function attachCatDrag(handle,block,container,checklistId){
-  let longPressTimer=null,dragging=false;
-
-  // Desktop
-  handle.draggable=true;
-  handle.addEventListener("dragstart",e=>{
-    e.dataTransfer.effectAllowed="move";
-    e.dataTransfer.setData("text/plain","cat");
-    setTimeout(()=>block.classList.add("dragging"),0);
-    container._draggingBlock=block;
-    createGhost(block.querySelector("h3")?.textContent||"",e.clientX,e.clientY);
+  _pointerDrag(handle,block,container,{
+    selector:".cat-block",
+    labelFn:el=>el.querySelector("h3")?.textContent||"",
+    onDone:(c)=>saveCatOrder(c,checklistId)
   });
-  // dragend on block (more reliable than handle)
-  block.addEventListener("dragend",()=>{
-    block.classList.remove("dragging");removeGhost();
-    clearCatDragOver(container);
-    delete container._draggingBlock;
-    saveCatOrder(container,checklistId);
-  });
-  block.addEventListener("dragover",e=>{
-    if(!container._draggingBlock||container._draggingBlock===block)return;
-    e.preventDefault();
-    const rect=block.getBoundingClientRect();
-    const mid=rect.top+rect.height/2;
-    clearCatDragOver(container);
-    block.classList.add(e.clientY<mid?"drag-over-top":"drag-over-bottom");
-  });
-  block.addEventListener("dragleave",()=>clearCatDragOver(container));
-  block.addEventListener("drop",e=>{
-    e.preventDefault();
-    const src=container._draggingBlock;if(!src||src===block)return;
-    clearCatDragOver(container);
-    const rect=block.getBoundingClientRect();
-    if(e.clientY<rect.top+rect.height/2)container.insertBefore(src,block);
-    else block.after(src);
-  });
-
-  // Touch longpress
-  handle.addEventListener("touchstart",e=>{
-    const touch=e.touches[0];
-    longPressTimer=setTimeout(()=>{
-      dragging=true;handle.classList.add("active");
-      navigator.vibrate&&navigator.vibrate(40);
-      createGhost(block.querySelector("h3")?.textContent||"",touch.clientX,touch.clientY);
-      container._draggingBlock=block;block.classList.add("dragging");
-    },450);
-  },{passive:true});
-  handle.addEventListener("touchmove",e=>{
-    clearTimeout(longPressTimer);if(!dragging)return;
-    e.preventDefault();
-    const touch=e.touches[0];moveGhost(touch.clientX,touch.clientY);
-    const el=document.elementFromPoint(touch.clientX,touch.clientY);
-    const targetBlock=el?.closest(".cat-block");
-    if(targetBlock&&targetBlock!==block&&targetBlock.parentNode===container){
-      clearCatDragOver(container);
-      const rect=targetBlock.getBoundingClientRect();
-      const above=touch.clientY<rect.top+rect.height/2;
-      targetBlock.classList.add(above?"drag-over-top":"drag-over-bottom");
-      container._touchCatTarget={block:targetBlock,above};
-    }
-  },{passive:false});
-  handle.addEventListener("touchend",()=>{
-    clearTimeout(longPressTimer);
-    if(!dragging){dragging=false;return}
-    dragging=false;handle.classList.remove("active");
-    block.classList.remove("dragging");removeGhost();
-    if(container._touchCatTarget){
-      const{block:tgt,above}=container._touchCatTarget;
-      if(above)container.insertBefore(block,tgt);else tgt.after(block);
-      delete container._touchCatTarget;
-    }
-    clearCatDragOver(container);saveCatOrder(container,checklistId);
-  });
-}
-
-function clearCatDragOver(container){
-  container.querySelectorAll(".drag-over-top,.drag-over-bottom").forEach(el=>el.classList.remove("drag-over-top","drag-over-bottom"));
 }
 
 async function saveCatOrder(container,checklistId){
@@ -996,113 +924,107 @@ function makeCheckrow(it,checklistId,container,refreshProgress){
   return row;
 }
 
-/* ── Drag helpers ── */
-let dragGhost=null;
+/* ── Drag & Drop via Pointer Events (no HTML5 drag API) ── */
+let _drag=null; // global drag state
 
-function attachItemDrag(handle,row,container){
-  let longPressTimer=null;
-  let dragging=false;
+function _pointerDrag(handle, el, container, {
+  selector,        // CSS selector to find siblings
+  labelFn,         // fn(el) → display text for ghost
+  onDone           // fn(container) → called after drop to save order
+}){
+  let pressTimer=null;
 
-  // Desktop drag
-  handle.draggable=true;
-  handle.addEventListener("dragstart",e=>{
-    e.dataTransfer.effectAllowed="move";
-    e.dataTransfer.setData("text/plain","item");
-    setTimeout(()=>row.classList.add("dragging"),0);
-    container._draggingRow=row;
-    createGhost(row.querySelector("label")?.textContent||"",e.clientX,e.clientY);
-  });
-  // dragend on row (more reliable)
-  row.addEventListener("dragend",()=>{
-    row.classList.remove("dragging");
-    removeGhost();
-    clearDragOver(container);
-    delete container._draggingRow;
-    saveItemOrder(container);
-  });
-  row.addEventListener("dragover",e=>{
-    if(!container._draggingRow||container._draggingRow===row)return;
-    e.preventDefault();
-    const rect=row.getBoundingClientRect();
-    const mid=rect.top+rect.height/2;
-    clearDragOver(container);
-    row.classList.add(e.clientY<mid?"drag-over-top":"drag-over-bottom");
-  });
-  row.addEventListener("dragleave",()=>clearDragOver(container));
-  row.addEventListener("drop",e=>{
-    e.preventDefault();
-    const src=container._draggingRow;if(!src||src===row)return;
-    clearDragOver(container);
-    const rect=row.getBoundingClientRect();
-    const mid=rect.top+rect.height/2;
-    if(e.clientY<mid) container.insertBefore(src,row);
-    else row.after(src);
-  });
+  handle.style.touchAction="none";
 
-  // Touch / longpress
-  handle.addEventListener("touchstart",e=>{
-    const touch=e.touches[0];
-    longPressTimer=setTimeout(()=>{
-      dragging=true;
-      handle.classList.add("active");
-      navigator.vibrate&&navigator.vibrate(40);
-      createGhost(row.querySelector("label")?.textContent||"",touch.clientX,touch.clientY);
-      container._draggingRow=row;
-      row.classList.add("dragging");
-    },450);
-  },{passive:true});
-  handle.addEventListener("touchmove",e=>{
-    clearTimeout(longPressTimer);
-    if(!dragging)return;
-    e.preventDefault();
-    const touch=e.touches[0];
-    moveGhost(touch.clientX,touch.clientY);
-    const el=document.elementFromPoint(touch.clientX,touch.clientY);
-    const targetRow=el?.closest(".checkrow");
-    if(targetRow&&targetRow!==row&&targetRow.parentNode===container){
-      clearDragOver(container);
-      const rect=targetRow.getBoundingClientRect();
-      const mid=rect.top+rect.height/2;
-      targetRow.classList.add(touch.clientY<mid?"drag-over-top":"drag-over-bottom");
-      container._touchTarget={row:targetRow,above:touch.clientY<mid};
+  handle.addEventListener("pointerdown", e=>{
+    // Only primary button / single touch
+    if(e.button!==0&&e.pointerType==="mouse")return;
+    pressTimer=setTimeout(()=>startDrag(e), e.pointerType==="touch"?400:0);
+    if(e.pointerType!=="touch") startDrag(e); // immediate on mouse
+    else{
+      // wait for longpress; cancel on move
+      const cancelOnMove=()=>{clearTimeout(pressTimer);handle.removeEventListener("pointermove",cancelOnMove)};
+      handle.addEventListener("pointermove",cancelOnMove,{once:true,passive:true});
     }
-  },{passive:false});
-  handle.addEventListener("touchend",()=>{
-    clearTimeout(longPressTimer);
-    if(!dragging){dragging=false;return}
-    dragging=false;handle.classList.remove("active");
-    row.classList.remove("dragging");removeGhost();
-    if(container._touchTarget){
-      const{row:tgt,above}=container._touchTarget;
-      if(above)container.insertBefore(row,tgt);else tgt.after(row);
-      delete container._touchTarget;
-    }
-    clearDragOver(container);
-    saveItemOrder(container);
   });
+
+  function startDrag(e){
+    clearTimeout(pressTimer);
+    if(_drag)return;
+    navigator.vibrate&&navigator.vibrate(40);
+    handle.setPointerCapture(e.pointerId);
+
+    // Build ghost from element clone
+    const rect=el.getBoundingClientRect();
+    const ghost=el.cloneNode(true);
+    ghost.style.cssText=`position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;opacity:.85;pointer-events:none;z-index:9999;background:var(--surface);border-radius:10px;box-shadow:var(--shadow-lg);transition:none`;
+    document.body.appendChild(ghost);
+
+    el.classList.add("dragging");
+    _drag={el,container,ghost,offsetX:e.clientX-rect.left,offsetY:e.clientY-rect.top,selector,onDone,lastTarget:null};
+
+    handle.addEventListener("pointermove",onMove);
+    handle.addEventListener("pointerup",onUp,{once:true});
+    handle.addEventListener("pointercancel",onUp,{once:true});
+  }
+
+  function onMove(e){
+    if(!_drag)return;
+    const{ghost,el,container,offsetX,offsetY,selector}=_drag;
+    const x=e.clientX-offsetX, y=e.clientY-offsetY;
+    ghost.style.left=x+"px";
+    ghost.style.top=y+"px";
+
+    // Find target sibling
+    ghost.style.display="none";
+    const under=document.elementFromPoint(e.clientX,e.clientY);
+    ghost.style.display="";
+    const target=under?.closest(selector);
+    clearIndicators(container,selector);
+    if(target&&target!==el&&target.parentNode===container){
+      const r=target.getBoundingClientRect();
+      const above=e.clientY<r.top+r.height/2;
+      target.classList.add(above?"drag-over-top":"drag-over-bottom");
+      _drag.lastTarget={target,above};
+    } else {
+      _drag.lastTarget=null;
+    }
+  }
+
+  function onUp(){
+    if(!_drag)return;
+    handle.removeEventListener("pointermove",onMove);
+    const{el,container,ghost,lastTarget,onDone}=_drag;
+    ghost.remove();
+    el.classList.remove("dragging");
+    clearIndicators(container,selector);
+    if(lastTarget){
+      const{target,above}=lastTarget;
+      if(above) container.insertBefore(el,target);
+      else target.after(el);
+    }
+    _drag=null;
+    onDone(container);
+  }
 }
 
-function clearDragOver(container){
-  container.querySelectorAll(".drag-over-top,.drag-over-bottom").forEach(el=>{
+function clearIndicators(container,selector){
+  container.querySelectorAll(selector).forEach(el=>{
     el.classList.remove("drag-over-top","drag-over-bottom");
   });
 }
 
-function createGhost(text,x,y){
-  dragGhost=q("div");dragGhost.className="drag-ghost";dragGhost.textContent=text;
-  document.body.appendChild(dragGhost);
-  moveGhost(x,y);
+function attachItemDrag(handle,row,container){
+  _pointerDrag(handle,row,container,{
+    selector:".checkrow",
+    labelFn:el=>el.querySelector("label")?.textContent||"",
+    onDone:saveItemOrder
+  });
 }
-function moveGhost(x,y){if(dragGhost){dragGhost.style.left=x+14+"px";dragGhost.style.top=y-10+"px"}}
-function removeGhost(){dragGhost?.remove();dragGhost=null}
-
-// Global fallback: always clean up ghost if drag ends anywhere
-document.addEventListener("dragend",()=>removeGhost(),true);
 
 async function saveItemOrder(container){
   const rows=[...container.querySelectorAll(".checkrow[data-id]")];
-  const updates=rows.map((r,i)=>sb.from("checklist_items").update({sort_order:(i+1)*10}).eq("id",r.dataset.id));
-  await Promise.all(updates);
+  await Promise.all(rows.map((r,i)=>sb.from("checklist_items").update({sort_order:(i+1)*10}).eq("id",r.dataset.id)));
   panelDirty=true;
 }
 
