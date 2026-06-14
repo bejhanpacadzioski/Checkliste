@@ -18,7 +18,7 @@
   --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06);
   --shadow-lg:0 8px 32px rgba(0,0,0,.14);
 }
-@media(prefers-color-scheme:dark){:root{--bg:#0f172a;--surface:#1e293b;--border:#334155;--text:#f1f5f9;--muted:#94a3b8}}
+html.dark{--bg:#0f172a;--surface:#1e293b;--border:#334155;--text:#f1f5f9;--muted:#94a3b8}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.5}
 
@@ -352,7 +352,12 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
     <div class="suser">
       <span class="uname" id="sUserName">—</span>
       <span class="uemail" id="sUserEmail">—</span>
-      <button id="logoutBtn">Abmelden</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px">
+        <button id="logoutBtn" style="margin-top:0;flex:1;margin-right:8px">Abmelden</button>
+        <button id="darkToggle" title="Dark Mode" style="background:none;border:1px solid var(--border);border-radius:8px;padding:7px 9px;cursor:pointer;color:var(--muted);display:flex;align-items:center;transition:background .15s,color .15s;flex-shrink:0">
+          <svg id="darkIcon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg>
+        </button>
+      </div>
     </div>
   </aside>
 
@@ -656,6 +661,21 @@ function setActing(id,name){
 /* ── Auth ── */
 function initClient(){sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}})}
 
+/* ── Dark mode ── */
+const MOON_ICON=`<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;
+const SUN_ICON=`<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>`;
+
+function applyDark(on){
+  document.documentElement.classList.toggle("dark",!!on);
+  const icon=$("darkIcon");if(icon)icon.innerHTML=on?SUN_ICON:MOON_ICON;
+}
+
+async function toggleDark(){
+  const isDark=document.documentElement.classList.contains("dark");
+  applyDark(!isDark);
+  await sb.from("profiles").update({dark_mode:!isDark}).eq("id",user.id);
+}
+
 async function doLogin(){
   const email=$("loginEmail").value.trim(),pw=$("loginPw").value;
   $("loginBtn").textContent="Anmelden…";$("loginBtn").disabled=true;
@@ -675,6 +695,8 @@ async function loadApp(){
     const p=await sb.from("profiles").select("*").eq("id",user.id).single();
     $("sUserName").textContent=p.data?.display_name||user.email;
     $("sUserEmail").textContent=user.email;
+    // Apply dark mode from profile (default: off)
+    applyDark(p.data?.dark_mode===true);
     const m=await sb.from("organization_members").select("organization_id,role").eq("user_id",user.id);
     orgId=m.data?.[0]?.organization_id;
     isSuper=(m.data||[]).some(x=>x.role==="super_admin");
@@ -1492,6 +1514,9 @@ document.addEventListener("DOMContentLoaded",()=>{
   $("loginBtn").onclick=doLogin;
   $("loginPw").onkeydown=e=>{if(e.key==="Enter")doLogin()};
   $("logoutBtn").onclick=doLogout;
+  $("darkToggle").onclick=toggleDark;
+  // Init icon based on current state (light by default)
+  applyDark(false);
   $("menuBtn").onclick=openSidebar;
   $("sidebarBackdrop").onclick=closeSidebar;
   $("stopActing").onclick=()=>setActing(null,"");
