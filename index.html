@@ -888,12 +888,17 @@ function attachCatDrag(handle,block,container,checklistId){
   handle.draggable=true;
   handle.addEventListener("dragstart",e=>{
     e.dataTransfer.effectAllowed="move";
+    e.dataTransfer.setData("text/plain","cat");
     setTimeout(()=>block.classList.add("dragging"),0);
     container._draggingBlock=block;
     createGhost(block.querySelector("h3")?.textContent||"",e.clientX,e.clientY);
   });
-  handle.addEventListener("dragend",()=>{
-    block.classList.remove("dragging");removeGhost();saveCatOrder(container,checklistId);
+  // dragend on block (more reliable than handle)
+  block.addEventListener("dragend",()=>{
+    block.classList.remove("dragging");removeGhost();
+    clearCatDragOver(container);
+    delete container._draggingBlock;
+    saveCatOrder(container,checklistId);
   });
   block.addEventListener("dragover",e=>{
     if(!container._draggingBlock||container._draggingBlock===block)return;
@@ -1007,9 +1012,12 @@ function attachItemDrag(handle,row,container){
     container._draggingRow=row;
     createGhost(row.querySelector("label")?.textContent||"",e.clientX,e.clientY);
   });
-  handle.addEventListener("dragend",()=>{
+  // dragend on row (more reliable)
+  row.addEventListener("dragend",()=>{
     row.classList.remove("dragging");
     removeGhost();
+    clearDragOver(container);
+    delete container._draggingRow;
     saveItemOrder(container);
   });
   row.addEventListener("dragover",e=>{
@@ -1087,6 +1095,9 @@ function createGhost(text,x,y){
 }
 function moveGhost(x,y){if(dragGhost){dragGhost.style.left=x+14+"px";dragGhost.style.top=y-10+"px"}}
 function removeGhost(){dragGhost?.remove();dragGhost=null}
+
+// Global fallback: always clean up ghost if drag ends anywhere
+document.addEventListener("dragend",()=>removeGhost(),true);
 
 async function saveItemOrder(container){
   const rows=[...container.querySelectorAll(".checkrow[data-id]")];
