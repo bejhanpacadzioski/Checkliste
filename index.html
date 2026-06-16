@@ -658,6 +658,13 @@ async function loadChecklists(){
   if(error){box.textContent=error.message;return}
   const n=data?data.length:0;
   $("checkSub").textContent=n?n+" Checklist"+(n!==1?"en":""):"";
+  // Fetch which checklists are shared (to show icon)
+  const sharedByMe={};
+  if(data&&data.length){
+    const clIds=data.map(c=>c.id);
+    const{data:sharesOut}=await sb.from("checklist_shares").select("checklist_id").in("checklist_id",clIds);
+    (sharesOut||[]).forEach(s=>sharedByMe[s.checklist_id]=true);
+  }
   if(!n){
     box.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Noch keine Checklisten</div><div class="empty-sub">Erstelle eine Checkliste.</div><button class="btn btn-primary" id="goTpl">Zu den Vorlagen</button></div>';
     on("goTpl",()=>show("Tpl"));return;
@@ -675,7 +682,8 @@ async function loadChecklists(){
     const pct=t?Math.round(d/t*100):0,done=t>0&&pct===100;
     const card=q("div");card.className="cl-card"+(done?" done-card":"");
     const badge=done?'<span class="cl-done-badge"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg>Fertig</span>':"";
-    card.innerHTML='<div class="cl-ring">'+ring(pct)+'</div><div class="cl-body"><div class="cl-title">'+escH((cl.icon||"📋")+" "+cl.title)+'</div><div class="cl-desc">'+escH(cl.description||"Keine Beschreibung")+'</div><div class="cl-meta"><span>'+d+"/"+t+' erledigt</span>'+badge+'<span class="cl-date">'+fmtD(cl.created_at)+'</span></div><div class="cl-actions"><button class="btn-dup">Duplizieren</button><button class="btn-arch">Archivieren</button><button class="btn-del">Löschen</button></div></div>';
+    const shareBadge=sharedByMe[cl.id]?'<span title="Geteilt" style="display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;color:#6366f1;background:rgba(99,102,241,.1);padding:2px 7px;border-radius:99px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Geteilt</span>':"";
+    card.innerHTML='<div class="cl-ring">'+ring(pct)+'</div><div class="cl-body"><div class="cl-title">'+escH((cl.icon||"📋")+" "+cl.title)+'</div><div class="cl-desc">'+escH(cl.description||"Keine Beschreibung")+'</div><div class="cl-meta"><span>'+d+"/"+t+' erledigt</span>'+badge+shareBadge+'<span class="cl-date">'+fmtD(cl.created_at)+'</span></div><div class="cl-actions"><button class="btn-dup">Duplizieren</button><button class="btn-arch">Archivieren</button><button class="btn-del">Löschen</button></div></div>';
     card.querySelector(".btn-dup").onclick=e=>{e.stopPropagation();duplicateCl(cl.id)};
     card.querySelector(".btn-arch").onclick=e=>{e.stopPropagation();archiveCl(cl.id)};
     card.querySelector(".btn-del").onclick=async e=>{e.stopPropagation();
