@@ -1925,12 +1925,8 @@ async function createTemplateFromSeed(t){
 function on(id,fn){const el=$(id);if(el)el.onclick=fn}
 function onkey(id,fn){const el=$(id);if(el)el.onkeydown=fn}
 
-document.addEventListener("DOMContentLoaded",async()=>{
+document.addEventListener("DOMContentLoaded",()=>{
   initClient();
-
-  // Share links: show read-only view, skip everything else
-  const shareId=new URLSearchParams(location.search).get("share");
-  if(shareId){await checkShareMode();return}
 
   // Normal app wiring
   on("loginBtn",doLogin);
