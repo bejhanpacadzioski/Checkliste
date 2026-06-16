@@ -19,8 +19,8 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 #sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100dvh;overflow-y:auto;padding:20px 12px;transition:transform .25s ease}
 .sidebar-logo{display:flex;align-items:center;gap:10px;padding:0 8px 20px;border-bottom:1px solid var(--border);margin-bottom:16px}
 .sidebar-logo svg{width:28px;height:28px;flex-shrink:0}
-.sidebar-logo .lname{font-weight:700;font-size:15px;letter-spacing:-.3px}
-.sidebar-logo .lsub{font-size:11px;color:var(--muted);font-weight:400;display:block;letter-spacing:0}
+.lname{font-weight:700;font-size:15px;letter-spacing:-.3px}
+.lsub{font-size:11px;color:var(--muted);font-weight:400;display:block}
 nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;font-size:14px;font-weight:500;color:var(--muted);cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:background .15s,color .15s;font-family:inherit}
 .nav-item:hover{background:var(--bg);color:var(--text)}
@@ -28,17 +28,18 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 .nav-item svg{width:18px;height:18px;flex-shrink:0}
 .nav-item.hidden{display:none}
 .suser{border-top:1px solid var(--border);padding-top:14px;margin-top:8px;font-size:13px;color:var(--muted)}
-.suser .uname{font-weight:600;color:var(--text);font-size:14px;display:block;margin-bottom:2px}
-.suser .uemail{font-size:12px;word-break:break-all}
-.suser button{margin-top:10px;width:100%;background:none;border:1px solid var(--border);border-radius:8px;padding:7px;font-size:13px;color:var(--muted);cursor:pointer;font-family:inherit;transition:background .15s}
-.suser button:hover{background:var(--bg);color:var(--text)}
+.uname{font-weight:600;color:var(--text);font-size:14px;display:block;margin-bottom:2px}
+.uemail{font-size:12px;word-break:break-all}
 .acting-badge{display:none;align-items:center;gap:6px;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;color:var(--accent);margin-bottom:8px}
 .acting-badge.show{display:flex}
 .acting-badge button{background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);line-height:1;padding:0}
 #main{flex:1;min-width:0;display:flex;flex-direction:column}
-#topbar{display:none;align-items:center;gap:10px;padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:30}
+#topbar{display:none;align-items:center;gap:8px;padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:30}
 #topbar .logo-text{font-weight:700;font-size:16px;flex:1}
-#menuBtn{background:none;border:none;cursor:pointer;color:var(--text);padding:4px;display:flex}
+#menuBtn{background:none;border:none;cursor:pointer;color:var(--text);padding:4px;display:flex;flex-shrink:0}
+.topbar-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.icon-btn{background:none;border:1px solid var(--border);border-radius:8px;padding:7px;cursor:pointer;color:var(--muted);display:flex;align-items:center;transition:background .15s,color .15s}
+.icon-btn:hover{background:var(--bg);color:var(--text)}
 .page-header{padding:24px 24px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .page-title{font-size:22px;font-weight:700;letter-spacing:-.4px}
 .page-sub{font-size:14px;color:var(--muted);margin-top:2px}
@@ -46,12 +47,14 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 .cl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-top:18px}
 .cl-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:16px 18px;cursor:pointer;transition:box-shadow .18s,transform .18s,border-color .18s;display:flex;gap:14px;align-items:flex-start}
 .cl-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px);border-color:var(--accent)}
+.cl-card.done-card{border-color:rgba(34,197,94,.4)}
 .cl-ring{flex-shrink:0;width:52px;height:52px}
-.cl-ring svg{width:52px;height:52px}
 .cl-body{flex:1;min-width:0}
 .cl-title{font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cl-desc{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cl-meta{font-size:12px;color:var(--muted);margin-top:6px}
+.cl-meta{font-size:12px;color:var(--muted);margin-top:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cl-date{font-size:11px;color:var(--muted);opacity:.7}
+.cl-done-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:#16a34a;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:99px;padding:2px 8px}
 .cl-actions{display:flex;gap:6px;margin-top:10px}
 .cl-actions button{font-size:12px;padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;font-family:inherit;font-weight:500;transition:background .15s,color .15s}
 .cl-actions button:hover{background:var(--bg);color:var(--text)}
@@ -60,34 +63,60 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 #detailOverlay.open{opacity:1;pointer-events:all}
 #detailPanel{position:fixed;top:0;right:0;bottom:0;width:min(520px,100vw);background:var(--surface);border-left:1px solid var(--border);box-shadow:var(--shadow-lg);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .26s cubic-bezier(.4,0,.2,1);z-index:101}
 #detailOverlay.open #detailPanel{transform:translateX(0)}
-.detail-header{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0}
-.detail-close{background:none;border:none;cursor:pointer;color:var(--muted);padding:4px;display:flex;border-radius:8px;transition:background .15s;flex-shrink:0}
+.detail-header{display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.detail-close{background:none;border:none;cursor:pointer;color:var(--muted);padding:6px;display:flex;border-radius:8px;transition:background .15s;flex-shrink:0}
 .detail-close:hover{background:var(--bg)}
-.detail-title{font-size:17px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.detail-body{flex:1;overflow-y:auto;padding:20px}
-.detail-progress-bar{height:6px;background:var(--border);border-radius:99px;overflow:hidden;margin:8px 0 4px}
-.detail-progress-bar .bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px;transition:width .4s ease}
+.detail-title-wrap{flex:1;min-width:0}
+.detail-title{font-size:16px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;border-radius:6px;padding:2px 4px;transition:background .15s;display:block}
+.detail-title:hover{background:var(--bg)}
+.detail-title-edit{font-size:16px;font-weight:700;border:none;outline:none;background:var(--bg);border-radius:6px;padding:2px 4px;width:100%;font-family:inherit;color:var(--text);display:none}
+.detail-title-edit.active{display:block}
+.detail-title.editing{display:none}
+.detail-hbtns{display:flex;gap:6px;flex-shrink:0}
+.detail-body{flex:1;overflow-y:auto;padding:20px;-webkit-overflow-scrolling:touch}
+.progress-wrap{margin-bottom:20px}
+.detail-progress-bar{height:6px;background:var(--border);border-radius:99px;overflow:hidden;margin:8px 0 5px}
+.bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px;transition:width .4s ease}
+.bar.complete{background:linear-gradient(90deg,#16a34a,#22c55e)}
 .detail-progress-label{font-size:13px;color:var(--muted)}
+.complete-banner{display:flex;align-items:center;gap:10px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:12px;padding:10px 14px;margin-bottom:12px;font-weight:600;font-size:14px;color:#16a34a}
 .cat-block{margin-bottom:18px}
-.cat-block h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:8px}
+.cat-header{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.cat-header h3{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);flex:1}
+.cat-del-btn{background:none;border:none;cursor:pointer;color:transparent;font-size:15px;padding:2px 5px;border-radius:6px;transition:color .15s}
+.cat-header:hover .cat-del-btn{color:var(--muted)}
+.cat-del-btn:hover{color:var(--danger)!important}
 .cat-inner{background:var(--bg);border-radius:12px;overflow:hidden}
-.checkrow{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:1px solid var(--border)}
+.checkrow{display:flex;align-items:center;gap:10px;padding:11px 14px;border-top:1px solid var(--border)}
 .checkrow:first-child{border-top:none}
 .checkrow input[type=checkbox]{width:20px;height:20px;flex-shrink:0;cursor:pointer;accent-color:var(--accent)}
-.checkrow label{cursor:pointer;flex:1;font-size:14px;transition:color .15s}
+.checkrow label{cursor:pointer;flex:1;font-size:14px;transition:color .15s;word-break:break-word}
 .checkrow label.done{text-decoration:line-through;color:var(--muted)}
+.item-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:2px 4px;line-height:1;border-radius:5px;transition:color .15s;flex-shrink:0;opacity:0}
+.checkrow:hover .item-del{opacity:1}
+.item-del:hover{color:var(--danger)}
+.drag-handle,.cat-drag-handle{display:flex;align-items:center;cursor:grab;color:var(--border);padding:0 6px 0 0;flex-shrink:0;touch-action:none;transition:color .15s}
+.drag-handle:hover,.cat-drag-handle:hover{color:var(--muted)}
+.dragging{opacity:.35}
+.drag-over-top{box-shadow:0 -2px 0 var(--accent)!important}
+.drag-over-bottom{box-shadow:0 2px 0 var(--accent)!important}
 .inline-add{display:flex;gap:8px;align-items:center;padding:10px 14px;border-top:1px solid var(--border)}
 .inline-add input{flex:1;border:none;background:transparent;font-size:13px;color:var(--text);font-family:inherit;outline:none}
 .inline-add input::placeholder{color:var(--muted)}
-.inline-add button{background:var(--accent);color:#fff;border:none;width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s}
+.inline-add button{background:var(--accent);color:#fff;border:none;width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s}
 .inline-add button:hover{opacity:.85}
-.tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:18px}
+.empty-cat-hint{padding:18px;font-size:13px;color:var(--muted);text-align:center;font-style:italic}
+.tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:12px}
 .tpl-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:16px 18px}
 .tpl-card-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .tpl-icon{font-size:24px;line-height:1}
 .tpl-name{font-weight:600;font-size:15px}
-.tpl-desc{font-size:12px;color:var(--muted);margin-bottom:12px}
+.tpl-desc{font-size:12px;color:var(--muted);margin-bottom:12px;min-height:16px}
 .tpl-actions{display:flex;gap:6px;flex-wrap:wrap}
+.tpl-section{margin-bottom:28px}
+.tpl-section-title{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:4px}
+.tpl-section-title svg{width:14px;height:14px;flex-shrink:0}
+.tpl-section-divider{height:1px;background:var(--border);margin-bottom:12px}
 #tplEditorWrap{display:none;margin-top:20px}
 #tplEditorWrap.show{display:block}
 .editor-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:20px}
@@ -95,33 +124,37 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 .cat-editor{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px}
 .cat-editor-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .cat-editor-head h4{flex:1;font-size:14px;font-weight:600;margin:0}
+.tpl-item-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--border)}
+.tpl-item-handle{display:flex;align-items:center;cursor:grab;color:var(--border);padding:0 4px;touch-action:none;transition:color .15s;flex-shrink:0}
+.tpl-item-handle:hover{color:var(--muted)}
 .user-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--border)}
 .user-row:first-child{border-top:none}
 .user-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .user-info{flex:1;min-width:0}
-.user-info .uname{font-weight:600;font-size:14px}
-.user-info .uemail{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.user-info .uname-u{font-weight:600;font-size:14px}
+.user-info .uemail-u{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:10px;padding:9px 16px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity .15s,transform .1s}
 .btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
 .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
-.btn-primary:hover{opacity:.9}
+.btn-primary:hover:not(:disabled){opacity:.9}
 .btn-ghost{background:none;border:1px solid var(--border);color:var(--text)}
 .btn-ghost:hover{background:var(--bg)}
 .btn-danger{background:#fef2f2;border:1px solid #fca5a5;color:var(--danger)}
 .btn-danger:hover{background:#fee2e2}
 .btn-sm{padding:6px 12px;font-size:13px;border-radius:8px}
 .form-group{margin-bottom:14px}
-.form-group label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+.form-group label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
 .form-group input,.form-group select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s}
 .form-group input:focus,.form-group select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.12)}
 #modalOverlay{position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s ease}
 #modalOverlay.open{opacity:1;pointer-events:all}
 .modal-box{background:var(--surface);border-radius:20px;box-shadow:var(--shadow-lg);padding:24px;width:100%;max-width:400px;transform:scale(.95) translateY(10px);transition:transform .22s ease}
 #modalOverlay.open .modal-box{transform:scale(1) translateY(0)}
-.modal-title{font-size:17px;font-weight:700;margin-bottom:6px}
+.modal-title{font-size:17px;font-weight:700;margin-bottom:4px}
 .modal-sub{font-size:14px;color:var(--muted);margin-bottom:4px}
 .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
-#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#0f172a;color:#f8fafc;border-radius:12px;padding:11px 20px;font-size:14px;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,.3);z-index:300;opacity:0;transition:opacity .2s,transform .2s;white-space:nowrap;pointer-events:none}
+#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:#0f172a;color:#f8fafc;border-radius:12px;padding:11px 20px;font-size:14px;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,.3);z-index:300;opacity:0;transition:opacity .2s,transform .2s;white-space:nowrap;pointer-events:none}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 #loader{position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:250;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
 #loader.show{opacity:1;pointer-events:all}
@@ -132,8 +165,7 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 #loginScreen.show{display:flex}
 .login-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:36px 32px;width:100%;max-width:380px;backdrop-filter:blur(20px)}
 .login-logo{margin-bottom:28px;text-align:center}
-.login-logo svg{width:44px;height:44px;margin-bottom:10px}
-.login-logo h1{font-size:22px;font-weight:700;color:#f1f5f9;letter-spacing:-.4px}
+.login-logo h1{font-size:22px;font-weight:700;color:#f1f5f9;letter-spacing:-.4px;margin-top:10px}
 .login-logo p{font-size:13px;color:#94a3b8;margin-top:4px}
 .login-box .form-group label{color:#94a3b8}
 .login-box .form-group input{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:#f1f5f9}
@@ -141,39 +173,40 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 #loginBtn{width:100%;padding:12px;font-size:15px;margin-top:4px;border-radius:12px}
 #loginMsg{text-align:center;font-size:13px;color:#ef4444;margin-top:10px;min-height:18px}
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center}
-.tpl-section{margin-bottom:28px}
-.tpl-section-title{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:4px;padding:0 2px}
-.tpl-section-title svg{width:14px;height:14px;flex-shrink:0}
-.tpl-section-divider{height:1px;background:var(--border);margin-bottom:12px}
-.drag-handle{display:flex;align-items:center;cursor:grab;color:var(--border);padding:0 4px 0 0;flex-shrink:0;touch-action:none;transition:color .15s}
-.drag-handle:hover{color:var(--muted)}
-.cat-drag-handle{display:flex;align-items:center;cursor:grab;color:var(--border);padding:2px 6px 2px 0;touch-action:none;transition:color .15s}
-.cat-drag-handle:hover{color:var(--muted)}
-.dragging{opacity:.35}
-.drag-over-top{box-shadow:0 -2px 0 var(--accent)!important}
-.drag-over-bottom{box-shadow:0 2px 0 var(--accent)!important}
 .empty-icon{font-size:48px;margin-bottom:14px;opacity:.5}
 .empty-title{font-size:16px;font-weight:600;margin-bottom:6px}
 .empty-sub{font-size:14px;color:var(--muted);margin-bottom:20px}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:400;opacity:0;transition:opacity .5s}
+#confetti.show{opacity:1}
 #bottomNav{display:none}
+#changePwOverlay{position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s ease}
+#changePwOverlay.open{opacity:1;pointer-events:all}
+#changePwBox{background:var(--surface);border-radius:20px;box-shadow:var(--shadow-lg);padding:24px;width:100%;max-width:380px;transform:scale(.95) translateY(10px);transition:transform .22s ease}
+#changePwOverlay.open #changePwBox{transform:scale(1) translateY(0)}
+#editUserOverlay{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:150;opacity:0;pointer-events:none;transition:opacity .22s ease}
+#editUserOverlay.open{opacity:1;pointer-events:all}
+#editUserPanel{position:fixed;top:0;right:0;bottom:0;width:min(420px,100vw);background:var(--surface);border-left:1px solid var(--border);box-shadow:var(--shadow-lg);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .26s cubic-bezier(.4,0,.2,1);z-index:151;overflow-y:auto;padding:24px}
+#editUserOverlay.open #editUserPanel{transform:translateX(0)}
 @media(max-width:768px){
   #sidebar{position:fixed;top:0;left:0;bottom:0;z-index:50;transform:translateX(-100%);box-shadow:var(--shadow-lg)}
   #sidebar.open{transform:translateX(0)}
   #sidebarBackdrop{display:none;position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:49}
   #sidebarBackdrop.show{display:block}
   #topbar{display:flex}
-  #main{padding-bottom:70px}
+  #main{padding-bottom:72px}
   .page-header{padding:16px 16px 0}
-  #content{padding:16px}
+  #content{padding:14px}
   #bottomNav{display:grid;grid-template-columns:repeat(3,1fr);position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--border);padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:40}
-  .bnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:500;color:var(--muted);font-family:inherit;border-radius:10px;transition:background .15s,color .15s}
+  .bnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:500;color:var(--muted);font-family:inherit;border-radius:10px}
   .bnav-item svg{width:22px;height:22px}
   .bnav-item.active{color:var(--accent)}
   .bnav-item.hidden{display:none}
   .cl-grid,.tpl-grid{grid-template-columns:1fr}
-  .page-title{font-size:19px}
-  #detailPanel{width:100vw;border-left:none;border-radius:20px 20px 0 0;top:auto;height:92dvh;transform:translateY(100%)}
+  #detailPanel{width:100vw;border-left:none;border-radius:20px 20px 0 0;top:auto;height:94dvh;transform:translateY(100%)}
   #detailOverlay.open #detailPanel{transform:translateY(0)}
+  .detail-hbtns .btn-label{display:none}
+  .detail-hbtns .btn-sm{padding:7px;border-radius:9px}
+  @media(hover:none){.item-del{opacity:.4}}
 }
 </style>
 </head>
@@ -182,9 +215,8 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 <div id="loginScreen">
   <div class="login-box">
     <div class="login-logo">
-      <svg viewBox="0 0 44 44" fill="none"><rect width="44" height="44" rx="12" fill="url(#lg)"/><path d="M14 22h6m0 0 4-6 4 6M20 22v6" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="lg" x1="0" y1="0" x2="44" y2="44"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#818cf8"/></linearGradient></defs></svg>
-      <h1>Checklists</h1>
-      <p>Melde dich an, um fortzufahren</p>
+      <svg viewBox="0 0 44 44" fill="none" style="width:44px;height:44px"><rect width="44" height="44" rx="12" fill="url(#llg)"/><path d="M14 22h6m0 0 4-6 4 6M20 22v6" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="llg" x1="0" y1="0" x2="44" y2="44"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#818cf8"/></linearGradient></defs></svg>
+      <h1>Checklists</h1><p>by Bejhan · Anmelden</p>
     </div>
     <div class="form-group"><label>E-Mail</label><input id="loginEmail" type="email" autocomplete="email" placeholder="name@domain.ch"></div>
     <div class="form-group"><label>Passwort</label><input id="loginPw" type="password" autocomplete="current-password" placeholder="••••••••"></div>
@@ -196,78 +228,117 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 <div id="shell" style="display:none">
   <div id="sidebarBackdrop"></div>
   <aside id="sidebar">
-    <div style="display:flex;justify-content:flex-end;gap:6px;margin-bottom:12px" id="desktopActions">
-      <button id="darkToggleDesktop" title="Dark Mode" style="background:none;border:1px solid var(--border);border-radius:8px;padding:6px 8px;cursor:pointer;color:var(--muted);display:flex;align-items:center;transition:background .15s,color .15s">
-        <svg id="darkIconDesktop" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg>
-      </button>
-      <button id="logoutBtnDesktop" style="background:none;border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;font-family:inherit;transition:background .15s;white-space:nowrap">Abmelden</button>
+    <div style="display:flex;justify-content:flex-end;gap:6px;margin-bottom:10px">
+      <button class="icon-btn" id="darkToggleDesktop" title="Dark Mode"><svg id="darkIconDesktop" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg></button>
+      <button id="logoutBtnDesktop" style="background:none;border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;font-family:inherit">Abmelden</button>
     </div>
     <div class="sidebar-logo">
       <svg viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="8" fill="url(#slg)"/><path d="M9 14h4m0 0 3-4 3 4M13 14v4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="slg" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#818cf8"/></linearGradient></defs></svg>
       <div><span class="lname">Checklists</span><span class="lsub">by Bejhan</span></div>
     </div>
     <div class="acting-badge" id="actingBadge">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-      <span id="actingName">—</span>
-      <button id="stopActing" title="Beenden">✕</button>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      <span id="actingName">—</span><button id="stopActing">✕</button>
     </div>
     <nav class="snav">
-      <button class="nav-item active" id="bCheck">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M9 12l2 2 4-4"/></svg>Checklisten
-      </button>
-      <button class="nav-item" id="bTpl">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Vorlagen
-      </button>
-      <button class="nav-item hidden" id="bAdmin">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 11l1.5 1.5L21 9"/></svg>Admin
-      </button>
+      <button class="nav-item active" id="bCheck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M9 12l2 2 4-4"/></svg>Checklisten</button>
+      <button class="nav-item" id="bTpl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Vorlagen</button>
+      <button class="nav-item hidden" id="bAdmin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 11l1.5 1.5L21 9"/></svg>Admin</button>
     </nav>
     <div class="suser">
       <span class="uname" id="sUserName">—</span>
       <span class="uemail" id="sUserEmail">—</span>
-      <button id="logoutBtn">Abmelden</button>
+      <button id="changePwBtn" style="width:100%;margin-top:10px;background:none;border:1px solid var(--border);border-radius:8px;padding:7px;font-size:13px;color:var(--muted);cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Passwort ändern
+      </button>
     </div>
   </aside>
 
   <div id="main">
     <header id="topbar">
-      <button id="menuBtn" aria-label="Menü"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+      <button id="menuBtn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
       <span class="logo-text">Checklists</span>
+      <div class="topbar-actions">
+        <button class="icon-btn" id="darkToggle" title="Dark Mode"><svg id="darkIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg></button>
+        <button id="logoutBtn" style="background:none;border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;font-family:inherit;white-space:nowrap">Abmelden</button>
+      </div>
     </header>
 
     <div id="content">
+      <!-- Checklisten -->
       <div id="vCheck">
         <div class="page-header">
-          <div><h1 class="page-title">Checklisten</h1><p class="page-sub" id="checkSub">Lade…</p></div>
-          <button class="btn btn-ghost btn-sm" id="refreshCheck"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>Aktualisieren</button>
+          <div><h1 class="page-title">Checklisten</h1><p class="page-sub" id="checkSub"></p></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <button class="btn btn-ghost btn-sm" id="newEmptyCl"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Leere Checkliste</button>
+            <button class="btn btn-primary btn-sm" id="newFromTplCl"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Aus Vorlage</button>
+            <button class="btn btn-ghost btn-sm" id="showArchivedCl"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg>Archiviert</button>
+            <button class="icon-btn btn-sm" id="refreshCheck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/></svg></button>
+          </div>
         </div>
-        <div id="checkList" style="margin-top:18px"></div>
+        <div id="checkUserFilter" style="display:none;margin-top:14px;padding:0 24px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <label style="font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap">Benutzer:</label>
+            <select id="checkUserSelect" style="flex:1;min-width:180px;padding:8px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none"></select>
+          </div>
+        </div>
+        <div id="checkList" style="margin-top:14px"></div>
+        <div id="archivedClSection" style="display:none;margin-top:24px;padding:0 24px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);flex:1">Archivierte Checklisten</span>
+            <button class="btn btn-ghost btn-sm" id="closeArchivedCl">Schliessen</button>
+          </div>
+          <div style="height:1px;background:var(--border);margin-bottom:12px"></div>
+          <div id="archivedClList"></div>
+        </div>
       </div>
 
+      <!-- Vorlagen -->
       <div id="vTpl" style="display:none">
         <div class="page-header">
-          <div><h1 class="page-title">Vorlagen</h1><p class="page-sub">Vorlagen verwalten und Checklisten erstellen</p></div>
+          <div><h1 class="page-title">Vorlagen</h1><p class="page-sub">Vorlagen verwalten</p></div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="btn btn-ghost btn-sm" id="seedMore">Standardvorlagen</button>
-            <button class="btn btn-primary btn-sm" id="newTpl"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Neue Vorlage</button>
+            <button class="btn btn-ghost btn-sm" id="showArchivedTpl"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg>Archiviert</button>
+            <button class="btn btn-primary btn-sm" id="newTpl"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Neue Vorlage</button>
           </div>
         </div>
         <div id="tplList" style="margin-top:18px"></div>
+        <div id="archivedTplSection" style="display:none;margin-top:24px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);flex:1">Archivierte Vorlagen</span>
+            <button class="btn btn-ghost btn-sm" id="closeArchivedTpl">Schliessen</button>
+          </div>
+          <div style="height:1px;background:var(--border);margin-bottom:12px"></div>
+          <div id="archivedTplList"></div>
+        </div>
         <div id="tplEditorWrap"><div class="editor-card" id="tplEditor"></div></div>
       </div>
 
+      <!-- Admin -->
       <div id="vAdmin" style="display:none">
-        <div class="page-header"><div><h1 class="page-title">Admin</h1><p class="page-sub">Benutzer verwalten</p></div></div>
-        <div style="margin-top:18px" class="editor-card">
-          <h3 style="font-size:15px;font-weight:700;margin-bottom:14px">Neuer Benutzer</h3>
-          <div style="display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">
-            <div class="form-group"><label>Auth UUID</label><input id="newUserId" placeholder="xxxxxxxx-xxxx-…"></div>
-            <div class="form-group"><label>E-Mail</label><input id="newUserEmail" type="email"></div>
-            <div class="form-group"><label>Name</label><input id="newUserName"></div>
-            <div class="form-group"><label>Rolle</label><select id="newUserRole"><option value="user">User</option><option value="admin">Admin</option><option value="super_admin">Super Admin</option></select></div>
+        <div class="page-header"><div><h1 class="page-title">Admin</h1><p class="page-sub">Benutzer &amp; Inhalte verwalten</p></div></div>
+        <div style="margin-top:18px;display:flex;flex-direction:column;gap:16px">
+          <div class="editor-card">
+            <h3 style="font-size:15px;font-weight:700;margin-bottom:4px">Neuer Benutzer</h3>
+            <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Der User wird direkt angelegt und kann sich sofort einloggen.</p>
+            <div style="display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">
+              <div class="form-group"><label>Name</label><input id="newUserName" placeholder="z.B. Anna Müller"></div>
+              <div class="form-group"><label>E-Mail</label><input id="newUserEmail" type="email" placeholder="anna@firma.ch"></div>
+              <div class="form-group"><label>Initiales Passwort</label><input id="newUserPw" type="password" placeholder="Min. 6 Zeichen"></div>
+              <div class="form-group"><label>Rolle</label><select id="newUserRole"><option value="user">User</option><option value="admin">Admin</option><option value="super_admin">Super Admin</option></select></div>
+            </div>
+            <div id="adminMsg" style="font-size:13px;margin-bottom:10px;min-height:18px"></div>
+            <button class="btn btn-primary btn-sm" id="addUser"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Benutzer anlegen</button>
           </div>
-          <button class="btn btn-primary btn-sm" id="addUser">Benutzer hinzufügen</button>
-          <div id="users" style="margin-top:16px"></div>
+          <div class="editor-card"><h3 style="font-size:15px;font-weight:700;margin-bottom:14px">Alle Benutzer</h3><div id="users"></div></div>
+          <div class="editor-card" id="adminClSection" style="display:none">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+              <h3 style="font-size:15px;font-weight:700;flex:1">Checklisten von <span id="adminClUser">—</span></h3>
+              <button class="btn btn-ghost btn-sm" id="adminClClose">Schliessen</button>
+            </div>
+            <div id="adminClList"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -280,18 +351,25 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
   </nav>
 </div>
 
+<!-- Detail Panel -->
 <div id="detailOverlay">
   <div id="detailPanel">
     <div class="detail-header">
       <button class="detail-close" id="detailClose"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-      <span class="detail-title" id="detailTitle">—</span>
-      <button class="btn btn-ghost btn-sm" id="detailAddCat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Kategorie</button>
-      <button class="btn btn-danger btn-sm" id="detailArchive">Archivieren</button>
+      <div class="detail-title-wrap">
+        <span class="detail-title" id="detailTitle">—</span>
+        <input class="detail-title-edit" id="detailTitleEdit" type="text">
+      </div>
+      <div class="detail-hbtns">
+        <button class="btn btn-ghost btn-sm" id="detailAddCat"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg><span class="btn-label">Kategorie</span></button>
+        <button class="btn btn-danger btn-sm" id="detailArchive"><span class="btn-label">Archivieren</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg></button>
+      </div>
     </div>
     <div class="detail-body" id="detailBody"></div>
   </div>
 </div>
 
+<!-- Modal -->
 <div id="modalOverlay">
   <div class="modal-box">
     <div class="modal-title" id="modalTitle"></div>
@@ -304,83 +382,119 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
   </div>
 </div>
 
+<!-- Change Password Modal -->
+<div id="changePwOverlay">
+  <div id="changePwBox">
+    <h3 style="font-size:17px;font-weight:700;margin-bottom:4px">Passwort ändern</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:18px">Neues Passwort für deinen Account.</p>
+    <div class="form-group"><label>Neues Passwort</label><input id="newPw1" type="password" placeholder="Min. 6 Zeichen"></div>
+    <div class="form-group"><label>Bestätigen</label><input id="newPw2" type="password" placeholder="Wiederholen"></div>
+    <div id="changePwMsg" style="font-size:13px;min-height:18px;margin-bottom:10px"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-ghost btn-sm" id="changePwCancel">Abbrechen</button>
+      <button class="btn btn-primary btn-sm" id="changePwConfirm">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit User Panel -->
+<div id="editUserOverlay">
+  <div id="editUserPanel">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+      <button id="editUserClose" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:6px;border-radius:8px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      <h2 style="font-size:18px;font-weight:700;flex:1" id="editUserTitle">Benutzer bearbeiten</h2>
+    </div>
+    <div id="editUserBody"></div>
+  </div>
+</div>
+
+<canvas id="confetti"></canvas>
 <div id="toast"></div>
 <div id="loader"><div class="loader-box"><div class="spinner"></div><span id="loaderText">Lade…</span></div></div>
 
-
 <script>
-const SUPABASE_URL="https://hcxqhyswdaycfnxivhnm.supabase.co";
-const SUPABASE_KEY="sb_publishable_WwSZT4nIB1hRbDhxF2uZpg_bxnq2BM2";
+const SB_URL="https://hcxqhyswdaycfnxivhnm.supabase.co";
+const SB_KEY="sb_publishable_WwSZT4nIB1hRbDhxF2uZpg_bxnq2BM2";
 let sb,user,orgId,isSuper=false,actingAs=null,currentTpl=null,currentChecklistId=null,panelDirty=false;
 const $=id=>document.getElementById(id),q=t=>document.createElement(t);
-function on(id,fn){const el=$(id);if(el)el.onclick=fn}
-function onkey(id,fn){const el=$(id);if(el)el.onkeydown=fn}
+const on=(id,fn)=>{const e=$(id);if(e)e.onclick=fn};
+const onkey=(id,fn)=>{const e=$(id);if(e)e.onkeydown=fn};
 
-function toast(msg,dur=2400){const el=$("toast");el.innerHTML=msg;el.classList.add("show");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),dur)}
-function loading(on,txt="Lade…"){$("loaderText").textContent=txt;$("loader").classList.toggle("show",on)}
+/* Toast */
+function toast(m,d=2400){const e=$("toast");e.textContent=m;e.classList.add("show");clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove("show"),d)}
+/* Loader */
+function loading(v,t="Lade…"){$("loaderText").textContent=t;$("loader").classList.toggle("show",v)}
+/* Escape */
+function escH(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function escA(s){return String(s).replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
+function fmtD(iso){if(!iso)return"";return new Date(iso).toLocaleDateString("de-CH",{day:"2-digit",month:"2-digit",year:"2-digit"})}
 
+/* Modal */
 function showModal({title,sub="",input=null,danger=false,confirmLabel="OK"}){
-  return new Promise(resolve=>{
+  return new Promise(r=>{
     $("modalTitle").textContent=title;$("modalSub").textContent=sub;
-    const wrap=$("modalInputWrap");
-    if(input){wrap.style.display="";$("modalInputLabel").textContent=input.label||"";$("modalInput").value=input.value||"";$("modalInput").placeholder=input.placeholder||"";setTimeout(()=>$("modalInput").focus(),80)}
-    else{wrap.style.display="none"}
+    const w=$("modalInputWrap");
+    if(input){w.style.display="";$("modalInputLabel").textContent=input.label||"";$("modalInput").value=input.value||"";$("modalInput").placeholder=input.placeholder||"";setTimeout(()=>$("modalInput").focus(),80)}
+    else w.style.display="none";
     $("modalConfirm").textContent=confirmLabel;
     $("modalConfirm").className="btn btn-sm "+(danger?"btn-danger":"btn-primary");
     $("modalOverlay").classList.add("open");
-    const close=val=>{$("modalOverlay").classList.remove("open");$("modalConfirm").onclick=null;$("modalCancel").onclick=null;$("modalInput").onkeydown=null;resolve(val)};
-    $("modalConfirm").onclick=()=>close(input?$("modalInput").value.trim():true);
-    $("modalCancel").onclick=()=>close(null);
-    $("modalInput").onkeydown=e=>{if(e.key==="Enter")close(input?$("modalInput").value.trim():true);if(e.key==="Escape")close(null)};
+    const done=v=>{$("modalOverlay").classList.remove("open");$("modalConfirm").onclick=null;$("modalCancel").onclick=null;$("modalInput").onkeydown=null;r(v)};
+    $("modalConfirm").onclick=()=>done(input?$("modalInput").value.trim():true);
+    $("modalCancel").onclick=()=>done(null);
+    $("modalInput").onkeydown=e=>{if(e.key==="Enter")done(input?$("modalInput").value.trim():true);if(e.key==="Escape")done(null)};
   })
 }
 
-function showSelectModal(title,currentVal,values,labels){
-  return new Promise(resolve=>{
+function showSelectModal(title,cur,vals,labels){
+  return new Promise(r=>{
     $("modalTitle").textContent=title;$("modalSub").textContent="";
-    const wrap=$("modalInputWrap");wrap.style.display="";
+    const w=$("modalInputWrap");w.style.display="";
     $("modalInputLabel").textContent=title;
     const inp=$("modalInput");inp.style.display="none";
     let sel=document.getElementById("modalSelect");
     if(!sel){sel=document.createElement("select");sel.id="modalSelect";sel.className=inp.className;inp.parentNode.insertBefore(sel,inp.nextSibling)}
-    sel.style.display="";sel.innerHTML=values.map((v,i)=>`<option value="${v}"${v===currentVal?" selected":""}>${labels[i]}</option>`).join("");
+    sel.style.display="";
+    sel.innerHTML=vals.map((v,i)=>`<option value="${v}"${v===cur?" selected":""}>${labels[i]}</option>`).join("");
     $("modalConfirm").textContent="OK";$("modalConfirm").className="btn btn-sm btn-primary";
     $("modalOverlay").classList.add("open");
-    const close=val=>{$("modalOverlay").classList.remove("open");inp.style.display="";sel.style.display="none";$("modalConfirm").onclick=null;$("modalCancel").onclick=null;resolve(val)};
-    $("modalConfirm").onclick=()=>close(sel.value);
-    $("modalCancel").onclick=()=>close(null);
+    const done=v=>{$("modalOverlay").classList.remove("open");inp.style.display="";sel.style.display="none";$("modalConfirm").onclick=null;$("modalCancel").onclick=null;r(v)};
+    $("modalConfirm").onclick=()=>done(sel.value);
+    $("modalCancel").onclick=()=>done(null);
     setTimeout(()=>sel.focus(),80);
   })
 }
 
 document.addEventListener("keydown",e=>{
-  if(e.key==="Escape"){
-    if($("modalOverlay").classList.contains("open")){$("modalOverlay").classList.remove("open");return}
-    if($("detailOverlay").classList.contains("open")){closeDetailPanel();return}
-  }
+  if(e.key!=="Escape")return;
+  if($("modalOverlay").classList.contains("open")){$("modalOverlay").classList.remove("open");return}
+  if($("detailOverlay").classList.contains("open")){closeDetailPanel()}
 });
 
-function ringSVG(pct){
-  const r=20,c=2*Math.PI*r,offset=c-(pct/100)*c;
-  const color=pct===100?"#22c55e":"#6366f1";
-  const track=pct===100?"rgba(34,197,94,.2)":"#e2e8f0";
-  return `<svg width="52" height="52" viewBox="0 0 48 48"><circle cx="24" cy="24" r="${r}" fill="none" stroke="${track}" stroke-width="4"/><circle cx="24" cy="24" r="${r}" fill="none" stroke="${color}" stroke-width="4" stroke-dasharray="${c.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}" stroke-linecap="round" transform="rotate(-90 24 24)"/><text x="24" y="28" text-anchor="middle" font-size="11" font-weight="700" fill="${color}" font-family="Inter,sans-serif">${pct}%</text></svg>`;
+/* Ring SVG */
+function ring(pct){
+  const r=20,c=2*Math.PI*r,off=c-(pct/100)*c;
+  const col=pct===100?"#22c55e":"#6366f1",trk=pct===100?"rgba(34,197,94,.2)":"#e2e8f0";
+  return `<svg width="52" height="52" viewBox="0 0 48 48"><circle cx="24" cy="24" r="${r}" fill="none" stroke="${trk}" stroke-width="4"/><circle cx="24" cy="24" r="${r}" fill="none" stroke="${col}" stroke-width="4" stroke-dasharray="${c.toFixed(2)}" stroke-dashoffset="${off.toFixed(2)}" stroke-linecap="round" transform="rotate(-90 24 24)"/><text x="24" y="28" text-anchor="middle" font-size="11" font-weight="700" fill="${col}" font-family="Inter,sans-serif">${pct}%</text></svg>`;
 }
 
+/* Confetti */
 function celebrate(){
-  const canvas=$("confetti");if(!canvas)return;canvas.classList.add("show");
-  const ctx=canvas.getContext("2d");canvas.width=window.innerWidth;canvas.height=window.innerHeight;
-  const colors=["#6366f1","#818cf8","#22c55e","#f59e0b","#ec4899","#06b6d4"];
-  const pieces=Array.from({length:80},()=>({x:Math.random()*canvas.width,y:-20,vx:(Math.random()-.5)*4,vy:Math.random()*4+2,r:Math.random()*6+3,color:colors[Math.floor(Math.random()*colors.length)],angle:Math.random()*360,va:(Math.random()-.5)*8,life:1}));
-  let frame=0;
-  function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);pieces.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.angle+=p.va;p.life-=.012;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.angle*Math.PI/180);ctx.globalAlpha=Math.max(0,p.life);ctx.fillStyle=p.color;ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r);ctx.restore()});frame++;if(frame<120)requestAnimationFrame(draw);else{canvas.classList.remove("show");ctx.clearRect(0,0,canvas.width,canvas.height)}}
-  draw();
+  const cv=$("confetti");if(!cv)return;cv.classList.add("show");
+  const cx=cv.getContext("2d");cv.width=innerWidth;cv.height=innerHeight;
+  const cols=["#6366f1","#818cf8","#22c55e","#f59e0b","#ec4899"];
+  const ps=Array.from({length:80},()=>({x:Math.random()*cv.width,y:-20,vx:(Math.random()-.5)*4,vy:Math.random()*4+2,r:Math.random()*6+3,col:cols[~~(Math.random()*cols.length)],a:Math.random()*360,va:(Math.random()-.5)*8,l:1}));
+  let f=0;
+  (function draw(){cx.clearRect(0,0,cv.width,cv.height);ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.a+=p.va;p.l-=.012;cx.save();cx.translate(p.x,p.y);cx.rotate(p.a*Math.PI/180);cx.globalAlpha=Math.max(0,p.l);cx.fillStyle=p.col;cx.fillRect(-p.r,-p.r/2,p.r*2,p.r);cx.restore()});f++;if(f<120)requestAnimationFrame(draw);else{cv.classList.remove("show");cx.clearRect(0,0,cv.width,cv.height)}})();
 }
 
-function escHtml(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
-function escAttr(s){return String(s).replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
-function fmtDate(iso){if(!iso)return"";const d=new Date(iso);return d.toLocaleDateString("de-CH",{day:"2-digit",month:"2-digit",year:"2-digit"})}
+/* Dark mode */
+const MOON='<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+const SUN='<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+function applyDark(v){document.documentElement.classList.toggle("dark",!!v);[$("darkIcon"),$("darkIconDesktop")].forEach(el=>{if(el)el.innerHTML=v?SUN:MOON})}
+async function toggleDark(){const d=document.documentElement.classList.contains("dark");applyDark(!d);await sb.from("profiles").update({dark_mode:!d}).eq("id",user.id)}
 
+/* Nav */
 function show(v){
   ["Check","Tpl","Admin"].forEach(x=>{
     $("v"+x).style.display=x===v?"":"none";
@@ -393,6 +507,7 @@ function show(v){
 function openSidebar(){$("sidebar").classList.add("open");$("sidebarBackdrop").classList.add("show")}
 function closeSidebar(){$("sidebar").classList.remove("open");$("sidebarBackdrop").classList.remove("show")}
 
+/* Detail panel */
 function openDetailPanel(id){
   currentChecklistId=id;panelDirty=false;
   $("detailOverlay").classList.add("open");document.body.style.overflow="hidden";
@@ -404,47 +519,32 @@ function closeDetailPanel(){
   if(panelDirty)loadChecklists();panelDirty=false;
 }
 
-function initTitleEdit(id,currentTitle){
-  const titleEl=$("detailTitle"),editEl=$("detailTitleEdit");
-  titleEl.onclick=()=>{editEl.value=currentTitle;titleEl.classList.add("editing");editEl.classList.add("active");editEl.focus();editEl.select()};
-  const saveTitle=async()=>{
-    const val=editEl.value.trim();titleEl.classList.remove("editing");editEl.classList.remove("active");
-    if(!val||val===currentTitle)return;
-    await sb.from("checklists").update({title:val,updated_by:user.id}).eq("id",id);
-    currentTitle=val;titleEl.textContent=val;panelDirty=true;toast("Titel gespeichert");
+function initTitleEdit(id,cur){
+  const t=$("detailTitle"),e=$("detailTitleEdit");
+  t.onclick=()=>{e.value=cur;t.classList.add("editing");e.classList.add("active");e.focus();e.select()};
+  const save=async()=>{
+    const v=e.value.trim();t.classList.remove("editing");e.classList.remove("active");
+    if(!v||v===cur)return;
+    await sb.from("checklists").update({title:v,updated_by:user.id}).eq("id",id);
+    cur=v;t.textContent=v;panelDirty=true;toast("Titel gespeichert");
   };
-  editEl.onblur=saveTitle;
-  editEl.onkeydown=e=>{if(e.key==="Enter")saveTitle();if(e.key==="Escape"){titleEl.classList.remove("editing");editEl.classList.remove("active")}};
+  e.onblur=save;e.onkeydown=ev=>{if(ev.key==="Enter")save();if(ev.key==="Escape"){t.classList.remove("editing");e.classList.remove("active")}};
 }
 
 function owner(){return actingAs||user.id}
 function setActing(id,name){
   actingAs=id;
   if(id){$("actingName").textContent=name;$("actingBadge").classList.add("show")}
-  else{$("actingBadge").classList.remove("show")}
+  else $("actingBadge").classList.remove("show");
   loadChecklists();loadTemplates();
 }
 
-/* ── Dark mode ── */
-const MOON_ICON='<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
-const SUN_ICON='<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
-function applyDark(on){
-  document.documentElement.classList.toggle("dark",!!on);
-  [$("darkIcon"),$("darkIconDesktop")].forEach(el=>{if(el)el.innerHTML=on?SUN_ICON:MOON_ICON});
-}
-async function toggleDark(){
-  const isDark=document.documentElement.classList.contains("dark");
-  applyDark(!isDark);
-  await sb.from("profiles").update({dark_mode:!isDark}).eq("id",user.id);
-}
-
-/* ── Auth ── */
-function initClient(){sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}})}
-
+/* Auth */
+function initClient(){sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}})}
 async function doLogin(){
-  const email=$("loginEmail").value.trim(),pw=$("loginPw").value;
+  const em=$("loginEmail").value.trim(),pw=$("loginPw").value;
   $("loginBtn").textContent="Anmelden…";$("loginBtn").disabled=true;
-  const{error}=await sb.auth.signInWithPassword({email,password:pw});
+  const{error}=await sb.auth.signInWithPassword({email:em,password:pw});
   $("loginBtn").textContent="Anmelden";$("loginBtn").disabled=false;
   if(error){$("loginMsg").textContent=error.message;return}
   $("loginMsg").textContent="";await loadApp();
@@ -452,16 +552,13 @@ async function doLogin(){
 async function doLogout(){await sb.auth.signOut();$("shell").style.display="none";$("loginScreen").classList.add("show");toast("Abgemeldet")}
 async function checkSession(){const{data}=await sb.auth.getSession();if(data.session)await loadApp();else $("loginScreen").classList.add("show")}
 
-/* ── User cache ── */
-let _allUsers=null;
-async function getAllUsers(){if(_allUsers)return _allUsers;const{data}=await sb.from("profiles").select("id,display_name,email").order("display_name");_allUsers=data||[];return _allUsers}
-
-async function showOwnerPicker(defaultOwnerId){
-  if(!isSuper)return defaultOwnerId||owner();
-  const users=await getAllUsers();
-  const values=users.map(u=>u.id);
-  const labels=users.map(u=>u.display_name||u.email||u.id);
-  return await showSelectModal("Für wen?",defaultOwnerId||user.id,values,labels);
+/* User cache */
+let _users=null;
+async function getUsers(){if(_users)return _users;const{data}=await sb.from("profiles").select("id,display_name,email").order("display_name");_users=data||[];return _users}
+async function ownerPicker(def){
+  if(!isSuper)return def||owner();
+  const us=await getUsers();
+  return await showSelectModal("Für wen?",def||user.id,us.map(u=>u.id),us.map(u=>u.display_name||u.email));
 }
 
 async function loadApp(){
@@ -479,51 +576,50 @@ async function loadApp(){
     [$("bAdmin"),$("bbAdmin")].forEach(el=>{if(el)el.classList.toggle("hidden",!isSuper)});
     await Promise.all([loadTemplates(),loadChecklists()]);
     if(isSuper){
-      const filter=$("checkUserFilter"),sel=$("checkUserSelect");
-      filter.style.display="";
-      const users=await getAllUsers();
-      sel.innerHTML='<option value="">Alle Checklisten</option><option value="'+user.id+'" selected>Meine Checklisten</option>'
-        +users.filter(u=>u.id!==user.id).map(u=>'<option value="'+u.id+'">'+escHtml(u.display_name||u.email)+'</option>').join("");
+      const filt=$("checkUserFilter"),sel=$("checkUserSelect");
+      filt.style.display="";
+      const us=await getUsers();
+      sel.innerHTML='<option value="">Alle Checklisten</option>'
+        +'<option value="'+user.id+'" selected>Meine Checklisten</option>'
+        +us.filter(u=>u.id!==user.id).map(u=>'<option value="'+u.id+'">'+escH(u.display_name||u.email)+'</option>').join("");
       sel.onchange=()=>{
         const uid=sel.value;
-        if(!uid){setActing(null,"");return}
-        if(uid===user.id){setActing(null,"");return}
-        const u=users.find(u=>u.id===uid);
+        if(!uid||uid===user.id){setActing(null,"");return}
+        const u=us.find(u=>u.id===uid);
         setActing(uid,u?u.display_name||u.email:"");
       };
     }
   }finally{loading(false)}
 }
 
-/* ── Checklists ── */
+/* Checklists */
 async function loadChecklists(){
   const box=$("checkList");
   box.innerHTML='<div style="display:flex;justify-content:center;padding:48px"><div class="spinner"></div></div>';
   const{data,error}=await sb.from("checklists").select("*").is("deleted_at",null).order("created_at",{ascending:false});
   if(error){box.textContent=error.message;return}
-  const count=data?data.length:0;
-  $("checkSub").textContent=count?count+" Checklist"+(count!==1?"en":""):"";
-  if(!count){
-    box.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Noch keine Checklisten</div><div class="empty-sub">Erstelle eine Checkliste aus einer Vorlage.</div><button class="btn btn-primary" id="goTpl">Zu den Vorlagen</button></div>';
-    $("goTpl").onclick=()=>show("Tpl");return;
+  const n=data?data.length:0;
+  $("checkSub").textContent=n?n+" Checklist"+(n!==1?"en":""):"";
+  if(!n){
+    box.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Noch keine Checklisten</div><div class="empty-sub">Erstelle eine Checkliste.</div><button class="btn btn-primary" id="goTpl">Zu den Vorlagen</button></div>';
+    on("goTpl",()=>show("Tpl"));return;
   }
-  const clIds=data.map(cl=>cl.id);
-  const allCats=await sb.from("checklist_categories").select("id,checklist_id").in("checklist_id",clIds);
-  const catIds=(allCats.data||[]).map(c=>c.id);
-  const allItems=catIds.length?await sb.from("checklist_items").select("category_id,is_checked").in("category_id",catIds):{data:[]};
-  const catToCl={};(allCats.data||[]).forEach(c=>catToCl[c.id]=c.checklist_id);
-  const prog={};clIds.forEach(id=>prog[id]={done:0,total:0});
-  (allItems.data||[]).forEach(it=>{const cl=catToCl[it.category_id];if(!cl)return;prog[cl].total++;if(it.is_checked)prog[cl].done++});
+  const ids=data.map(c=>c.id);
+  const cats=await sb.from("checklist_categories").select("id,checklist_id").in("checklist_id",ids);
+  const cids=(cats.data||[]).map(c=>c.id);
+  const items=cids.length?await sb.from("checklist_items").select("category_id,is_checked").in("category_id",cids):{data:[]};
+  const c2cl={};(cats.data||[]).forEach(c=>c2cl[c.id]=c.checklist_id);
+  const prog={};ids.forEach(id=>prog[id]={d:0,t:0});
+  (items.data||[]).forEach(it=>{const cl=c2cl[it.category_id];if(!cl)return;prog[cl].t++;if(it.is_checked)prog[cl].d++});
   const grid=q("div");grid.className="cl-grid";
   (data||[]).forEach(cl=>{
-    const{done,total}=prog[cl.id]||{done:0,total:0};
-    const pct=total?Math.round(done/total*100):0;
-    const isComplete=total>0&&pct===100;
-    const card=q("div");card.className="cl-card"+(isComplete?" done-card":"");
-    const doneBadge=isComplete?'<span class="cl-done-badge"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg>Fertig</span>':"";
-    card.innerHTML='<div class="cl-ring">'+ringSVG(pct)+'</div><div class="cl-body"><div class="cl-title">'+escHtml((cl.icon||"📋")+" "+cl.title)+'</div><div class="cl-desc">'+escHtml(cl.description||"Keine Beschreibung")+'</div><div class="cl-meta"><span>'+done+"/"+total+' erledigt</span>'+doneBadge+'<span class="cl-date">'+fmtDate(cl.created_at)+'</span></div><div class="cl-actions"><button class="btn-dup">Duplizieren</button><button class="btn-arch">Archivieren</button></div></div>';
-    card.querySelector(".btn-dup").onclick=e=>{e.stopPropagation();duplicateChecklist(cl.id)};
-    card.querySelector(".btn-arch").onclick=e=>{e.stopPropagation();archiveChecklist(cl.id)};
+    const{d,t}=prog[cl.id]||{d:0,t:0};
+    const pct=t?Math.round(d/t*100):0,done=t>0&&pct===100;
+    const card=q("div");card.className="cl-card"+(done?" done-card":"");
+    const badge=done?'<span class="cl-done-badge"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg>Fertig</span>':"";
+    card.innerHTML='<div class="cl-ring">'+ring(pct)+'</div><div class="cl-body"><div class="cl-title">'+escH((cl.icon||"📋")+" "+cl.title)+'</div><div class="cl-desc">'+escH(cl.description||"Keine Beschreibung")+'</div><div class="cl-meta"><span>'+d+"/"+t+' erledigt</span>'+badge+'<span class="cl-date">'+fmtD(cl.created_at)+'</span></div><div class="cl-actions"><button class="btn-dup">Duplizieren</button><button class="btn-arch">Archivieren</button></div></div>';
+    card.querySelector(".btn-dup").onclick=e=>{e.stopPropagation();duplicateCl(cl.id)};
+    card.querySelector(".btn-arch").onclick=e=>{e.stopPropagation();archiveCl(cl.id)};
     card.onclick=()=>openDetailPanel(cl.id);
     grid.appendChild(card);
   });
@@ -533,219 +629,217 @@ async function loadChecklists(){
 async function loadDetailPanel(id){
   const body=$("detailBody");
   body.innerHTML='<div style="display:flex;justify-content:center;padding:48px"><div class="spinner"></div></div>';
-  const[clRes,catsRes]=await Promise.all([sb.from("checklists").select("*").eq("id",id).single(),sb.from("checklist_categories").select("*").eq("checklist_id",id).order("sort_order")]);
-  const cl=clRes.data;
+  const[clR,catR]=await Promise.all([
+    sb.from("checklists").select("*").eq("id",id).single(),
+    sb.from("checklist_categories").select("*").eq("checklist_id",id).order("sort_order")
+  ]);
+  const cl=clR.data;
   $("detailTitle").textContent=(cl.icon||"📋")+" "+cl.title;
-  $("detailTitle").title="Titel klicken zum Bearbeiten";
-  $("detailArchive").onclick=()=>archiveChecklist(id,true);
+  $("detailArchive").onclick=()=>archiveCl(id,true);
   initTitleEdit(id,cl.title);
-  const catIds=(catsRes.data||[]).map(c=>c.id);
-  const itemsRes=catIds.length?await sb.from("checklist_items").select("*").in("category_id",catIds).order("sort_order"):{data:[]};
-  const itemsByCat={};(itemsRes.data||[]).forEach(it=>{(itemsByCat[it.category_id]=itemsByCat[it.category_id]||[]).push(it)});
-  let total=0,done=0;(itemsRes.data||[]).forEach(it=>{total++;if(it.is_checked)done++});
-  const pct=total?Math.round(done/total*100):0;
-  let wasComplete=pct===100&&total>0;
-  function buildProgress(dn,tot){
-    const p=tot?Math.round(dn/tot*100):0,complete=p===100&&tot>0;
-    const barClass=complete?"bar complete":"bar";
-    const banner=complete?'<div class="complete-banner"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l5 5L20 7"/></svg>Alle Punkte erledigt!</div>':"";
-    return '<div class="progress-wrap">'+banner+'<div class="detail-progress-bar"><div class="'+barClass+'" style="width:'+p+'%"></div></div><div class="detail-progress-label">'+dn+' von '+tot+' erledigt · '+p+'%</div></div>';
+  const cids=(catR.data||[]).map(c=>c.id);
+  const itR=cids.length?await sb.from("checklist_items").select("*").in("category_id",cids).order("sort_order"):{data:[]};
+  const bycat={};(itR.data||[]).forEach(it=>{(bycat[it.category_id]=bycat[it.category_id]||[]).push(it)});
+  let tot=(itR.data||[]).length,dn=(itR.data||[]).filter(i=>i.is_checked).length;
+  let wasComplete=tot>0&&dn===tot;
+
+  const progWrap=q("div");progWrap.className="progress-wrap-outer";
+  body.innerHTML="";body.appendChild(progWrap);
+
+  function buildProg(d,t){
+    const p=t?Math.round(d/t*100):0,comp=p===100&&t>0;
+    const banner=comp?'<div class="complete-banner"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l5 5L20 7"/></svg>Alle Punkte erledigt!</div>':"";
+    const cls="bar"+(comp?" complete":"");
+    progWrap.innerHTML=banner+'<div class="detail-progress-bar"><div class="'+cls+'" style="width:'+p+'%"></div></div><div class="detail-progress-label">'+d+' von '+t+' erledigt · '+p+'%</div>';
   }
-  body.innerHTML=buildProgress(done,total);
-  function refreshProgress(){
-    const allCbs=body.querySelectorAll('input[type=checkbox]');
-    const tot=allCbs.length,dn=[...allCbs].filter(c=>c.checked).length;
-    const nowComplete=dn===tot&&tot>0;
-    const old=body.querySelector(".progress-wrap");if(old)old.outerHTML=buildProgress(dn,tot);
-    if(nowComplete&&!wasComplete){celebrate();wasComplete=true}
+  buildProg(dn,tot);
+
+  function refreshProg(){
+    const cbs=body.querySelectorAll('input[type=checkbox]');
+    const t2=cbs.length,d2=[...cbs].filter(c=>c.checked).length;
+    const nowComp=d2===t2&&t2>0;
+    buildProg(d2,t2);
+    if(nowComp&&!wasComplete){celebrate();wasComplete=true}
   }
-  if(!catsRes.data||!catsRes.data.length){body.innerHTML+=`<div class="empty-cat-hint">Noch keine Kategorien. Klicke oben auf „+ Kategorie", um loszulegen.</div>`;return}
-  const catContainer=q("div");catContainer.id="cat-container-"+id;
-  for(const cat of catsRes.data){
-    const block=q("div");block.className="cat-block";block.dataset.catId=cat.id;
-    const catHead=q("div");catHead.className="cat-header";
-    const catHandle=q("div");catHandle.className="cat-drag-handle";catHandle.title="Ziehen zum Sortieren";
-    catHandle.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>';
-    const catTitle=q("h3");catTitle.textContent=cat.title;
-    const catDel=q("button");catDel.className="cat-del-btn";catDel.textContent="×";catDel.title="Kategorie löschen";
-    catDel.onclick=async()=>{
+
+  if(!catR.data||!catR.data.length){const hint=q("div");hint.className="empty-cat-hint";hint.textContent='Noch keine Kategorien. Klicke "+ Kategorie" oben.';body.appendChild(hint);return}
+
+  const cc=q("div");cc.id="cc-"+id;
+  for(const cat of catR.data){
+    const blk=q("div");blk.className="cat-block";blk.dataset.catId=cat.id;
+    const hd=q("div");hd.className="cat-header";
+    const hnd=q("div");hnd.className="cat-drag-handle";hnd.title="Ziehen zum Sortieren";
+    hnd.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>';
+    const ht=q("h3");ht.textContent=cat.title;
+    const hd2=q("button");hd2.className="cat-del-btn";hd2.textContent="×";hd2.title="Löschen";
+    hd2.onclick=async()=>{
       const ok=await showModal({title:"Kategorie löschen?",sub:'"'+cat.title+'" und alle Einträge werden gelöscht.',confirmLabel:"Löschen",danger:true});
       if(!ok)return;loading(true,"Lösche…");
       await sb.from("checklist_items").delete().eq("category_id",cat.id);
       await sb.from("checklist_categories").delete().eq("id",cat.id);
-      loading(false);toast("Kategorie gelöscht");panelDirty=true;loadDetailPanel(id);
+      loading(false);toast("Gelöscht");panelDirty=true;loadDetailPanel(id);
     };
-    catHead.append(catHandle,catTitle,catDel);block.appendChild(catHead);
-    const inner=q("div");inner.className="cat-inner";
-    const items=itemsByCat[cat.id]||[];
-    items.forEach(it=>inner.appendChild(makeCheckrow(it,id,inner,refreshProgress)));
-    const addRow=q("div");addRow.className="inline-add";
+    hd.append(hnd,ht,hd2);blk.appendChild(hd);
+    const inn=q("div");inn.className="cat-inner";
+    (bycat[cat.id]||[]).forEach(it=>inn.appendChild(makeRow(it,inn,refreshProg)));
+    const ar=q("div");ar.className="inline-add";
     const inp=q("input");inp.placeholder="Neuer Eintrag…";
-    const plusBtn=q("button");plusBtn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><path d="M12 5v14M5 12h14"/></svg>';
+    const pb=q("button");pb.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><path d="M12 5v14M5 12h14"/></svg>';
     const doAdd=async()=>{
-      const title=inp.value.trim();if(!title)return;
-      plusBtn.disabled=true;loading(true,"Speichere…");
-      const res=await sb.from("checklist_items").insert({category_id:cat.id,title,sort_order:Date.now()%100000,is_checked:false}).select().single();
-      loading(false);plusBtn.disabled=false;
-      if(res.error){alert(res.error.message);return}
-      inp.value="";toast("Eintrag hinzugefügt");panelDirty=true;
-      inner.insertBefore(makeCheckrow(res.data,id,inner,refreshProgress),addRow);refreshProgress();inp.focus();
+      const t=inp.value.trim();if(!t)return;pb.disabled=true;loading(true,"Speichere…");
+      const res=await sb.from("checklist_items").insert({category_id:cat.id,title:t,sort_order:Date.now()%100000,is_checked:false}).select().single();
+      loading(false);pb.disabled=false;if(res.error){alert(res.error.message);return}
+      inp.value="";panelDirty=true;inn.insertBefore(makeRow(res.data,inn,refreshProg),ar);refreshProg();inp.focus();
     };
-    plusBtn.onclick=doAdd;inp.onkeydown=e=>{if(e.key==="Enter")doAdd()};
-    addRow.append(inp,plusBtn);inner.appendChild(addRow);
-    block.appendChild(inner);
-    attachCatDrag(catHandle,block,catContainer,id);
-    catContainer.appendChild(block);
+    pb.onclick=doAdd;inp.onkeydown=e=>{if(e.key==="Enter")doAdd()};
+    ar.append(inp,pb);inn.appendChild(ar);
+    blk.appendChild(inn);
+    ptrDrag(hnd,blk,cc,".cat-block",c=>saveCatOrd(c,id));
+    cc.appendChild(blk);
   }
-  body.appendChild(catContainer);
+  body.appendChild(cc);
 }
 
-function makeCheckrow(it,checklistId,container,refreshProgress){
+function makeRow(it,container,refreshProg){
   const row=q("div");row.className="checkrow";row.dataset.id=it.id;
-  const handle=q("div");handle.className="drag-handle";handle.title="Ziehen zum Sortieren";
-  handle.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>';
+  const hnd=q("div");hnd.className="drag-handle";hnd.title="Ziehen";
+  hnd.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>';
   const cb=q("input");cb.type="checkbox";cb.checked=it.is_checked;cb.id="cb-"+it.id;
-  const lbl=q("label");lbl.htmlFor="cb-"+it.id;lbl.textContent=it.title;
-  if(it.is_checked)lbl.classList.add("done");
-  const delBtn=q("button");delBtn.className="item-del";delBtn.innerHTML="×";delBtn.title="Löschen";
-  delBtn.onclick=async e=>{
+  const lb=q("label");lb.htmlFor="cb-"+it.id;lb.textContent=it.title;if(it.is_checked)lb.classList.add("done");
+  const del=q("button");del.className="item-del";del.innerHTML="×";del.title="Löschen";
+  del.onclick=async e=>{
     e.stopPropagation();
     const ok=await showModal({title:"Eintrag löschen?",sub:'"'+it.title+'"',confirmLabel:"Löschen",danger:true});
     if(!ok)return;loading(true,"Lösche…");await sb.from("checklist_items").delete().eq("id",it.id);loading(false);
-    toast("Eintrag gelöscht");panelDirty=true;row.remove();refreshProgress();
+    panelDirty=true;row.remove();refreshProg();
   };
   cb.onchange=async()=>{
-    lbl.classList.toggle("done",cb.checked);
+    lb.classList.toggle("done",cb.checked);
     await sb.from("checklist_items").update({is_checked:cb.checked,checked_at:cb.checked?new Date().toISOString():null,checked_by:cb.checked?user.id:null}).eq("id",it.id);
-    toast(cb.checked?"✓ Erledigt":"↩ Zurückgesetzt");panelDirty=true;refreshProgress();
+    panelDirty=true;refreshProg();
   };
-  row.append(handle,cb,lbl,delBtn);
-  attachItemDrag(handle,row,container);
+  row.append(hnd,cb,lb,del);
+  ptrDrag(hnd,row,container,".checkrow",saveItemOrd);
   return row;
 }
 
-/* ── Pointer drag ── */
-let _drag=null;
-function _pointerDrag(handle,el,container,{selector,onDone}){
-  let pressTimer=null;
+/* Pointer drag */
+let _drg=null;
+function ptrDrag(handle,el,container,sel,onDone){
+  let timer=null;
   handle.style.touchAction="none";
   handle.addEventListener("pointerdown",e=>{
     if(e.button!==0&&e.pointerType==="mouse")return;
     if(e.pointerType==="touch"){
-      const cancelOnMove=()=>{clearTimeout(pressTimer);handle.removeEventListener("pointermove",cancelOnMove)};
-      handle.addEventListener("pointermove",cancelOnMove,{once:true,passive:true});
-      pressTimer=setTimeout(()=>startDrag(e),400);
-    } else startDrag(e);
+      const cancel=()=>{clearTimeout(timer);handle.removeEventListener("pointermove",cancel)};
+      handle.addEventListener("pointermove",cancel,{once:true,passive:true});
+      timer=setTimeout(()=>start(e),420);
+    } else start(e);
   });
-  function startDrag(e){
-    clearTimeout(pressTimer);if(_drag)return;
+  function start(e){
+    clearTimeout(timer);if(_drg)return;
     navigator.vibrate&&navigator.vibrate(40);
     handle.setPointerCapture(e.pointerId);
-    const rect=el.getBoundingClientRect();
-    const ghost=el.cloneNode(true);
-    ghost.style.cssText="position:fixed;left:"+rect.left+"px;top:"+rect.top+"px;width:"+rect.width+"px;opacity:.85;pointer-events:none;z-index:9999;background:var(--surface);border-radius:10px;box-shadow:var(--shadow-lg);transition:none";
-    document.body.appendChild(ghost);
+    const rc=el.getBoundingClientRect();
+    const gh=el.cloneNode(true);
+    gh.style.cssText="position:fixed;left:"+rc.left+"px;top:"+rc.top+"px;width:"+rc.width+"px;opacity:.85;pointer-events:none;z-index:9999;background:var(--surface);border-radius:10px;box-shadow:var(--shadow-lg);transition:none";
+    document.body.appendChild(gh);
     el.classList.add("dragging");
-    _drag={el,container,ghost,offsetX:e.clientX-rect.left,offsetY:e.clientY-rect.top,selector,onDone,lastTarget:null};
-    handle.addEventListener("pointermove",onMove);
-    handle.addEventListener("pointerup",onUp,{once:true});
-    handle.addEventListener("pointercancel",onUp,{once:true});
+    _drg={el,container,gh,ox:e.clientX-rc.left,oy:e.clientY-rc.top,sel,onDone,tgt:null};
+    handle.addEventListener("pointermove",move);
+    handle.addEventListener("pointerup",up,{once:true});
+    handle.addEventListener("pointercancel",up,{once:true});
   }
-  function onMove(e){
-    if(!_drag)return;
-    const{ghost,el,container,offsetX,offsetY,selector}=_drag;
-    ghost.style.left=(e.clientX-offsetX)+"px";ghost.style.top=(e.clientY-offsetY)+"px";
-    ghost.style.display="none";
-    const under=document.elementFromPoint(e.clientX,e.clientY);
-    ghost.style.display="";
-    const target=under?under.closest(selector):null;
-    clearIndicators(container,selector);
-    if(target&&target!==el&&target.parentNode===container){
-      const r=target.getBoundingClientRect(),above=e.clientY<r.top+r.height/2;
-      target.classList.add(above?"drag-over-top":"drag-over-bottom");
-      _drag.lastTarget={target,above};
-    } else _drag.lastTarget=null;
+  function move(e){
+    if(!_drg)return;
+    const{gh,el,container,ox,oy,sel}=_drg;
+    gh.style.left=(e.clientX-ox)+"px";gh.style.top=(e.clientY-oy)+"px";
+    gh.style.display="none";const under=document.elementFromPoint(e.clientX,e.clientY);gh.style.display="";
+    const tgt=under?under.closest(sel):null;
+    clearInd(container,sel);
+    if(tgt&&tgt!==el&&tgt.parentNode===container){
+      const rb=tgt.getBoundingClientRect(),ab=e.clientY<rb.top+rb.height/2;
+      tgt.classList.add(ab?"drag-over-top":"drag-over-bottom");
+      _drg.tgt={el:tgt,ab};
+    } else _drg.tgt=null;
   }
-  function onUp(){
-    if(!_drag)return;
-    handle.removeEventListener("pointermove",onMove);
-    const{el,container,ghost,lastTarget,onDone,selector}=_drag;
-    ghost.remove();el.classList.remove("dragging");clearIndicators(container,selector);
-    if(lastTarget){const{target,above}=lastTarget;if(above)container.insertBefore(el,target);else target.after(el)}
-    _drag=null;onDone(container);
+  function up(){
+    if(!_drg)return;
+    handle.removeEventListener("pointermove",move);
+    const{el,container,gh,tgt,onDone,sel}=_drg;
+    gh.remove();el.classList.remove("dragging");clearInd(container,sel);
+    if(tgt){if(tgt.ab)container.insertBefore(el,tgt.el);else tgt.el.after(el)}
+    _drg=null;onDone(container);
   }
 }
-function clearIndicators(container,selector){container.querySelectorAll(selector).forEach(el=>el.classList.remove("drag-over-top","drag-over-bottom"))}
-function attachItemDrag(handle,row,container){_pointerDrag(handle,row,container,{selector:".checkrow",onDone:saveItemOrder})}
-async function saveItemOrder(container){
-  const rows=[...container.querySelectorAll(".checkrow[data-id]")];
+function clearInd(c,sel){c.querySelectorAll(sel).forEach(e=>e.classList.remove("drag-over-top","drag-over-bottom"))}
+async function saveItemOrd(c){
+  const rows=[...c.querySelectorAll(".checkrow[data-id]")];
   await Promise.all(rows.map((r,i)=>sb.from("checklist_items").update({sort_order:(i+1)*10}).eq("id",r.dataset.id)));
   panelDirty=true;
 }
-function attachCatDrag(handle,block,container,checklistId){_pointerDrag(handle,block,container,{selector:".cat-block",onDone:c=>saveCatOrder(c,checklistId)})}
-async function saveCatOrder(container,checklistId){
-  const blocks=[...container.querySelectorAll(".cat-block[data-cat-id]")];
-  await Promise.all(blocks.map((b,i)=>sb.from("checklist_categories").update({sort_order:(i+1)*10}).eq("id",b.dataset.catId)));
+async function saveCatOrd(c,clId){
+  const blks=[...c.querySelectorAll(".cat-block[data-cat-id]")];
+  await Promise.all(blks.map((b,i)=>sb.from("checklist_categories").update({sort_order:(i+1)*10}).eq("id",b.dataset.catId)));
   panelDirty=true;
 }
 
-async function addChecklistCategory(){
+async function addChecklistCat(){
   if(!currentChecklistId)return;
-  const title=await showModal({title:"Neue Kategorie",input:{label:"Name",placeholder:"z.B. Dokumente"}});
-  if(!title)return;loading(true,"Speichere…");
-  await sb.from("checklist_categories").insert({checklist_id:currentChecklistId,title,sort_order:Date.now()%100000});
-  loading(false);toast("Kategorie hinzugefügt");panelDirty=true;loadDetailPanel(currentChecklistId);
+  const t=await showModal({title:"Neue Kategorie",input:{label:"Name",placeholder:"z.B. Dokumente"}});
+  if(!t)return;loading(true,"Speichere…");
+  await sb.from("checklist_categories").insert({checklist_id:currentChecklistId,title:t,sort_order:Date.now()%100000});
+  loading(false);panelDirty=true;loadDetailPanel(currentChecklistId);toast("Kategorie hinzugefügt");
 }
 
-async function archiveChecklist(id,fromPanel=false){
-  const ok=await showModal({title:"Archivieren?",sub:"Die Checkliste wird ausgeblendet.",confirmLabel:"Archivieren",danger:true});
+async function archiveCl(id,fromPanel=false){
+  const ok=await showModal({title:"Archivieren?",sub:"Checkliste wird ausgeblendet.",confirmLabel:"Archivieren",danger:true});
   if(!ok)return;loading(true,"Archiviere…");
   await sb.from("checklists").update({archived:true,deleted_at:new Date().toISOString(),deleted_by:user.id}).eq("id",id);
   loading(false);toast("Archiviert");
   if(fromPanel){panelDirty=true;closeDetailPanel()}else loadChecklists();
 }
 
-async function loadArchivedChecklists(){
-  const section=$("archivedClSection"),list=$("archivedClList");
-  section.style.display="";
-  list.innerHTML='<div style="display:flex;justify-content:center;padding:24px"><div class="spinner"></div></div>';
-  section.scrollIntoView({behavior:"smooth",block:"start"});
-  let query=sb.from("checklists").select("*,profiles(display_name,email)").not("deleted_at","is",null).order("deleted_at",{ascending:false});
-  if(!isSuper)query=query.eq("owner_id",user.id);
-  const{data,error}=await query;
-  if(error){list.textContent=error.message;return}
-  if(!data||!data.length){list.innerHTML='<div class="empty-state" style="padding:28px 0"><div class="empty-icon">🗂️</div><div class="empty-title">Keine archivierten Checklisten</div></div>';return}
+async function loadArchivedCls(){
+  const sec=$("archivedClSection"),lst=$("archivedClList");
+  sec.style.display="";lst.innerHTML='<div style="display:flex;justify-content:center;padding:24px"><div class="spinner"></div></div>';
+  sec.scrollIntoView({behavior:"smooth",block:"start"});
+  let q2=sb.from("checklists").select("*,profiles(display_name,email)").not("deleted_at","is",null).order("deleted_at",{ascending:false});
+  if(!isSuper)q2=q2.eq("owner_id",user.id);
+  const{data,error}=await q2;
+  if(error){lst.textContent=error.message;return}
+  if(!data||!data.length){lst.innerHTML='<div class="empty-state" style="padding:28px 0"><div class="empty-icon">🗂️</div><div class="empty-title">Keine archivierten Checklisten</div></div>';return}
   const grid=q("div");grid.className="cl-grid";
   (data||[]).forEach(cl=>{
-    const ownerName=cl.profiles?cl.profiles.display_name||cl.profiles.email:"";
+    const own=cl.profiles?cl.profiles.display_name||cl.profiles.email:"";
     const card=q("div");card.className="cl-card";card.style.opacity=".7";
-    card.innerHTML='<div class="cl-ring">'+ringSVG(0)+'</div><div class="cl-body"><div class="cl-title">'+escHtml((cl.icon||"📋")+" "+cl.title)+'</div><div class="cl-desc">'+(isSuper&&ownerName?escHtml(ownerName):"Archiviert")+'</div><div class="cl-meta"><span class="cl-date">Archiviert: '+fmtDate(cl.deleted_at)+'</span></div><div class="cl-actions"></div></div>';
-    const actions=card.querySelector(".cl-actions");
-    const btnR=q("button");btnR.textContent="Wiederherstellen";
-    btnR.onclick=async e=>{e.stopPropagation();loading(true,"Stelle wieder her…");await sb.from("checklists").update({archived:false,deleted_at:null,deleted_by:null}).eq("id",cl.id);loading(false);toast("Wiederhergestellt");card.remove();loadChecklists()};
-    const btnD=q("button");btnD.textContent="Löschen";btnD.className="btn-danger";
-    btnD.onclick=async e=>{
+    card.innerHTML='<div class="cl-ring">'+ring(0)+'</div><div class="cl-body"><div class="cl-title">'+escH((cl.icon||"📋")+" "+cl.title)+'</div><div class="cl-desc">'+(isSuper&&own?escH(own):"Archiviert")+'</div><div class="cl-meta"><span class="cl-date">'+fmtD(cl.deleted_at)+'</span></div><div class="cl-actions"></div></div>';
+    const act=card.querySelector(".cl-actions");
+    const r=q("button");r.textContent="Wiederherstellen";
+    r.onclick=async e=>{e.stopPropagation();loading(true,"...");await sb.from("checklists").update({archived:false,deleted_at:null,deleted_by:null}).eq("id",cl.id);loading(false);toast("Wiederhergestellt");card.remove();loadChecklists()};
+    const d=q("button");d.textContent="Löschen";d.className="btn-danger";
+    d.onclick=async e=>{
       e.stopPropagation();
-      const ok=await showModal({title:"Endgültig löschen?",sub:'"'+cl.title+'" wird unwiderruflich gelöscht.',confirmLabel:"Löschen",danger:true});
+      const ok=await showModal({title:"Endgültig löschen?",sub:'"'+cl.title+'"',confirmLabel:"Löschen",danger:true});
       if(!ok)return;loading(true,"Lösche…");
       const cats=await sb.from("checklist_categories").select("id").eq("checklist_id",cl.id);
-      const cIds=(cats.data||[]).map(c=>c.id);
-      if(cIds.length)await sb.from("checklist_items").delete().in("category_id",cIds);
+      const cids=(cats.data||[]).map(c=>c.id);
+      if(cids.length)await sb.from("checklist_items").delete().in("category_id",cids);
       await sb.from("checklist_categories").delete().eq("checklist_id",cl.id);
       await sb.from("checklists").delete().eq("id",cl.id);
-      loading(false);toast("Endgültig gelöscht");card.remove();
+      loading(false);toast("Gelöscht");card.remove();
     };
-    actions.append(btnR,btnD);grid.appendChild(card);
+    act.append(r,d);grid.appendChild(card);
   });
-  list.innerHTML="";list.appendChild(grid);
+  lst.innerHTML="";lst.appendChild(grid);
 }
 
-async function duplicateChecklist(id){
+async function duplicateCl(id){
   const c=await sb.from("checklists").select("*").eq("id",id).single();
   if(c.error){alert(c.error.message);return}
-  const title=await showModal({title:"Checkliste duplizieren",input:{label:"Name der Kopie",value:c.data.title+" Kopie"}});
-  if(!title)return;loading(true,"Dupliziere…");
-  const r=await sb.from("checklists").insert({organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,title,description:c.data.description,icon:c.data.icon}).select().single();
+  const t=await showModal({title:"Checkliste duplizieren",input:{label:"Name",value:c.data.title+" Kopie"}});
+  if(!t)return;loading(true,"Dupliziere…");
+  const r=await sb.from("checklists").insert({organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,title:t,description:c.data.description,icon:c.data.icon}).select().single();
   if(r.error){alert(r.error.message);loading(false);return}
   const cats=await sb.from("checklist_categories").select("*").eq("checklist_id",id).order("sort_order");
   for(const cat of cats.data||[]){
@@ -753,359 +847,372 @@ async function duplicateChecklist(id){
     const items=await sb.from("checklist_items").select("*").eq("category_id",cat.id).order("sort_order");
     if(items.data&&items.data.length)await sb.from("checklist_items").insert(items.data.map(i=>({category_id:nc.data.id,title:i.title,sort_order:i.sort_order,is_checked:false})));
   }
-  loading(false);await loadChecklists();toast("✓ Dupliziert");
+  loading(false);await loadChecklists();toast("Dupliziert");
 }
 
-async function createEmptyChecklist(){
-  const title=await showModal({title:"Leere Checkliste erstellen",input:{label:"Titel",placeholder:"z.B. Meine Checkliste",value:""}});
-  if(!title)return;
-  const ownerId=await showOwnerPicker(owner());
-  if(!ownerId)return;
+async function createEmptyCl(){
+  const t=await showModal({title:"Leere Checkliste",input:{label:"Titel",placeholder:"z.B. Meine Liste",value:""}});
+  if(!t)return;
+  const oid=await ownerPicker(owner());if(!oid)return;
   loading(true,"Erstelle…");
-  const r=await sb.from("checklists").insert({organization_id:orgId,owner_id:ownerId,created_by:user.id,updated_by:user.id,title,icon:"📋"}).select().single();
+  const r=await sb.from("checklists").insert({organization_id:orgId,owner_id:oid,created_by:user.id,updated_by:user.id,title:t,icon:"📋"}).select().single();
   if(r.error){alert(r.error.message);loading(false);return}
   loading(false);
-  if(ownerId!==user.id){const users=await getAllUsers();const u=users.find(u=>u.id===ownerId);setActing(ownerId,u?u.display_name||u.email:"")}
+  if(oid!==user.id){const us=await getUsers();const u=us.find(u=>u.id===oid);setActing(oid,u?u.display_name||u.email:"")}
   await loadChecklists();openDetailPanel(r.data.id);toast("Checkliste erstellt");
 }
 
-async function pickTemplateAndCreate(){
+async function pickTplAndCreate(){
   loading(true,"Lade Vorlagen…");
   const{data,error}=await sb.from("templates").select("*").is("deleted_at",null).order("title");
   loading(false);
   if(error||!data||!data.length){toast("Keine Vorlagen vorhanden.");return}
-  const values=data.map(t=>t.id);
-  const labels=data.map(t=>(t.icon||"📂")+" "+t.title);
-  const chosen=await showSelectModal("Vorlage wählen",values[0],values,labels);
+  const chosen=await showSelectModal("Vorlage wählen",data[0].id,data.map(t=>t.id),data.map(t=>(t.icon||"📂")+" "+t.title));
   if(!chosen)return;
-  const tpl=data.find(t=>t.id===chosen);
-  if(tpl)await makeChecklist(tpl);
+  const tpl=data.find(t=>t.id===chosen);if(tpl)await makeCl(tpl);
 }
 
-async function makeChecklist(t){
+async function makeCl(t){
   const title=await showModal({title:"Checkliste erstellen",input:{label:"Titel",value:t.title+" "+new Date().toLocaleDateString("de-CH")}});
   if(!title)return;
-  const ownerId=await showOwnerPicker(owner());
-  if(!ownerId)return;
+  const oid=await ownerPicker(owner());if(!oid)return;
   loading(true,"Erstelle…");
-  const r=await sb.from("checklists").insert({organization_id:orgId,owner_id:ownerId,created_by:user.id,updated_by:user.id,template_id:t.id,title,description:t.description,icon:t.icon}).select().single();
+  const r=await sb.from("checklists").insert({organization_id:orgId,owner_id:oid,created_by:user.id,updated_by:user.id,template_id:t.id,title,description:t.description,icon:t.icon}).select().single();
   if(r.error){alert(r.error.message);loading(false);return}
   const cats=await sb.from("template_categories").select("*").eq("template_id",t.id).order("sort_order");
   for(const c of cats.data||[]){
     const nc=await sb.from("checklist_categories").insert({checklist_id:r.data.id,title:c.title,sort_order:c.sort_order}).select().single();
-    const items=await sb.from("template_items").select("*").eq("category_id",c.id).order("sort_order");
-    if(items.data&&items.data.length)await sb.from("checklist_items").insert(items.data.map(i=>({category_id:nc.data.id,title:i.title,sort_order:i.sort_order,is_checked:false})));
+    const its=await sb.from("template_items").select("*").eq("category_id",c.id).order("sort_order");
+    if(its.data&&its.data.length)await sb.from("checklist_items").insert(its.data.map(i=>({category_id:nc.data.id,title:i.title,sort_order:i.sort_order,is_checked:false})));
   }
   loading(false);
-  if(ownerId!==user.id){const users=await getAllUsers();const u=users.find(u=>u.id===ownerId);setActing(ownerId,u?u.display_name||u.email:"")}
+  if(oid!==user.id){const us=await getUsers();const u=us.find(u=>u.id===oid);setActing(oid,u?u.display_name||u.email:"")}
   await loadChecklists();show("Check");openDetailPanel(r.data.id);toast("Checkliste erstellt");
 }
 
-/* ── Templates ── */
+/* Templates */
 async function loadTemplates(){
   const box=$("tplList");
   box.innerHTML='<div style="display:flex;justify-content:center;padding:48px"><div class="spinner"></div></div>';
   const{data,error}=await sb.from("templates").select("*").is("deleted_at",null).order("title");
   if(error){box.textContent=error.message;return}
+  if(!data||!data.length){box.innerHTML='<div class="empty-state"><div class="empty-icon">📂</div><div class="empty-title">Noch keine Vorlagen</div><div class="empty-sub">Erstelle eine Vorlage oder füge Standardvorlagen hinzu.</div></div>';return}
   const global=(data||[]).filter(t=>t.is_global);
   const mine=(data||[]).filter(t=>!t.is_global&&t.owner_id===owner());
   const others=(data||[]).filter(t=>!t.is_global&&t.owner_id!==owner());
-  if(!data||!data.length){box.innerHTML='<div class="empty-state"><div class="empty-icon">📂</div><div class="empty-title">Noch keine Vorlagen</div><div class="empty-sub">Erstelle eine eigene Vorlage oder füge Standardvorlagen hinzu.</div></div>';return}
   box.innerHTML="";
-  function renderSection(title,icon,templates,canEdit){
-    if(!templates.length)return;
-    const section=q("div");section.className="tpl-section";
-    section.innerHTML='<div class="tpl-section-title">'+icon+'<span>'+title+'</span></div><div class="tpl-section-divider"></div>';
-    const grid=q("div");grid.className="tpl-grid";
-    templates.forEach(t=>{
+  function sec(title,icn,list,editable){
+    if(!list.length)return;
+    const s=q("div");s.className="tpl-section";
+    s.innerHTML='<div class="tpl-section-title">'+icn+'<span>'+title+'</span></div><div class="tpl-section-divider"></div>';
+    const gr=q("div");gr.className="tpl-grid";
+    list.forEach(t=>{
       const card=q("div");card.className="tpl-card";
-      card.innerHTML='<div class="tpl-card-head"><span class="tpl-icon">'+(t.icon||"📂")+'</span><span class="tpl-name">'+escHtml(t.title)+'</span></div><div class="tpl-desc">'+escHtml(t.description||"")+'</div><div class="tpl-actions"></div>';
+      card.innerHTML='<div class="tpl-card-head"><span class="tpl-icon">'+(t.icon||"📂")+'</span><span class="tpl-name">'+escH(t.title)+'</span></div><div class="tpl-desc">'+escH(t.description||"")+'</div><div class="tpl-actions"></div>';
       const a=card.querySelector(".tpl-actions");
-      const b1=q("button");b1.className="btn btn-primary btn-sm";b1.textContent="Checkliste erstellen";b1.onclick=()=>makeChecklist(t);
-      a.append(b1);
-      if(canEdit){
-        const b2=q("button");b2.className="btn btn-ghost btn-sm";b2.textContent="Bearbeiten";b2.onclick=()=>openTemplateEditor(t.id);
-        const b3=q("button");b3.className="btn btn-danger btn-sm";b3.textContent="Löschen";b3.onclick=()=>deleteTemplate(t.id);
+      const b1=q("button");b1.className="btn btn-primary btn-sm";b1.textContent="Checkliste erstellen";b1.onclick=()=>makeCl(t);a.append(b1);
+      if(editable){
+        const b2=q("button");b2.className="btn btn-ghost btn-sm";b2.textContent="Bearbeiten";b2.onclick=()=>openTplEditor(t.id);
+        const b3=q("button");b3.className="btn btn-danger btn-sm";b3.textContent="Löschen";b3.onclick=()=>deleteTpl(t.id);
         a.append(b2,b3);
       }
-      grid.appendChild(card);
+      gr.appendChild(card);
     });
-    section.appendChild(grid);box.appendChild(section);
+    s.appendChild(gr);box.appendChild(s);
   }
-  const globIcon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a12 12 0 0 1 0 18M12 3a12 12 0 0 0 0 18M3 12h18"/></svg>';
-  const meIcon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>';
-  const othIcon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6"/><circle cx="17" cy="8" r="3"/><path d="M21 20c0-3.3-2.7-6-6-6"/></svg>';
-  renderSection("Globale Vorlagen",globIcon,global,isSuper);
-  renderSection("Meine Vorlagen",meIcon,mine,true);
-  renderSection("Vorlagen von anderen",othIcon,others,isSuper);
+  const gi='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a12 12 0 0 1 0 18M12 3a12 12 0 0 0 0 18M3 12h18"/></svg>';
+  const mi='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>';
+  const oi='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6"/><circle cx="17" cy="8" r="3"/><path d="M21 20c0-3.3-2.7-6-6-6"/></svg>';
+  sec("Globale Vorlagen",gi,global,isSuper);
+  sec("Meine Vorlagen",mi,mine,true);
+  sec("Vorlagen von anderen",oi,others,isSuper);
 }
 
-async function loadArchivedTemplates(){
-  const section=$("archivedTplSection"),list=$("archivedTplList");
-  section.style.display="";list.innerHTML='<div style="display:flex;justify-content:center;padding:24px"><div class="spinner"></div></div>';
-  section.scrollIntoView({behavior:"smooth",block:"start"});
-  let query=sb.from("templates").select("*,profiles(display_name,email)").not("deleted_at","is",null).order("title");
-  if(!isSuper)query=query.eq("owner_id",user.id);
-  const{data,error}=await query;
-  if(error){list.textContent=error.message;return}
-  if(!data||!data.length){list.innerHTML='<div class="empty-state" style="padding:28px 0"><div class="empty-icon">🗂️</div><div class="empty-title">Keine archivierten Vorlagen</div></div>';return}
+async function loadArchivedTpls(){
+  const sec=$("archivedTplSection"),lst=$("archivedTplList");
+  sec.style.display="";lst.innerHTML='<div style="display:flex;justify-content:center;padding:24px"><div class="spinner"></div></div>';
+  sec.scrollIntoView({behavior:"smooth",block:"start"});
+  let q2=sb.from("templates").select("*,profiles(display_name,email)").not("deleted_at","is",null).order("title");
+  if(!isSuper)q2=q2.eq("owner_id",user.id);
+  const{data,error}=await q2;
+  if(error){lst.textContent=error.message;return}
+  if(!data||!data.length){lst.innerHTML='<div class="empty-state" style="padding:28px 0"><div class="empty-icon">🗂️</div><div class="empty-title">Keine archivierten Vorlagen</div></div>';return}
   const grid=q("div");grid.className="tpl-grid";
   (data||[]).forEach(t=>{
-    const ownerName=t.profiles?t.profiles.display_name||t.profiles.email:"";
+    const own=t.profiles?t.profiles.display_name||t.profiles.email:"";
     const card=q("div");card.className="tpl-card";card.style.opacity=".7";
-    card.innerHTML='<div class="tpl-card-head"><span class="tpl-icon">'+(t.icon||"📂")+'</span><span class="tpl-name">'+escHtml(t.title)+'</span></div><div class="tpl-desc">'+escHtml(t.description||"")+(isSuper&&ownerName?' <span style="color:var(--muted);font-size:11px">· '+escHtml(ownerName)+'</span>':"")+'<div style="margin-top:4px;font-size:11px;color:var(--muted)">Archiviert: '+fmtDate(t.deleted_at)+'</div></div><div class="tpl-actions"></div>';
+    card.innerHTML='<div class="tpl-card-head"><span class="tpl-icon">'+(t.icon||"📂")+'</span><span class="tpl-name">'+escH(t.title)+'</span></div><div class="tpl-desc">'+escH(t.description||"")+(isSuper&&own?' <span style="font-size:11px;color:var(--muted)">· '+escH(own)+'</span>':"")+'<div style="font-size:11px;color:var(--muted);margin-top:4px">Archiviert: '+fmtD(t.deleted_at)+'</div></div><div class="tpl-actions"></div>';
     const a=card.querySelector(".tpl-actions");
-    const btnR=q("button");btnR.className="btn btn-primary btn-sm";
-    btnR.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 .49-4.36L1 10"/></svg> Wiederherstellen';
-    btnR.onclick=async()=>{loading(true,"Stelle wieder her…");await sb.from("templates").update({deleted_at:null,deleted_by:null}).eq("id",t.id);loading(false);toast("Vorlage wiederhergestellt");card.remove();await loadTemplates()};
-    const btnD=q("button");btnD.className="btn btn-danger btn-sm";btnD.textContent="Endgültig löschen";
-    btnD.onclick=async()=>{
-      const ok=await showModal({title:"Endgültig löschen?",sub:'"'+t.title+'" wird unwiderruflich gelöscht.',confirmLabel:"Löschen",danger:true});
+    const r=q("button");r.className="btn btn-primary btn-sm";r.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 .49-4.36L1 10"/></svg> Wiederherstellen';
+    r.onclick=async()=>{loading(true,"...");await sb.from("templates").update({deleted_at:null,deleted_by:null}).eq("id",t.id);loading(false);toast("Wiederhergestellt");card.remove();await loadTemplates()};
+    const d=q("button");d.className="btn btn-danger btn-sm";d.textContent="Endgültig löschen";
+    d.onclick=async()=>{
+      const ok=await showModal({title:"Endgültig löschen?",sub:'"'+t.title+'"',confirmLabel:"Löschen",danger:true});
       if(!ok)return;loading(true,"Lösche…");
       const cats=await sb.from("template_categories").select("id").eq("template_id",t.id);
-      const cIds=(cats.data||[]).map(c=>c.id);
-      if(cIds.length)await sb.from("template_items").delete().in("category_id",cIds);
+      const cids=(cats.data||[]).map(c=>c.id);
+      if(cids.length)await sb.from("template_items").delete().in("category_id",cids);
       await sb.from("template_categories").delete().eq("template_id",t.id);
       await sb.from("templates").delete().eq("id",t.id);
-      loading(false);toast("Endgültig gelöscht");card.remove();
+      loading(false);toast("Gelöscht");card.remove();
     };
-    a.append(btnR,btnD);grid.appendChild(card);
+    a.append(r,d);grid.appendChild(card);
   });
-  list.innerHTML="";list.appendChild(grid);
+  lst.innerHTML="";lst.appendChild(grid);
 }
 
-async function openTemplateEditor(id){
-  loading(true,"Lade Vorlage…");
+async function openTplEditor(id){
+  loading(true,"Lade…");
   try{
     currentTpl=id;
     const wrap=$("tplEditorWrap");wrap.classList.add("show");
     const box=$("tplEditor");
-    let tpl={title:"",description:"",icon:"📂"};
+    let tpl={title:"",description:"",icon:"📂",is_global:false};
     if(id){const r=await sb.from("templates").select("*").eq("id",id).single();tpl=r.data}
-    let userOptions="";
-    if(isSuper){
-      const{data:profiles}=await sb.from("profiles").select("id,display_name,email").order("display_name");
-      userOptions=(profiles||[]).map(p=>'<option value="'+escAttr(p.id)+'"'+(tpl.owner_id===p.id||(!tpl.owner_id&&p.id===user.id)?' selected':'')+'>'+escHtml(p.display_name||p.email)+'</option>').join("");
-    }
-    const globalChk=tpl.is_global?' checked':'';
+    let uopts="";
+    if(isSuper){const{data:pr}=await sb.from("profiles").select("id,display_name,email").order("display_name");uopts=(pr||[]).map(p=>'<option value="'+escA(p.id)+'"'+(tpl.owner_id===p.id||(!tpl.owner_id&&p.id===user.id)?" selected":"")+'>'+escH(p.display_name||p.email)+'</option>').join("")}
     box.innerHTML='<h2>'+(id?"Vorlage bearbeiten":"Neue Vorlage")+'</h2>'
       +'<div style="display:grid;gap:4px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));margin-bottom:14px">'
-      +'<div class="form-group"><label>Titel</label><input id="edTitle" value="'+escAttr(tpl.title||"")+'"></div>'
-      +'<div class="form-group"><label>Beschreibung</label><input id="edDesc" value="'+escAttr(tpl.description||"")+'"></div>'
-      +'<div class="form-group"><label>Icon</label><input id="edIcon" value="'+escAttr(tpl.icon||"📂")+'" style="max-width:80px"></div>'
-      +(isSuper?'<div class="form-group"><label>Besitzer</label><select id="edOwner">'+userOptions+'</select></div>':"")
+      +'<div class="form-group"><label>Titel</label><input id="edTitle" value="'+escA(tpl.title||"")+'"></div>'
+      +'<div class="form-group"><label>Beschreibung</label><input id="edDesc" value="'+escA(tpl.description||"")+'"></div>'
+      +'<div class="form-group"><label>Icon</label><input id="edIcon" value="'+escA(tpl.icon||"📂")+'" style="max-width:80px"></div>'
+      +(isSuper?'<div class="form-group"><label>Besitzer</label><select id="edOwner">'+uopts+'</select></div>':"")
       +'</div>'
-      +(isSuper?'<label style="display:flex;align-items:center;gap:8px;font-size:14px;margin-bottom:14px;cursor:pointer"><input type="checkbox" id="edIsGlobal" style="width:18px;height:18px;accent-color:var(--accent)"'+globalChk+'> <span>Globale Vorlage <span style="font-size:12px;color:var(--muted)">(für alle sichtbar)</span></span></label>':"")
+      +(isSuper?'<label style="display:flex;align-items:center;gap:8px;font-size:14px;margin-bottom:14px;cursor:pointer"><input type="checkbox" id="edIsGlobal" style="width:18px;height:18px;accent-color:var(--accent)"'+(tpl.is_global?" checked":"")+'>Globale Vorlage</label>':"")
       +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">'
       +'<button class="btn btn-primary btn-sm" id="saveTpl">Speichern</button>'
       +'<button class="btn btn-ghost btn-sm" id="addCat">+ Kategorie</button>'
-      +'<button class="btn btn-ghost btn-sm" id="closeTplEditor">Schliessen</button>'
-      +'</div>'
-      +'<p style="font-size:13px;color:var(--muted);margin-bottom:12px">Erst Kategorien erstellen, dann Punkte hinzufügen.</p>'
-      +'<div id="edCats"></div>';
-    $("saveTpl").onclick=()=>saveTemplateMeta().then(ok=>ok&&loadTemplates());
-    $("addCat").onclick=()=>addTemplateCategory();
-    $("closeTplEditor").onclick=()=>wrap.classList.remove("show");
-    if(id){const cats=await sb.from("template_categories").select("*").eq("template_id",id).order("sort_order");for(const c of cats.data||[])await renderTplCategory(c)}
+      +'<button class="btn btn-ghost btn-sm" id="closeTplEd">Schliessen</button>'
+      +'</div><div id="edCats"></div>';
+    on("saveTpl",async()=>{const ok=await saveTplMeta();if(ok)await loadTemplates()});
+    on("addCat",addTplCat);
+    on("closeTplEd",()=>wrap.classList.remove("show"));
+    if(id){const cats=await sb.from("template_categories").select("*").eq("template_id",id).order("sort_order");for(const c of cats.data||[])await renderTplCat(c)}
     wrap.scrollIntoView({behavior:"smooth",block:"start"});
   }finally{loading(false)}
 }
 
-async function saveTemplateMeta(){
-  const isGlobal=isSuper&&$("edIsGlobal")&&$("edIsGlobal").checked;
+async function saveTplMeta(){
+  const isGlob=isSuper&&$("edIsGlobal")&&$("edIsGlobal").checked;
   const forOwner=($("edOwner")&&$("edOwner").value)||owner();
-  const data={organization_id:orgId,owner_id:forOwner,created_by:user.id,updated_by:user.id,title:($("edTitle").value||"").trim(),description:($("edDesc").value||"").trim(),icon:($("edIcon").value||"").trim()||"📂",is_global:!!isGlobal};
-  if(!data.title){toast("Titel fehlt");return false}
-  if(currentTpl){const e=await sb.from("templates").update({title:data.title,description:data.description,icon:data.icon,is_global:!!isGlobal,updated_by:user.id}).eq("id",currentTpl);if(e.error){alert(e.error.message);return false}}
-  else{const r=await sb.from("templates").insert(data).select().single();if(r.error){alert(r.error.message);return false}currentTpl=r.data.id}
+  const dat={organization_id:orgId,owner_id:forOwner,created_by:user.id,updated_by:user.id,
+    title:($("edTitle").value||"").trim(),description:($("edDesc").value||"").trim(),
+    icon:($("edIcon").value||"").trim()||"📂",is_global:!!isGlob};
+  if(!dat.title){toast("Titel fehlt");return false}
+  if(currentTpl){
+    const e=await sb.from("templates").update({title:dat.title,description:dat.description,icon:dat.icon,is_global:!!isGlob,updated_by:user.id}).eq("id",currentTpl);
+    if(e.error){alert(e.error.message);return false}
+  } else {
+    const r=await sb.from("templates").insert(dat).select().single();
+    if(r.error){alert(r.error.message);return false}currentTpl=r.data.id;
+  }
   toast("Vorlage gespeichert");return true;
 }
 
-async function addTemplateCategory(){
-  if(!currentTpl){const ok=await saveTemplateMeta();if(!ok||!currentTpl)return}
-  const title=await showModal({title:"Neue Kategorie",input:{label:"Name",placeholder:"z.B. Ausrüstung"}});
-  if(!title)return;loading(true,"Speichere…");
-  const r=await sb.from("template_categories").insert({template_id:currentTpl,title,sort_order:Date.now()%100000}).select().single();
+async function addTplCat(){
+  if(!currentTpl){const ok=await saveTplMeta();if(!ok||!currentTpl)return}
+  const t=await showModal({title:"Neue Kategorie",input:{label:"Name",placeholder:"z.B. Ausrüstung"}});
+  if(!t)return;loading(true,"Speichere…");
+  const r=await sb.from("template_categories").insert({template_id:currentTpl,title:t,sort_order:Date.now()%100000}).select().single();
   loading(false);if(r.error){alert(r.error.message);return}
-  await renderTplCategory(r.data);toast("Kategorie hinzugefügt");
+  await renderTplCat(r.data);toast("Kategorie hinzugefügt");
 }
 
-async function renderTplCategory(c){
-  const wrap=q("div");wrap.className="cat-editor";wrap.id="tplcat-"+c.id;
-  wrap.innerHTML='<div class="cat-editor-head"><h4>'+escHtml(c.title)+'</h4></div><div id="tplitems-'+c.id+'"></div>';
+async function renderTplCat(c){
+  const wrap=q("div");wrap.className="cat-editor";wrap.id="tc-"+c.id;
+  wrap.innerHTML='<div class="cat-editor-head"><h4>'+escH(c.title)+'</h4></div><div id="ti-'+c.id+'"></div>';
   const del=q("button");del.className="btn btn-danger btn-sm";del.textContent="Löschen";
   del.onclick=async()=>{
     const ok=await showModal({title:'"'+c.title+'" löschen?',confirmLabel:"Löschen",danger:true});
-    if(!ok)return;loading(true,"Lösche…");await sb.from("template_categories").delete().eq("id",c.id);loading(false);wrap.remove();toast("Kategorie gelöscht");
+    if(!ok)return;loading(true,"...");await sb.from("template_categories").delete().eq("id",c.id);loading(false);wrap.remove();
   };
   wrap.querySelector(".cat-editor-head").appendChild(del);
-  const addRow=q("div");addRow.className="inline-add";addRow.style.cssText="border:1px solid var(--border);border-radius:10px;padding:6px 10px;margin-top:8px";
+
+  /* Inline add for template items */
+  const ar=q("div");ar.className="inline-add";ar.style.cssText="border:1px solid var(--border);border-radius:10px;padding:6px 10px;margin-top:8px";
   const inp=q("input");inp.placeholder="Neuer Punkt…";
-  const plus=q("button");plus.innerHTML="+";
-  const doAdd=async()=>{
-    const title=inp.value.trim();if(!title){toast("Bitte Punkt eingeben");return}
-    loading(true,"Speichere…");await sb.from("template_items").insert({category_id:c.id,title,sort_order:Date.now()%100000});loading(false);inp.value="";await loadTplItems(c.id);toast("Punkt hinzugefügt");
+  const pl=q("button");pl.innerHTML="+";
+  const doA=async()=>{
+    const t=inp.value.trim();if(!t){toast("Bitte Punkt eingeben");return}
+    loading(true,"Speichere…");
+    const r=await sb.from("template_items").insert({category_id:c.id,title:t,sort_order:Date.now()%100000}).select().single();
+    loading(false);inp.value="";if(r.error){alert(r.error.message);return}
+    /* Add row inline with drag */
+    addTplItemRow(r.data,c.id,"ti-"+c.id);
+    toast("Punkt hinzugefügt");
   };
-  plus.onclick=doAdd;inp.onkeydown=e=>{if(e.key==="Enter")doAdd()};
-  addRow.append(inp,plus);wrap.appendChild(addRow);
-  $("edCats").appendChild(wrap);await loadTplItems(c.id);
+  pl.onclick=doA;inp.onkeydown=e=>{if(e.key==="Enter")doA()};
+  ar.append(inp,pl);wrap.appendChild(ar);
+  $("edCats").appendChild(wrap);
+  await loadTplItems(c.id);
 }
 
 async function loadTplItems(catId){
-  const box=$("tplitems-"+catId);if(!box)return;
+  const box=$("ti-"+catId);if(!box)return;
   const r=await sb.from("template_items").select("*").eq("category_id",catId).order("sort_order");
   box.innerHTML="";
-  (r.data||[]).forEach(it=>{
-    const row=q("div");row.style.cssText="display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--border)";
-    const sp=q("span");sp.textContent="• "+it.title;sp.style.flex="1";sp.style.fontSize="14px";
-    const del=q("button");del.className="btn btn-ghost btn-sm";del.textContent="×";del.style.cssText="padding:4px 8px;color:var(--danger);border-color:#fca5a5";
-    del.onclick=async()=>{
-      const ok=await showModal({title:'"'+it.title+'" löschen?',confirmLabel:"Löschen",danger:true});
-      if(!ok)return;loading(true,"Lösche…");await sb.from("template_items").delete().eq("id",it.id);loading(false);toast("Punkt gelöscht");row.remove();
-    };
-    row.append(sp,del);box.appendChild(row);
+  (r.data||[]).forEach(it=>addTplItemRow(it,catId,"ti-"+catId));
+}
+
+function addTplItemRow(it,catId,containerId){
+  const box=$(containerId);if(!box)return;
+  const row=q("div");row.className="tpl-item-row";row.dataset.id=it.id;
+  const hnd=q("div");hnd.className="tpl-item-handle";
+  hnd.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>';
+  const sp=q("span");sp.textContent="• "+it.title;sp.style.flex="1";sp.style.fontSize="14px";
+  const del=q("button");del.className="btn btn-ghost btn-sm";del.textContent="×";del.style.cssText="padding:4px 8px;color:var(--danger);border-color:#fca5a5";
+  del.onclick=async()=>{
+    const ok=await showModal({title:'"'+it.title+'" löschen?',confirmLabel:"Löschen",danger:true});
+    if(!ok)return;loading(true,"...");await sb.from("template_items").delete().eq("id",it.id);loading(false);row.remove();
+  };
+  row.append(hnd,sp,del);
+  ptrDrag(hnd,row,box,".tpl-item-row",async c=>{
+    const rows=[...c.querySelectorAll(".tpl-item-row[data-id]")];
+    await Promise.all(rows.map((r,i)=>sb.from("template_items").update({sort_order:(i+1)*10}).eq("id",r.dataset.id)));
   });
+  box.appendChild(row);
 }
 
-async function deleteTemplate(id){
+async function deleteTpl(id){
   const ok=await showModal({title:"Vorlage löschen?",sub:"Kann nicht rückgängig gemacht werden.",confirmLabel:"Löschen",danger:true});
-  if(!ok)return;loading(true,"Lösche…");
+  if(!ok)return;loading(true,"...");
   await sb.from("templates").update({deleted_at:new Date().toISOString(),deleted_by:user.id}).eq("id",id);
-  loading(false);await loadTemplates();$("tplEditorWrap").classList.remove("show");toast("Vorlage gelöscht");
+  loading(false);await loadTemplates();$("tplEditorWrap").classList.remove("show");toast("Gelöscht");
 }
 
-async function seedStandardTemplates(){
-  const templates=[["Camping","Packliste fürs Camping","🏕️","Schlafen\n- Zelt\n- Schlafsack\n- Isomatte\n\nKochen\n- Gaskocher\n- Geschirr\n- Besteck\n- Wasser"],["Wandern","Vorlage für Wanderausflüge","🎒","Ausrüstung\n- Wanderschuhe\n- Rucksack\n- Regenjacke\n\nVerpflegung\n- Wasser\n- Snacks\n- Sandwich"],["Flugreise","Vorlage für Reisen mit Flug","✈️","Dokumente\n- Pass/ID\n- Boardingpass\n- Versicherung\n\nHandgepäck\n- Kopfhörer\n- Ladegerät\n- Powerbank"],["Einkauf","Allgemeine Einkaufsliste","🛒","Lebensmittel\n- Brot\n- Milch\n- Früchte\n\nHaushalt\n- Küchenpapier\n- Müllsäcke"]];
-  loading(true,"Prüfe Vorlagen…");
-  const{data:existing}=await sb.from("templates").select("title").is("deleted_at",null);
-  const existingTitles=new Set((existing||[]).map(t=>t.title));
-  const toCreate=templates.filter(t=>!existingTitles.has(t[0]));
-  if(!toCreate.length){loading(false);toast("Alle Standardvorlagen sind bereits vorhanden.");return}
-  for(const t of toCreate)await createTemplateFromSeed(t);
-  loading(false);await loadTemplates();toast(toCreate.length+" Vorlage"+(toCreate.length!==1?"n":"")+" hinzugefügt");
-}
-
-async function createTemplateFromSeed(t){
-  const r=await sb.from("templates").insert({organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,title:t[0],description:t[1],icon:t[2],is_global:isSuper}).select().single();
-  if(r.error)return;let cur=null,n=10,i=10;
-  for(const line of t[3].split("\n").map(x=>x.trim()).filter(Boolean)){
-    if(line.startsWith("-")){if(cur)await sb.from("template_items").insert({category_id:cur,title:line.replace(/^-\s*/,""),sort_order:i});i+=10}
-    else{const c=await sb.from("template_categories").insert({template_id:r.data.id,title:line,sort_order:n}).select().single();cur=c.data.id;n+=10;i=10}
+async function seedTpls(){
+  const tpls=[["Camping","Packliste fürs Camping","🏕️","Schlafen\n- Zelt\n- Schlafsack\n- Isomatte\n\nKochen\n- Gaskocher\n- Geschirr\n- Besteck"],["Wandern","Vorlage für Wanderausflüge","🎒","Ausrüstung\n- Wanderschuhe\n- Rucksack\n- Regenjacke\n\nVerpflegung\n- Wasser\n- Snacks"],["Flugreise","Vorlage für Reisen mit Flug","✈️","Dokumente\n- Pass/ID\n- Boardingpass\n- Versicherung\n\nHandgepäck\n- Kopfhörer\n- Ladegerät"],["Einkauf","Allgemeine Einkaufsliste","🛒","Lebensmittel\n- Brot\n- Milch\n- Früchte\n\nHaushalt\n- Küchenpapier\n- Müllsäcke"]];
+  loading(true,"Prüfe…");
+  const{data:ex}=await sb.from("templates").select("title").is("deleted_at",null);
+  const exS=new Set((ex||[]).map(t=>t.title));
+  const toC=tpls.filter(t=>!exS.has(t[0]));
+  if(!toC.length){loading(false);toast("Alle Standardvorlagen vorhanden.");return}
+  for(const t of toC){
+    const r=await sb.from("templates").insert({organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,title:t[0],description:t[1],icon:t[2],is_global:isSuper}).select().single();
+    if(r.error)continue;let cur=null,n=10,i=10;
+    for(const line of t[3].split("\n").map(x=>x.trim()).filter(Boolean)){
+      if(line.startsWith("-")){if(cur)await sb.from("template_items").insert({category_id:cur,title:line.replace(/^-\s*/,""),sort_order:i});i+=10}
+      else{const c=await sb.from("template_categories").insert({template_id:r.data.id,title:line,sort_order:n}).select().single();cur=c.data.id;n+=10;i=10}
+    }
   }
+  loading(false);await loadTemplates();toast(toC.length+" Vorlage"+(toC.length!==1?"n":"")+" hinzugefügt");
 }
 
-/* ── Admin ── */
+/* Admin */
 async function loadUsers(){
   const box=$("users");
   box.innerHTML='<div style="display:flex;justify-content:center;padding:24px"><div class="spinner"></div></div>';
-  const[profRes,memRes]=await Promise.all([
+  const[pR,mR]=await Promise.all([
     sb.from("profiles").select("*").order("display_name"),
     sb.from("organization_members").select("user_id,role").eq("organization_id",orgId)
   ]);
-  if(profRes.error){box.textContent=profRes.error.message;return}
-  const roleMap={};(memRes.data||[]).forEach(m=>roleMap[m.user_id]=m.role);
-  const roleLabel={user:"User",admin:"Admin",super_admin:"Super Admin"};
+  if(pR.error){box.textContent=pR.error.message;return}
+  const rMap={};(mR.data||[]).forEach(m=>rMap[m.user_id]=m.role);
+  const rLbl={user:"User",admin:"Admin",super_admin:"Super Admin"};
   box.innerHTML="";
-  if(!profRes.data||!profRes.data.length){box.innerHTML='<p style="color:var(--muted);font-size:14px">Noch keine Benutzer.</p>';return}
-  (profRes.data||[]).forEach(u=>{
-    const role=roleMap[u.id]||"user";
-    const isSelf=u.id===user.id;
+  if(!pR.data||!pR.data.length){box.innerHTML='<p style="color:var(--muted);font-size:14px">Noch keine Benutzer.</p>';return}
+  (pR.data||[]).forEach(u=>{
+    const role=rMap[u.id]||"user",isSelf=u.id===user.id;
     const row=q("div");row.className="user-row";
     const av=q("div");av.className="user-avatar";av.textContent=(u.display_name||u.email||"?")[0].toUpperCase();
-    const info=q("div");info.className="user-info";
-    info.innerHTML='<div class="uname">'+escHtml(u.display_name||"—")+(isSelf?' <span style="font-size:11px;color:var(--accent);font-weight:400">(Du)</span>':"")+'</div><div class="uemail">'+escHtml(u.email||"—")+'</div><div style="font-size:11px;color:var(--muted);margin-top:2px">'+(roleLabel[role]||role)+'</div>';
-    const actions=q("div");actions.style.cssText="display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0";
-    const btnCl=q("button");btnCl.className="btn btn-ghost btn-sm";btnCl.title="Checklisten anzeigen";
-    btnCl.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M9 12l2 2 4-4"/></svg>';
-    btnCl.onclick=()=>loadUserChecklists(u.id,u.display_name||u.email);
-    const btnAct=q("button");btnAct.className="btn btn-ghost btn-sm";btnAct.title="Als User arbeiten";
-    btnAct.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>';
-    btnAct.onclick=()=>{
-      setActing(u.id,u.display_name||u.email);show("Check");
-      const sel=$("checkUserSelect");if(sel)[...sel.options].forEach(o=>{if(o.value===u.id)o.selected=true});
-    };
-    const btnEdit=q("button");btnEdit.className="btn btn-ghost btn-sm";btnEdit.title="Bearbeiten";
-    btnEdit.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
-    btnEdit.onclick=()=>openEditUserPanel(u,role);
-    const btnDel=q("button");btnDel.className="btn btn-danger btn-sm";btnDel.title="Löschen";
-    btnDel.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>';
-    btnDel.onclick=()=>deleteUser(u);
-    btnDel.disabled=isSelf;if(isSelf)btnDel.style.opacity="0.3";
-    actions.append(btnCl,btnAct,btnEdit,btnDel);
-    row.append(av,info,actions);box.appendChild(row);
+    const inf=q("div");inf.className="user-info";
+    inf.innerHTML='<div class="uname-u">'+escH(u.display_name||"—")+(isSelf?' <span style="font-size:11px;color:var(--accent)">(Du)</span>':"")+'</div><div class="uemail-u">'+escH(u.email||"—")+'</div><div style="font-size:11px;color:var(--muted);margin-top:2px">'+(rLbl[role]||role)+'</div>';
+    const acts=q("div");acts.style.cssText="display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0";
+    const bCl=q("button");bCl.className="btn btn-ghost btn-sm";bCl.title="Checklisten";
+    bCl.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M9 12l2 2 4-4"/></svg>';
+    bCl.onclick=()=>loadUserCls(u.id,u.display_name||u.email);
+    const bAct=q("button");bAct.className="btn btn-ghost btn-sm";bAct.title="Als User arbeiten";
+    bAct.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>';
+    bAct.onclick=()=>{setActing(u.id,u.display_name||u.email);show("Check");const s=$("checkUserSelect");if(s)[...s.options].forEach(o=>{if(o.value===u.id)o.selected=true})};
+    const bEd=q("button");bEd.className="btn btn-ghost btn-sm";bEd.title="Bearbeiten";
+    bEd.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+    bEd.onclick=()=>openEditUser(u,role);
+    const bDel=q("button");bDel.className="btn btn-danger btn-sm";bDel.title="Löschen";
+    bDel.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>';
+    bDel.disabled=isSelf;if(isSelf)bDel.style.opacity=".3";
+    bDel.onclick=()=>deleteUser(u);
+    acts.append(bCl,bAct,bEd,bDel);
+    row.append(av,inf,acts);box.appendChild(row);
   });
 }
 
-async function loadUserChecklists(uid,uname){
-  const section=$("adminClSection"),list=$("adminClList");
-  $("adminClUser").textContent=uname;section.style.display="";
-  list.innerHTML='<div style="display:flex;justify-content:center;padding:24px"><div class="spinner"></div></div>';
-  section.scrollIntoView({behavior:"smooth",block:"nearest"});
+async function loadUserCls(uid,uname){
+  const sec=$("adminClSection"),lst=$("adminClList");
+  $("adminClUser").textContent=uname;sec.style.display="";
+  lst.innerHTML='<div style="display:flex;justify-content:center;padding:24px"><div class="spinner"></div></div>';
+  sec.scrollIntoView({behavior:"smooth",block:"nearest"});
   const{data,error}=await sb.from("checklists").select("*").eq("owner_id",uid).is("deleted_at",null).order("created_at",{ascending:false});
-  if(error){list.textContent=error.message;return}
-  if(!data||!data.length){list.innerHTML='<p style="color:var(--muted);font-size:14px;padding:12px 0">Keine Checklisten vorhanden.</p>';return}
-  list.innerHTML="";
+  if(error){lst.textContent=error.message;return}
+  if(!data||!data.length){lst.innerHTML='<p style="color:var(--muted);font-size:14px;padding:12px 0">Keine Checklisten.</p>';return}
+  lst.innerHTML="";
   (data||[]).forEach(cl=>{
     const row=q("div");row.style.cssText="display:flex;align-items:center;gap:12px;padding:11px 8px;border-top:1px solid var(--border);cursor:pointer;border-radius:8px;transition:background .15s";
-    row.innerHTML='<span style="font-size:20px;flex-shrink:0">'+(cl.icon||"📋")+'</span><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escHtml(cl.title)+'</div><div style="font-size:12px;color:var(--muted)">'+fmtDate(cl.created_at)+'</div></div><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--muted);flex-shrink:0"><path d="M9 18l6-6-6-6"/></svg>';
+    row.innerHTML='<span style="font-size:20px;flex-shrink:0">'+(cl.icon||"📋")+'</span><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escH(cl.title)+'</div><div style="font-size:12px;color:var(--muted)">'+fmtD(cl.created_at)+'</div></div>';
     row.onmouseenter=()=>row.style.background="var(--bg)";row.onmouseleave=()=>row.style.background="";
-    row.onclick=()=>{setActing(uid,uname);show("Check");const sel=$("checkUserSelect");if(sel)[...sel.options].forEach(o=>{if(o.value===uid)o.selected=true});setTimeout(()=>openDetailPanel(cl.id),100)};
-    list.appendChild(row);
+    row.onclick=()=>{setActing(uid,uname);show("Check");const s=$("checkUserSelect");if(s)[...s.options].forEach(o=>{if(o.value===uid)o.selected=true});setTimeout(()=>openDetailPanel(cl.id),100)};
+    lst.appendChild(row);
   });
 }
 
-function openEditUserPanel(u,currentRole){
-  const overlay=$("editUserOverlay"),panel=$("editUserPanel");
+function openEditUser(u,currentRole){
+  const ov=$("editUserOverlay"),pn=$("editUserPanel");
   $("editUserTitle").textContent=u.display_name||u.email||"Benutzer bearbeiten";
   const body=$("editUserBody");
-  body.innerHTML='<div style="background:var(--bg);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:13px;color:var(--muted)"><span style="font-weight:600;color:var(--text)">'+escHtml(u.email||"—")+'</span><br>Login-E-Mail (nicht änderbar)</div>'
-    +'<div class="form-group"><label>Benutzername</label><input id="euName" value="'+escAttr(u.display_name||"")+'"></div>'
+  body.innerHTML='<div style="background:var(--bg);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:13px;color:var(--muted)"><span style="font-weight:600;color:var(--text)">'+escH(u.email||"—")+'</span><br>Login-E-Mail (nicht änderbar)</div>'
+    +'<div class="form-group"><label>Benutzername</label><input id="euName" value="'+escA(u.display_name||"")+'"></div>'
     +'<div class="form-group"><label>Rolle</label><select id="euRole"><option value="user"'+(currentRole==="user"?" selected":"")+'>User</option><option value="admin"'+(currentRole==="admin"?" selected":"")+'>Admin</option><option value="super_admin"'+(currentRole==="super_admin"?" selected":"")+'>Super Admin</option></select></div>'
-    +'<div style="border-top:1px solid var(--border);padding-top:18px;margin-top:4px">'
-    +'<h4 style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Neues Passwort setzen</h4>'
+    +'<div style="border-top:1px solid var(--border);padding-top:18px;margin-top:4px"><h4 style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Neues Passwort setzen</h4>'
     +'<div class="form-group"><label>Neues Passwort</label><input id="euPw" type="password" placeholder="Leer lassen = unverändert"></div>'
-    +'<div class="form-group"><label>Passwort bestätigen</label><input id="euPw2" type="password" placeholder="Wiederholen"></div>'
-    +'</div>'
+    +'<div class="form-group"><label>Bestätigen</label><input id="euPw2" type="password" placeholder="Wiederholen"></div></div>'
     +'<div id="euMsg" style="font-size:13px;min-height:18px;margin-bottom:10px;color:var(--danger)"></div>'
     +'<div style="display:flex;gap:8px"><button class="btn btn-primary" id="euSave" style="flex:1">Speichern</button><button class="btn btn-ghost" id="euCancel">Abbrechen</button></div>';
-  const closePanel=()=>{overlay.style.opacity="0";overlay.style.pointerEvents="none";panel.style.transform="translateX(100%)"};
-  $("euCancel").onclick=closePanel;
-  $("editUserClose").onclick=closePanel;
-  overlay.onclick=e=>{if(e.target===overlay)closePanel()};
-  $("euSave").onclick=async()=>{
+  const close=()=>{ov.classList.remove("open")};
+  on("euCancel",close);on("editUserClose",close);
+  ov.onclick=e=>{if(e.target===ov)close()};
+  on("euSave",async()=>{
     const name=$("euName").value.trim(),role=$("euRole").value,pw=$("euPw").value,pw2=$("euPw2").value;
     const msg=$("euMsg");msg.style.color="var(--danger)";msg.textContent="";
     if(!name){msg.textContent="Benutzername darf nicht leer sein.";return}
     if(pw&&pw.length<6){msg.textContent="Passwort muss mindestens 6 Zeichen haben.";return}
     if(pw&&pw!==pw2){msg.textContent="Passwörter stimmen nicht überein.";return}
     loading(true,"Speichere…");
-    const pRes=await sb.from("profiles").update({display_name:name}).eq("id",u.id);
-    if(pRes.error){msg.textContent=pRes.error.message;loading(false);return}
-    const mRes=await sb.from("organization_members").update({role}).eq("user_id",u.id).eq("organization_id",orgId);
-    if(mRes.error){msg.textContent=mRes.error.message;loading(false);return}
+    const pR=await sb.from("profiles").update({display_name:name}).eq("id",u.id);
+    if(pR.error){msg.textContent=pR.error.message;loading(false);return}
+    const mR=await sb.from("organization_members").update({role}).eq("user_id",u.id).eq("organization_id",orgId);
+    if(mR.error){msg.textContent=mR.error.message;loading(false);return}
     if(pw){
       try{
-        const sessionRes=await sb.auth.getSession();
-        const token=sessionRes.data&&sessionRes.data.session?sessionRes.data.session.access_token:null;
-        if(!token){msg.textContent="Keine gültige Session.";loading(false);return}
-        const res=await fetch(SUPABASE_URL+"/functions/v1/set-user-password",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({user_id:u.id,password:pw})});
+        const sess=await sb.auth.getSession();
+        const tok=sess.data&&sess.data.session?sess.data.session.access_token:null;
+        if(!tok){msg.textContent="Keine gültige Session.";loading(false);return}
+        const res=await fetch(SB_URL+"/functions/v1/set-user-password",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+tok},body:JSON.stringify({user_id:u.id,password:pw})});
         let json={};try{json=await res.json()}catch(_){}
         if(!res.ok||json.error){msg.textContent=json.error||"Passwort-Fehler (HTTP "+res.status+")";loading(false);return}
       }catch(err){msg.textContent="Netzwerkfehler: "+err.message;loading(false);return}
     }
     loading(false);msg.style.color="var(--success)";msg.textContent="✓ Gespeichert";
-    setTimeout(()=>closePanel(),800);loadUsers();toast("Benutzer aktualisiert");
-  };
-  overlay.style.opacity="1";overlay.style.pointerEvents="all";panel.style.transform="translateX(0)";
-  setTimeout(()=>$("euName")&&$("euName").focus(),100);
+    setTimeout(close,800);_users=null;loadUsers();toast("Benutzer aktualisiert");
+  });
+  ov.classList.add("open");setTimeout(()=>$("euName")&&$("euName").focus(),100);
 }
 
 async function deleteUser(u){
-  const ok=await showModal({title:escHtml(u.display_name||u.email)+" löschen?",sub:"Der User wird aus der Organisation entfernt.",confirmLabel:"Entfernen",danger:true});
+  const ok=await showModal({title:escH(u.display_name||u.email)+" entfernen?",sub:"Der User wird aus der Organisation entfernt.",confirmLabel:"Entfernen",danger:true});
   if(!ok)return;loading(true,"Entferne…");
-  await sb.from("organization_members").delete().eq("user_id",u.id).eq("organization_id",orgId);
-  await sb.from("profiles").delete().eq("id",u.id);
-  loading(false);loadUsers();toast("Benutzer entfernt");
+  try{
+    const sess=await sb.auth.getSession();
+    const tok=sess.data&&sess.data.session?sess.data.session.access_token:null;
+    const res=await fetch(SB_URL+"/functions/v1/delete-user",{method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":"Bearer "+tok},
+      body:JSON.stringify({user_id:u.id,organization_id:orgId})});
+    let json={};try{json=await res.json()}catch(_){}
+    if(!res.ok||json.error){
+      // Fallback: try direct delete
+      await sb.from("organization_members").delete().eq("user_id",u.id).eq("organization_id",orgId);
+      await sb.from("profiles").delete().eq("id",u.id);
+    }
+    loading(false);_users=null;loadUsers();toast("Benutzer entfernt");
+  }catch(e){loading(false);toast("Fehler: "+e.message)}
 }
 
 async function addUser(){
@@ -1115,112 +1222,62 @@ async function addUser(){
   if(pw.length<6){msgEl.textContent="Passwort muss mindestens 6 Zeichen haben.";return}
   loading(true,"Lege User an…");
   try{
-    const session=await sb.auth.getSession();
-    const token=session.data&&session.data.session?session.data.session.access_token:null;
-    const res=await fetch(SUPABASE_URL+"/functions/v1/create-user",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({email,password:pw,display_name:name,organization_id:orgId,role})});
+    const sess=await sb.auth.getSession();
+    const tok=sess.data&&sess.data.session?sess.data.session.access_token:null;
+    const res=await fetch(SB_URL+"/functions/v1/create-user",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+tok},body:JSON.stringify({email,password:pw,display_name:name,organization_id:orgId,role})});
     const json=await res.json();
     if(!res.ok||json.error){msgEl.textContent=json.error||"Fehler beim Anlegen.";loading(false);return}
     $("newUserName").value="";$("newUserEmail").value="";$("newUserPw").value="";
-    msgEl.style.color="var(--success)";msgEl.textContent="✓ User erfolgreich angelegt.";
-    _allUsers=null;loadUsers();toast("User angelegt");
+    msgEl.style.color="var(--success)";msgEl.textContent="✓ User angelegt.";
+    _users=null;loadUsers();toast("User angelegt");
   }catch(e){msgEl.textContent=e.message||"Netzwerkfehler."}
   loading(false);
 }
 
-/* ── Own password change ── */
-function openChangePwModal(){
-  const overlay=$("changePwOverlay"),box=$("changePwBox");
+/* Own PW */
+function openPwModal(){
   $("newPw1").value="";$("newPw2").value="";$("changePwMsg").textContent="";
-  overlay.style.opacity="1";overlay.style.pointerEvents="all";box.style.transform="scale(1) translateY(0)";
-  closeSidebar();setTimeout(()=>$("newPw1").focus(),80);
+  $("changePwOverlay").classList.add("open");closeSidebar();setTimeout(()=>$("newPw1").focus(),80);
 }
-function closeChangePwModal(){
-  const overlay=$("changePwOverlay"),box=$("changePwBox");
-  overlay.style.opacity="0";overlay.style.pointerEvents="none";box.style.transform="scale(.95) translateY(10px)";
-}
-async function submitChangePw(){
+function closePwModal(){$("changePwOverlay").classList.remove("open")}
+async function submitPw(){
   const pw=$("newPw1").value,pw2=$("newPw2").value,msg=$("changePwMsg");
   msg.style.color="var(--danger)";msg.textContent="";
   if(!pw){msg.textContent="Bitte Passwort eingeben.";return}
   if(pw.length<6){msg.textContent="Mindestens 6 Zeichen.";return}
   if(pw!==pw2){msg.textContent="Passwörter stimmen nicht überein.";return}
-  loading(true,"Speichere…");
-  const{error}=await sb.auth.updateUser({password:pw});
-  loading(false);
+  loading(true,"Speichere…");const{error}=await sb.auth.updateUser({password:pw});loading(false);
   if(error){msg.textContent=error.message;return}
   msg.style.color="var(--success)";msg.textContent="✓ Passwort geändert.";
-  setTimeout(()=>closeChangePwModal(),1200);toast("Passwort geändert");
+  setTimeout(closePwModal,1200);toast("Passwort geändert");
 }
 
-/* ── CSS: item-del always visible on touch ── */
-const _style=document.createElement("style");
-_style.textContent=".item-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:0 4px;line-height:1;opacity:0;transition:opacity .15s,color .15s;flex-shrink:0}.checkrow:hover .item-del{opacity:1}.item-del:hover{color:var(--danger)}@media(hover:none){.item-del{opacity:.4}}";
-document.head.appendChild(_style);
-
-/* ── Event wiring ── */
+/* Wiring */
 document.addEventListener("DOMContentLoaded",()=>{
   initClient();
-  on("loginBtn",doLogin);
-  onkey("loginPw",e=>{if(e.key==="Enter")doLogin()});
-  on("logoutBtn",doLogout);
-  on("logoutBtnDesktop",doLogout);
-  on("darkToggle",toggleDark);
-  on("darkToggleDesktop",toggleDark);
-  on("editUserClose",()=>{$("editUserOverlay").style.opacity="0";$("editUserOverlay").style.pointerEvents="none";$("editUserPanel").style.transform="translateX(100%)"});
-  on("changePwBtn",()=>openChangePwModal());
-  on("changePwCancel",()=>closeChangePwModal());
-  on("changePwConfirm",()=>submitChangePw());
-  onkey("newPw1",e=>{if(e.key==="Enter")submitChangePw()});
-  onkey("newPw2",e=>{if(e.key==="Enter")submitChangePw()});
-  applyDark(false);
-  if(window.innerWidth<=768){const d=$("desktopActions");if(d)d.style.display="none"}
-  on("menuBtn",openSidebar);
-  on("sidebarBackdrop",closeSidebar);
+  on("loginBtn",doLogin);onkey("loginPw",e=>{if(e.key==="Enter")doLogin()});
+  on("logoutBtn",doLogout);on("logoutBtnDesktop",doLogout);
+  on("darkToggle",toggleDark);on("darkToggleDesktop",toggleDark);
+  on("menuBtn",openSidebar);on("sidebarBackdrop",closeSidebar);
   on("stopActing",()=>setActing(null,""));
   on("bCheck",()=>show("Check"));on("bTpl",()=>show("Tpl"));on("bAdmin",()=>show("Admin"));
   on("bbCheck",()=>show("Check"));on("bbTpl",()=>show("Tpl"));on("bbAdmin",()=>show("Admin"));
   on("refreshCheck",()=>{loading(true,"Aktualisiere…");loadChecklists().finally(()=>loading(false))});
-  on("newEmptyCl",()=>createEmptyChecklist());
-  on("newFromTplCl",()=>pickTemplateAndCreate());
-  on("showArchivedCl",()=>loadArchivedChecklists());
-  on("closeArchivedCl",()=>{$("archivedClSection").style.display="none"});
-  on("newTpl",()=>openTemplateEditor(null));
-  on("seedMore",()=>seedStandardTemplates());
-  on("showArchivedTpl",()=>loadArchivedTemplates());
-  on("closeArchivedTpl",()=>{$("archivedTplSection").style.display="none"});
+  on("newEmptyCl",createEmptyCl);on("newFromTplCl",pickTplAndCreate);
+  on("showArchivedCl",loadArchivedCls);on("closeArchivedCl",()=>{$("archivedClSection").style.display="none"});
+  on("newTpl",()=>openTplEditor(null));on("seedMore",seedTpls);
+  on("showArchivedTpl",loadArchivedTpls);on("closeArchivedTpl",()=>{$("archivedTplSection").style.display="none"});
   on("adminClClose",()=>{$("adminClSection").style.display="none"});
   on("addUser",addUser);
+  on("detailClose",closeDetailPanel);on("detailAddCat",addChecklistCat);on("detailArchive",()=>archiveCl(currentChecklistId,true));
   $("detailOverlay").onclick=e=>{if(e.target===$("detailOverlay"))closeDetailPanel()};
-  on("detailClose",closeDetailPanel);
-  on("detailAddCat",()=>addChecklistCategory());
-  on("detailArchive",()=>archiveChecklist(currentChecklistId,true));
+  on("changePwBtn",openPwModal);on("changePwCancel",closePwModal);on("changePwConfirm",submitPw);
+  onkey("newPw1",e=>{if(e.key==="Enter")submitPw()});onkey("newPw2",e=>{if(e.key==="Enter")submitPw()});
+  on("editUserClose",()=>$("editUserOverlay").classList.remove("open"));
+  applyDark(false);
   checkSession();
 });
 if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js");
 </script>
-<!-- Edit User Panel -->
-<div id="editUserOverlay" style="position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:150;opacity:0;pointer-events:none;transition:opacity .22s ease">
-  <div id="editUserPanel" style="position:fixed;top:0;right:0;bottom:0;width:min(420px,100vw);background:var(--surface);border-left:1px solid var(--border);box-shadow:var(--shadow-lg);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .26s cubic-bezier(.4,0,.2,1);z-index:151;overflow-y:auto;padding:24px">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
-      <button id="editUserClose" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:6px;border-radius:8px;display:flex;transition:background .15s"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-      <h2 style="font-size:18px;font-weight:700;flex:1" id="editUserTitle">Benutzer bearbeiten</h2>
-    </div>
-    <div id="editUserBody"></div>
-  </div>
-</div>
-<!-- Change Password Modal -->
-<div id="changePwOverlay" style="position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s ease">
-  <div style="background:var(--surface);border-radius:20px;box-shadow:var(--shadow-lg);padding:24px;width:100%;max-width:380px;transform:scale(.95) translateY(10px);transition:transform .22s ease" id="changePwBox">
-    <h3 style="font-size:17px;font-weight:700;margin-bottom:4px">Passwort ändern</h3>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:18px">Wähle ein neues Passwort für deinen Account.</p>
-    <div class="form-group"><label>Neues Passwort</label><input id="newPw1" type="password" placeholder="Min. 6 Zeichen"></div>
-    <div class="form-group"><label>Passwort bestätigen</label><input id="newPw2" type="password" placeholder="Wiederholen"></div>
-    <div id="changePwMsg" style="font-size:13px;min-height:18px;margin-bottom:10px"></div>
-    <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn btn-ghost btn-sm" id="changePwCancel">Abbrechen</button>
-      <button class="btn btn-primary btn-sm" id="changePwConfirm">Speichern</button>
-    </div>
-  </div>
-</div>
 </body>
 </html>
