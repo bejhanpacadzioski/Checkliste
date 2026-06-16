@@ -12,7 +12,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--bg:#f1f5f9;--surface:#fff;--border:#e2e8f0;--text:#0f172a;--muted:#64748b;--accent:#6366f1;--accent2:#818cf8;--danger:#ef4444;--success:#22c55e;--sidebar-w:240px;--r:16px;--shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06);--shadow-lg:0 8px 32px rgba(0,0,0,.14)}
-@media(prefers-color-scheme:dark){:root{--bg:#0f172a;--surface:#1e293b;--border:#334155;--text:#f1f5f9;--muted:#94a3b8}}
+html.dark{--bg:#0f172a;--surface:#1e293b;--border:#334155;--text:#f1f5f9;--muted:#94a3b8}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.5}
 #shell{display:flex;min-height:100dvh}
@@ -141,6 +141,17 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 #loginBtn{width:100%;padding:12px;font-size:15px;margin-top:4px;border-radius:12px}
 #loginMsg{text-align:center;font-size:13px;color:#ef4444;margin-top:10px;min-height:18px}
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center}
+.tpl-section{margin-bottom:28px}
+.tpl-section-title{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:4px;padding:0 2px}
+.tpl-section-title svg{width:14px;height:14px;flex-shrink:0}
+.tpl-section-divider{height:1px;background:var(--border);margin-bottom:12px}
+.drag-handle{display:flex;align-items:center;cursor:grab;color:var(--border);padding:0 4px 0 0;flex-shrink:0;touch-action:none;transition:color .15s}
+.drag-handle:hover{color:var(--muted)}
+.cat-drag-handle{display:flex;align-items:center;cursor:grab;color:var(--border);padding:2px 6px 2px 0;touch-action:none;transition:color .15s}
+.cat-drag-handle:hover{color:var(--muted)}
+.dragging{opacity:.35}
+.drag-over-top{box-shadow:0 -2px 0 var(--accent)!important}
+.drag-over-bottom{box-shadow:0 2px 0 var(--accent)!important}
 .empty-icon{font-size:48px;margin-bottom:14px;opacity:.5}
 .empty-title{font-size:16px;font-weight:600;margin-bottom:6px}
 .empty-sub{font-size:14px;color:var(--muted);margin-bottom:20px}
@@ -185,6 +196,12 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 <div id="shell" style="display:none">
   <div id="sidebarBackdrop"></div>
   <aside id="sidebar">
+    <div style="display:flex;justify-content:flex-end;gap:6px;margin-bottom:12px" id="desktopActions">
+      <button id="darkToggleDesktop" title="Dark Mode" style="background:none;border:1px solid var(--border);border-radius:8px;padding:6px 8px;cursor:pointer;color:var(--muted);display:flex;align-items:center;transition:background .15s,color .15s">
+        <svg id="darkIconDesktop" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg>
+      </button>
+      <button id="logoutBtnDesktop" style="background:none;border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;font-family:inherit;transition:background .15s;white-space:nowrap">Abmelden</button>
+    </div>
     <div class="sidebar-logo">
       <svg viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="8" fill="url(#slg)"/><path d="M9 14h4m0 0 3-4 3 4M13 14v4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="slg" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#818cf8"/></linearGradient></defs></svg>
       <div><span class="lname">Checklists</span><span class="lsub">by Bejhan</span></div>
@@ -296,38 +313,74 @@ const SUPABASE_URL="https://hcxqhyswdaycfnxivhnm.supabase.co";
 const SUPABASE_KEY="sb_publishable_WwSZT4nIB1hRbDhxF2uZpg_bxnq2BM2";
 let sb,user,orgId,isSuper=false,actingAs=null,currentTpl=null,currentChecklistId=null,panelDirty=false;
 const $=id=>document.getElementById(id),q=t=>document.createElement(t);
+function on(id,fn){const el=$(id);if(el)el.onclick=fn}
+function onkey(id,fn){const el=$(id);if(el)el.onkeydown=fn}
 
-/* ── Toast ── */
-function toast(msg,dur=2200){const el=$("toast");el.textContent=msg;el.classList.add("show");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),dur)}
-
-/* ── Loader: only for non-modal ops ── */
+function toast(msg,dur=2400){const el=$("toast");el.innerHTML=msg;el.classList.add("show");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),dur)}
 function loading(on,txt="Lade…"){$("loaderText").textContent=txt;$("loader").classList.toggle("show",on)}
 
-/* ── Modal (replaces prompt/confirm — never wrap in loading()) ── */
 function showModal({title,sub="",input=null,danger=false,confirmLabel="OK"}){
   return new Promise(resolve=>{
     $("modalTitle").textContent=title;$("modalSub").textContent=sub;
     const wrap=$("modalInputWrap");
-    if(input){wrap.style.display="";$("modalInputLabel").textContent=input.label||"";$("modalInput").value=input.value||"";$("modalInput").placeholder=input.placeholder||"";setTimeout(()=>$("modalInput").focus(),100)}
+    if(input){wrap.style.display="";$("modalInputLabel").textContent=input.label||"";$("modalInput").value=input.value||"";$("modalInput").placeholder=input.placeholder||"";setTimeout(()=>$("modalInput").focus(),80)}
     else{wrap.style.display="none"}
     $("modalConfirm").textContent=confirmLabel;
     $("modalConfirm").className="btn btn-sm "+(danger?"btn-danger":"btn-primary");
     $("modalOverlay").classList.add("open");
-    const close=val=>{$("modalOverlay").classList.remove("open");$("modalConfirm").onclick=null;$("modalCancel").onclick=null;resolve(val)};
+    const close=val=>{$("modalOverlay").classList.remove("open");$("modalConfirm").onclick=null;$("modalCancel").onclick=null;$("modalInput").onkeydown=null;resolve(val)};
     $("modalConfirm").onclick=()=>close(input?$("modalInput").value.trim():true);
     $("modalCancel").onclick=()=>close(null);
-    $("modalInput").onkeydown=e=>{if(e.key==="Enter")close(input?$("modalInput").value.trim():true)};
+    $("modalInput").onkeydown=e=>{if(e.key==="Enter")close(input?$("modalInput").value.trim():true);if(e.key==="Escape")close(null)};
   })
 }
 
-/* ── Progress ring ── */
-function ringSVG(pct,size=52){
-  const r=20,c=2*Math.PI*r,offset=c-(pct/100)*c;
-  const color=pct===100?"#22c55e":"#6366f1";
-  return `<svg width="${size}" height="${size}" viewBox="0 0 48 48"><circle cx="24" cy="24" r="${r}" fill="none" stroke="#e2e8f0" stroke-width="4"/><circle cx="24" cy="24" r="${r}" fill="none" stroke="${color}" stroke-width="4" stroke-dasharray="${c.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}" stroke-linecap="round" transform="rotate(-90 24 24)"/><text x="24" y="28" text-anchor="middle" font-size="11" font-weight="700" fill="${color}" font-family="Inter,sans-serif">${pct}%</text></svg>`
+function showSelectModal(title,currentVal,values,labels){
+  return new Promise(resolve=>{
+    $("modalTitle").textContent=title;$("modalSub").textContent="";
+    const wrap=$("modalInputWrap");wrap.style.display="";
+    $("modalInputLabel").textContent=title;
+    const inp=$("modalInput");inp.style.display="none";
+    let sel=document.getElementById("modalSelect");
+    if(!sel){sel=document.createElement("select");sel.id="modalSelect";sel.className=inp.className;inp.parentNode.insertBefore(sel,inp.nextSibling)}
+    sel.style.display="";sel.innerHTML=values.map((v,i)=>`<option value="${v}"${v===currentVal?" selected":""}>${labels[i]}</option>`).join("");
+    $("modalConfirm").textContent="OK";$("modalConfirm").className="btn btn-sm btn-primary";
+    $("modalOverlay").classList.add("open");
+    const close=val=>{$("modalOverlay").classList.remove("open");inp.style.display="";sel.style.display="none";$("modalConfirm").onclick=null;$("modalCancel").onclick=null;resolve(val)};
+    $("modalConfirm").onclick=()=>close(sel.value);
+    $("modalCancel").onclick=()=>close(null);
+    setTimeout(()=>sel.focus(),80);
+  })
 }
 
-/* ── Navigation ── */
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"){
+    if($("modalOverlay").classList.contains("open")){$("modalOverlay").classList.remove("open");return}
+    if($("detailOverlay").classList.contains("open")){closeDetailPanel();return}
+  }
+});
+
+function ringSVG(pct){
+  const r=20,c=2*Math.PI*r,offset=c-(pct/100)*c;
+  const color=pct===100?"#22c55e":"#6366f1";
+  const track=pct===100?"rgba(34,197,94,.2)":"#e2e8f0";
+  return `<svg width="52" height="52" viewBox="0 0 48 48"><circle cx="24" cy="24" r="${r}" fill="none" stroke="${track}" stroke-width="4"/><circle cx="24" cy="24" r="${r}" fill="none" stroke="${color}" stroke-width="4" stroke-dasharray="${c.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}" stroke-linecap="round" transform="rotate(-90 24 24)"/><text x="24" y="28" text-anchor="middle" font-size="11" font-weight="700" fill="${color}" font-family="Inter,sans-serif">${pct}%</text></svg>`;
+}
+
+function celebrate(){
+  const canvas=$("confetti");if(!canvas)return;canvas.classList.add("show");
+  const ctx=canvas.getContext("2d");canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+  const colors=["#6366f1","#818cf8","#22c55e","#f59e0b","#ec4899","#06b6d4"];
+  const pieces=Array.from({length:80},()=>({x:Math.random()*canvas.width,y:-20,vx:(Math.random()-.5)*4,vy:Math.random()*4+2,r:Math.random()*6+3,color:colors[Math.floor(Math.random()*colors.length)],angle:Math.random()*360,va:(Math.random()-.5)*8,life:1}));
+  let frame=0;
+  function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);pieces.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.angle+=p.va;p.life-=.012;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.angle*Math.PI/180);ctx.globalAlpha=Math.max(0,p.life);ctx.fillStyle=p.color;ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r);ctx.restore()});frame++;if(frame<120)requestAnimationFrame(draw);else{canvas.classList.remove("show");ctx.clearRect(0,0,canvas.width,canvas.height)}}
+  draw();
+}
+
+function escHtml(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function escAttr(s){return String(s).replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
+function fmtDate(iso){if(!iso)return"";const d=new Date(iso);return d.toLocaleDateString("de-CH",{day:"2-digit",month:"2-digit",year:"2-digit"})}
+
 function show(v){
   ["Check","Tpl","Admin"].forEach(x=>{
     $("v"+x).style.display=x===v?"":"none";
@@ -337,24 +390,31 @@ function show(v){
   closeSidebar();
   if(v==="Admin")loadUsers();
 }
-
-/* ── Sidebar (mobile) ── */
 function openSidebar(){$("sidebar").classList.add("open");$("sidebarBackdrop").classList.add("show")}
 function closeSidebar(){$("sidebar").classList.remove("open");$("sidebarBackdrop").classList.remove("show")}
 
-/* ── Detail Panel ── */
 function openDetailPanel(id){
   currentChecklistId=id;panelDirty=false;
-  $("detailOverlay").classList.add("open");
-  document.body.style.overflow="hidden";
+  $("detailOverlay").classList.add("open");document.body.style.overflow="hidden";
+  $("detailTitle").classList.remove("editing");$("detailTitleEdit").classList.remove("active");
   loadDetailPanel(id);
 }
 function closeDetailPanel(){
-  $("detailOverlay").classList.remove("open");
-  document.body.style.overflow="";
-  // Only reload list if something actually changed in the panel
-  if(panelDirty)loadChecklists();
-  panelDirty=false;
+  $("detailOverlay").classList.remove("open");document.body.style.overflow="";
+  if(panelDirty)loadChecklists();panelDirty=false;
+}
+
+function initTitleEdit(id,currentTitle){
+  const titleEl=$("detailTitle"),editEl=$("detailTitleEdit");
+  titleEl.onclick=()=>{editEl.value=currentTitle;titleEl.classList.add("editing");editEl.classList.add("active");editEl.focus();editEl.select()};
+  const saveTitle=async()=>{
+    const val=editEl.value.trim();titleEl.classList.remove("editing");editEl.classList.remove("active");
+    if(!val||val===currentTitle)return;
+    await sb.from("checklists").update({title:val,updated_by:user.id}).eq("id",id);
+    currentTitle=val;titleEl.textContent=val;panelDirty=true;toast("Titel gespeichert");
+  };
+  editEl.onblur=saveTitle;
+  editEl.onkeydown=e=>{if(e.key==="Enter")saveTitle();if(e.key==="Escape"){titleEl.classList.remove("editing");editEl.classList.remove("active")}};
 }
 
 function owner(){return actingAs||user.id}
@@ -365,10 +425,21 @@ function setActing(id,name){
   loadChecklists();loadTemplates();
 }
 
-/* ── Auth ── */
-function initClient(){
-  sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+/* ── Dark mode ── */
+const MOON_ICON='<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+const SUN_ICON='<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+function applyDark(on){
+  document.documentElement.classList.toggle("dark",!!on);
+  [$("darkIcon"),$("darkIconDesktop")].forEach(el=>{if(el)el.innerHTML=on?SUN_ICON:MOON_ICON});
 }
+async function toggleDark(){
+  const isDark=document.documentElement.classList.contains("dark");
+  applyDark(!isDark);
+  await sb.from("profiles").update({dark_mode:!isDark}).eq("id",user.id);
+}
+
+/* ── Auth ── */
+function initClient(){sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}})}
 
 async function doLogin(){
   const email=$("loginEmail").value.trim(),pw=$("loginPw").value;
@@ -376,19 +447,21 @@ async function doLogin(){
   const{error}=await sb.auth.signInWithPassword({email,password:pw});
   $("loginBtn").textContent="Anmelden";$("loginBtn").disabled=false;
   if(error){$("loginMsg").textContent=error.message;return}
-  $("loginMsg").textContent="";
-  await loadApp();
+  $("loginMsg").textContent="";await loadApp();
 }
+async function doLogout(){await sb.auth.signOut();$("shell").style.display="none";$("loginScreen").classList.add("show");toast("Abgemeldet")}
+async function checkSession(){const{data}=await sb.auth.getSession();if(data.session)await loadApp();else $("loginScreen").classList.add("show")}
 
-async function doLogout(){
-  await sb.auth.signOut();
-  $("shell").style.display="none";$("loginScreen").classList.add("show");
-  toast("Abgemeldet");
-}
+/* ── User cache ── */
+let _allUsers=null;
+async function getAllUsers(){if(_allUsers)return _allUsers;const{data}=await sb.from("profiles").select("id,display_name,email").order("display_name");_allUsers=data||[];return _allUsers}
 
-async function checkSession(){
-  const{data}=await sb.auth.getSession();
-  if(data.session)await loadApp();else $("loginScreen").classList.add("show");
+async function showOwnerPicker(defaultOwnerId){
+  if(!isSuper)return defaultOwnerId||owner();
+  const users=await getAllUsers();
+  const values=users.map(u=>u.id);
+  const labels=users.map(u=>u.display_name||u.email||u.id);
+  return await showSelectModal("Für wen?",defaultOwnerId||user.id,values,labels);
 }
 
 async function loadApp(){
@@ -399,48 +472,56 @@ async function loadApp(){
     const p=await sb.from("profiles").select("*").eq("id",user.id).single();
     $("sUserName").textContent=p.data?.display_name||user.email;
     $("sUserEmail").textContent=user.email;
+    applyDark(p.data?.dark_mode===true);
     const m=await sb.from("organization_members").select("organization_id,role").eq("user_id",user.id);
     orgId=m.data?.[0]?.organization_id;
     isSuper=(m.data||[]).some(x=>x.role==="super_admin");
     [$("bAdmin"),$("bbAdmin")].forEach(el=>{if(el)el.classList.toggle("hidden",!isSuper)});
     await Promise.all([loadTemplates(),loadChecklists()]);
+    if(isSuper){
+      const filter=$("checkUserFilter"),sel=$("checkUserSelect");
+      filter.style.display="";
+      const users=await getAllUsers();
+      sel.innerHTML='<option value="">Alle Checklisten</option><option value="'+user.id+'" selected>Meine Checklisten</option>'
+        +users.filter(u=>u.id!==user.id).map(u=>'<option value="'+u.id+'">'+escHtml(u.display_name||u.email)+'</option>').join("");
+      sel.onchange=()=>{
+        const uid=sel.value;
+        if(!uid){setActing(null,"");return}
+        if(uid===user.id){setActing(null,"");return}
+        const u=users.find(u=>u.id===uid);
+        setActing(uid,u?u.display_name||u.email:"");
+      };
+    }
   }finally{loading(false)}
 }
 
 /* ── Checklists ── */
 async function loadChecklists(){
   const box=$("checkList");
-  box.innerHTML=`<div style="display:flex;justify-content:center;padding:40px"><div class="spinner"></div></div>`;
+  box.innerHTML='<div style="display:flex;justify-content:center;padding:48px"><div class="spinner"></div></div>';
   const{data,error}=await sb.from("checklists").select("*").is("deleted_at",null).order("created_at",{ascending:false});
   if(error){box.textContent=error.message;return}
-  $("checkSub").textContent=data?.length?`${data.length} Checklist${data.length!==1?"en":""}`:""
-  if(!data?.length){
-    box.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Noch keine Checklisten</div><div class="empty-sub">Erstelle eine Checkliste aus einer Vorlage.</div><button class="btn btn-primary" id="goTpl">Zu den Vorlagen</button></div>`;
+  const count=data?data.length:0;
+  $("checkSub").textContent=count?count+" Checklist"+(count!==1?"en":""):"";
+  if(!count){
+    box.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Noch keine Checklisten</div><div class="empty-sub">Erstelle eine Checkliste aus einer Vorlage.</div><button class="btn btn-primary" id="goTpl">Zu den Vorlagen</button></div>';
     $("goTpl").onclick=()=>show("Tpl");return;
   }
-
-  // Fetch all items in one query instead of N*2 queries
-  const allCatIds=[];
-  const checklistIds=(data||[]).map(cl=>cl.id);
-  const allCats=await sb.from("checklist_categories").select("id,checklist_id").in("checklist_id",checklistIds);
-  (allCats.data||[]).forEach(c=>allCatIds.push(c.id));
-  const allItems=allCatIds.length?await sb.from("checklist_items").select("category_id,is_checked").in("category_id",allCatIds):{data:[]};
-
-  // Build progress map
-  const catToChecklist={};(allCats.data||[]).forEach(c=>catToChecklist[c.id]=c.checklist_id);
-  const progressMap={};checklistIds.forEach(id=>progressMap[id]={done:0,total:0});
-  (allItems.data||[]).forEach(it=>{
-    const clId=catToChecklist[it.category_id];if(!clId)return;
-    progressMap[clId].total++;
-    if(it.is_checked)progressMap[clId].done++;
-  });
-
+  const clIds=data.map(cl=>cl.id);
+  const allCats=await sb.from("checklist_categories").select("id,checklist_id").in("checklist_id",clIds);
+  const catIds=(allCats.data||[]).map(c=>c.id);
+  const allItems=catIds.length?await sb.from("checklist_items").select("category_id,is_checked").in("category_id",catIds):{data:[]};
+  const catToCl={};(allCats.data||[]).forEach(c=>catToCl[c.id]=c.checklist_id);
+  const prog={};clIds.forEach(id=>prog[id]={done:0,total:0});
+  (allItems.data||[]).forEach(it=>{const cl=catToCl[it.category_id];if(!cl)return;prog[cl].total++;if(it.is_checked)prog[cl].done++});
   const grid=q("div");grid.className="cl-grid";
   (data||[]).forEach(cl=>{
-    const{done,total}=progressMap[cl.id]||{done:0,total:0};
+    const{done,total}=prog[cl.id]||{done:0,total:0};
     const pct=total?Math.round(done/total*100):0;
-    const card=q("div");card.className="cl-card";
-    card.innerHTML=`<div class="cl-ring">${ringSVG(pct)}</div><div class="cl-body"><div class="cl-title">${cl.icon||"📋"} ${escHtml(cl.title)}</div><div class="cl-desc">${escHtml(cl.description||"Keine Beschreibung")}</div><div class="cl-meta">${done}/${total} erledigt</div><div class="cl-actions"><button class="btn-dup">Duplizieren</button><button class="btn-arch">Archivieren</button></div></div>`;
+    const isComplete=total>0&&pct===100;
+    const card=q("div");card.className="cl-card"+(isComplete?" done-card":"");
+    const doneBadge=isComplete?'<span class="cl-done-badge"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg>Fertig</span>':"";
+    card.innerHTML='<div class="cl-ring">'+ringSVG(pct)+'</div><div class="cl-body"><div class="cl-title">'+escHtml((cl.icon||"📋")+" "+cl.title)+'</div><div class="cl-desc">'+escHtml(cl.description||"Keine Beschreibung")+'</div><div class="cl-meta"><span>'+done+"/"+total+' erledigt</span>'+doneBadge+'<span class="cl-date">'+fmtDate(cl.created_at)+'</span></div><div class="cl-actions"><button class="btn-dup">Duplizieren</button><button class="btn-arch">Archivieren</button></div></div>';
     card.querySelector(".btn-dup").onclick=e=>{e.stopPropagation();duplicateChecklist(cl.id)};
     card.querySelector(".btn-arch").onclick=e=>{e.stopPropagation();archiveChecklist(cl.id)};
     card.onclick=()=>openDetailPanel(cl.id);
@@ -449,167 +530,348 @@ async function loadChecklists(){
   box.innerHTML="";box.appendChild(grid);
 }
 
-/* ── Detail panel ── */
 async function loadDetailPanel(id){
   const body=$("detailBody");
-  body.innerHTML=`<div style="display:flex;justify-content:center;padding:40px"><div class="spinner"></div></div>`;
-  const[clRes,catsRes]=await Promise.all([
-    sb.from("checklists").select("*").eq("id",id).single(),
-    sb.from("checklist_categories").select("*").eq("checklist_id",id).order("sort_order")
-  ]);
-  $("detailTitle").textContent=`${clRes.data.icon||"📋"} ${clRes.data.title}`;
+  body.innerHTML='<div style="display:flex;justify-content:center;padding:48px"><div class="spinner"></div></div>';
+  const[clRes,catsRes]=await Promise.all([sb.from("checklists").select("*").eq("id",id).single(),sb.from("checklist_categories").select("*").eq("checklist_id",id).order("sort_order")]);
+  const cl=clRes.data;
+  $("detailTitle").textContent=(cl.icon||"📋")+" "+cl.title;
+  $("detailTitle").title="Titel klicken zum Bearbeiten";
   $("detailArchive").onclick=()=>archiveChecklist(id,true);
-
-  // Fetch all items for all categories in one query
+  initTitleEdit(id,cl.title);
   const catIds=(catsRes.data||[]).map(c=>c.id);
   const itemsRes=catIds.length?await sb.from("checklist_items").select("*").in("category_id",catIds).order("sort_order"):{data:[]};
-  const itemsByCat={};
-  (itemsRes.data||[]).forEach(it=>{(itemsByCat[it.category_id]=itemsByCat[it.category_id]||[]).push(it)});
-
-  let total=0,done=0;
-  (itemsRes.data||[]).forEach(it=>{total++;if(it.is_checked)done++});
+  const itemsByCat={};(itemsRes.data||[]).forEach(it=>{(itemsByCat[it.category_id]=itemsByCat[it.category_id]||[]).push(it)});
+  let total=0,done=0;(itemsRes.data||[]).forEach(it=>{total++;if(it.is_checked)done++});
   const pct=total?Math.round(done/total*100):0;
-
-  body.innerHTML=`<div style="margin-bottom:18px"><div class="detail-progress-bar"><div class="bar" style="width:${pct}%"></div></div><div class="detail-progress-label">${done} von ${total} erledigt · ${pct}%</div></div>`;
-
-  // Helper to update progress bar without reloading
+  let wasComplete=pct===100&&total>0;
+  function buildProgress(dn,tot){
+    const p=tot?Math.round(dn/tot*100):0,complete=p===100&&tot>0;
+    const barClass=complete?"bar complete":"bar";
+    const banner=complete?'<div class="complete-banner"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l5 5L20 7"/></svg>Alle Punkte erledigt!</div>':"";
+    return '<div class="progress-wrap">'+banner+'<div class="detail-progress-bar"><div class="'+barClass+'" style="width:'+p+'%"></div></div><div class="detail-progress-label">'+dn+' von '+tot+' erledigt · '+p+'%</div></div>';
+  }
+  body.innerHTML=buildProgress(done,total);
   function refreshProgress(){
     const allCbs=body.querySelectorAll('input[type=checkbox]');
     const tot=allCbs.length,dn=[...allCbs].filter(c=>c.checked).length;
-    const p=tot?Math.round(dn/tot*100):0;
-    body.querySelector(".bar").style.width=p+"%";
-    body.querySelector(".detail-progress-label").textContent=`${dn} von ${tot} erledigt · ${p}%`;
+    const nowComplete=dn===tot&&tot>0;
+    const old=body.querySelector(".progress-wrap");if(old)old.outerHTML=buildProgress(dn,tot);
+    if(nowComplete&&!wasComplete){celebrate();wasComplete=true}
   }
-
-  for(const cat of catsRes.data||[]){
-    const block=q("div");block.className="cat-block";
-    const catHead=q("div");catHead.style.cssText="display:flex;align-items:center;gap:8px;margin-bottom:8px";
-    const catTitle=q("h3");catTitle.textContent=cat.title;catTitle.style.cssText="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);flex:1";
-    const catDel=q("button");catDel.className="btn btn-ghost btn-sm";catDel.style.cssText="padding:3px 8px;font-size:12px;color:var(--muted)";catDel.textContent="×";
+  if(!catsRes.data||!catsRes.data.length){body.innerHTML+=`<div class="empty-cat-hint">Noch keine Kategorien. Klicke oben auf „+ Kategorie", um loszulegen.</div>`;return}
+  const catContainer=q("div");catContainer.id="cat-container-"+id;
+  for(const cat of catsRes.data){
+    const block=q("div");block.className="cat-block";block.dataset.catId=cat.id;
+    const catHead=q("div");catHead.className="cat-header";
+    const catHandle=q("div");catHandle.className="cat-drag-handle";catHandle.title="Ziehen zum Sortieren";
+    catHandle.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>';
+    const catTitle=q("h3");catTitle.textContent=cat.title;
+    const catDel=q("button");catDel.className="cat-del-btn";catDel.textContent="×";catDel.title="Kategorie löschen";
     catDel.onclick=async()=>{
-      const ok=await showModal({title:`Kategorie "${cat.title}" löschen?`,sub:"Alle Einträge dieser Kategorie werden gelöscht.",confirmLabel:"Löschen",danger:true});
-      if(!ok)return;
-      loading(true,"Lösche…");
+      const ok=await showModal({title:"Kategorie löschen?",sub:'"'+cat.title+'" und alle Einträge werden gelöscht.',confirmLabel:"Löschen",danger:true});
+      if(!ok)return;loading(true,"Lösche…");
       await sb.from("checklist_items").delete().eq("category_id",cat.id);
       await sb.from("checklist_categories").delete().eq("id",cat.id);
       loading(false);toast("Kategorie gelöscht");panelDirty=true;loadDetailPanel(id);
     };
-    catHead.append(catTitle,catDel);block.appendChild(catHead);
-
+    catHead.append(catHandle,catTitle,catDel);block.appendChild(catHead);
     const inner=q("div");inner.className="cat-inner";
     const items=itemsByCat[cat.id]||[];
-    items.forEach(it=>{
-      const row=q("div");row.className="checkrow";
-      const cb=q("input");cb.type="checkbox";cb.checked=it.is_checked;cb.id="cb-"+it.id;
-      const lbl=q("label");lbl.htmlFor="cb-"+it.id;lbl.textContent=it.title;
-      if(it.is_checked)lbl.classList.add("done");
-      // Delete button per item
-      const delBtn=q("button");delBtn.className="item-del";delBtn.innerHTML="×";delBtn.title="Eintrag löschen";
-      delBtn.onclick=async(e)=>{
-        e.stopPropagation();
-        const ok=await showModal({title:`"${it.title}" löschen?`,confirmLabel:"Löschen",danger:true});
-        if(!ok)return;
-        loading(true,"Lösche…");
-        await sb.from("checklist_items").delete().eq("id",it.id);
-        loading(false);toast("Eintrag gelöscht");panelDirty=true;row.remove();refreshProgress();
-      };
-      cb.onchange=async()=>{
-        lbl.classList.toggle("done",cb.checked);
-        await sb.from("checklist_items").update({is_checked:cb.checked,checked_at:cb.checked?new Date().toISOString():null,checked_by:cb.checked?user.id:null}).eq("id",it.id);
-        toast(cb.checked?"✓ Erledigt":"Zurückgesetzt");
-        panelDirty=true;
-        refreshProgress();
-      };
-      row.append(cb,lbl,delBtn);inner.appendChild(row);
-    });
+    items.forEach(it=>inner.appendChild(makeCheckrow(it,id,inner,refreshProgress)));
     const addRow=q("div");addRow.className="inline-add";
     const inp=q("input");inp.placeholder="Neuer Eintrag…";
-    const plusBtn=q("button");plusBtn.innerHTML="+";
+    const plusBtn=q("button");plusBtn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><path d="M12 5v14M5 12h14"/></svg>';
     const doAdd=async()=>{
       const title=inp.value.trim();if(!title)return;
-      loading(true,"Speichere…");
+      plusBtn.disabled=true;loading(true,"Speichere…");
       const res=await sb.from("checklist_items").insert({category_id:cat.id,title,sort_order:Date.now()%100000,is_checked:false}).select().single();
-      loading(false);if(res.error){alert(res.error.message);return}
+      loading(false);plusBtn.disabled=false;
+      if(res.error){alert(res.error.message);return}
       inp.value="";toast("Eintrag hinzugefügt");panelDirty=true;
-      // Add row inline without full reload
-      const newIt=res.data;
-      const newRow=q("div");newRow.className="checkrow";
-      const ncb=q("input");ncb.type="checkbox";ncb.id="cb-"+newIt.id;
-      const nlbl=q("label");nlbl.htmlFor="cb-"+newIt.id;nlbl.textContent=newIt.title;
-      const nDel=q("button");nDel.className="item-del";nDel.innerHTML="×";nDel.title="Eintrag löschen";
-      nDel.onclick=async(e)=>{
-        e.stopPropagation();
-        const ok=await showModal({title:`"${newIt.title}" löschen?`,confirmLabel:"Löschen",danger:true});
-        if(!ok)return;
-        loading(true,"Lösche…");await sb.from("checklist_items").delete().eq("id",newIt.id);loading(false);toast("Eintrag gelöscht");panelDirty=true;newRow.remove();refreshProgress();
-      };
-      ncb.onchange=async()=>{
-        nlbl.classList.toggle("done",ncb.checked);
-        await sb.from("checklist_items").update({is_checked:ncb.checked,checked_at:ncb.checked?new Date().toISOString():null,checked_by:ncb.checked?user.id:null}).eq("id",newIt.id);
-        toast(ncb.checked?"✓ Erledigt":"Zurückgesetzt");panelDirty=true;refreshProgress();
-      };
-      newRow.append(ncb,nlbl,nDel);inner.insertBefore(newRow,addRow);refreshProgress();
+      inner.insertBefore(makeCheckrow(res.data,id,inner,refreshProgress),addRow);refreshProgress();inp.focus();
     };
     plusBtn.onclick=doAdd;inp.onkeydown=e=>{if(e.key==="Enter")doAdd()};
     addRow.append(inp,plusBtn);inner.appendChild(addRow);
-    block.appendChild(inner);body.appendChild(block);
+    block.appendChild(inner);
+    attachCatDrag(catHandle,block,catContainer,id);
+    catContainer.appendChild(block);
   }
+  body.appendChild(catContainer);
+}
+
+function makeCheckrow(it,checklistId,container,refreshProgress){
+  const row=q("div");row.className="checkrow";row.dataset.id=it.id;
+  const handle=q("div");handle.className="drag-handle";handle.title="Ziehen zum Sortieren";
+  handle.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>';
+  const cb=q("input");cb.type="checkbox";cb.checked=it.is_checked;cb.id="cb-"+it.id;
+  const lbl=q("label");lbl.htmlFor="cb-"+it.id;lbl.textContent=it.title;
+  if(it.is_checked)lbl.classList.add("done");
+  const delBtn=q("button");delBtn.className="item-del";delBtn.innerHTML="×";delBtn.title="Löschen";
+  delBtn.onclick=async e=>{
+    e.stopPropagation();
+    const ok=await showModal({title:"Eintrag löschen?",sub:'"'+it.title+'"',confirmLabel:"Löschen",danger:true});
+    if(!ok)return;loading(true,"Lösche…");await sb.from("checklist_items").delete().eq("id",it.id);loading(false);
+    toast("Eintrag gelöscht");panelDirty=true;row.remove();refreshProgress();
+  };
+  cb.onchange=async()=>{
+    lbl.classList.toggle("done",cb.checked);
+    await sb.from("checklist_items").update({is_checked:cb.checked,checked_at:cb.checked?new Date().toISOString():null,checked_by:cb.checked?user.id:null}).eq("id",it.id);
+    toast(cb.checked?"✓ Erledigt":"↩ Zurückgesetzt");panelDirty=true;refreshProgress();
+  };
+  row.append(handle,cb,lbl,delBtn);
+  attachItemDrag(handle,row,container);
+  return row;
+}
+
+/* ── Pointer drag ── */
+let _drag=null;
+function _pointerDrag(handle,el,container,{selector,onDone}){
+  let pressTimer=null;
+  handle.style.touchAction="none";
+  handle.addEventListener("pointerdown",e=>{
+    if(e.button!==0&&e.pointerType==="mouse")return;
+    if(e.pointerType==="touch"){
+      const cancelOnMove=()=>{clearTimeout(pressTimer);handle.removeEventListener("pointermove",cancelOnMove)};
+      handle.addEventListener("pointermove",cancelOnMove,{once:true,passive:true});
+      pressTimer=setTimeout(()=>startDrag(e),400);
+    } else startDrag(e);
+  });
+  function startDrag(e){
+    clearTimeout(pressTimer);if(_drag)return;
+    navigator.vibrate&&navigator.vibrate(40);
+    handle.setPointerCapture(e.pointerId);
+    const rect=el.getBoundingClientRect();
+    const ghost=el.cloneNode(true);
+    ghost.style.cssText="position:fixed;left:"+rect.left+"px;top:"+rect.top+"px;width:"+rect.width+"px;opacity:.85;pointer-events:none;z-index:9999;background:var(--surface);border-radius:10px;box-shadow:var(--shadow-lg);transition:none";
+    document.body.appendChild(ghost);
+    el.classList.add("dragging");
+    _drag={el,container,ghost,offsetX:e.clientX-rect.left,offsetY:e.clientY-rect.top,selector,onDone,lastTarget:null};
+    handle.addEventListener("pointermove",onMove);
+    handle.addEventListener("pointerup",onUp,{once:true});
+    handle.addEventListener("pointercancel",onUp,{once:true});
+  }
+  function onMove(e){
+    if(!_drag)return;
+    const{ghost,el,container,offsetX,offsetY,selector}=_drag;
+    ghost.style.left=(e.clientX-offsetX)+"px";ghost.style.top=(e.clientY-offsetY)+"px";
+    ghost.style.display="none";
+    const under=document.elementFromPoint(e.clientX,e.clientY);
+    ghost.style.display="";
+    const target=under?under.closest(selector):null;
+    clearIndicators(container,selector);
+    if(target&&target!==el&&target.parentNode===container){
+      const r=target.getBoundingClientRect(),above=e.clientY<r.top+r.height/2;
+      target.classList.add(above?"drag-over-top":"drag-over-bottom");
+      _drag.lastTarget={target,above};
+    } else _drag.lastTarget=null;
+  }
+  function onUp(){
+    if(!_drag)return;
+    handle.removeEventListener("pointermove",onMove);
+    const{el,container,ghost,lastTarget,onDone,selector}=_drag;
+    ghost.remove();el.classList.remove("dragging");clearIndicators(container,selector);
+    if(lastTarget){const{target,above}=lastTarget;if(above)container.insertBefore(el,target);else target.after(el)}
+    _drag=null;onDone(container);
+  }
+}
+function clearIndicators(container,selector){container.querySelectorAll(selector).forEach(el=>el.classList.remove("drag-over-top","drag-over-bottom"))}
+function attachItemDrag(handle,row,container){_pointerDrag(handle,row,container,{selector:".checkrow",onDone:saveItemOrder})}
+async function saveItemOrder(container){
+  const rows=[...container.querySelectorAll(".checkrow[data-id]")];
+  await Promise.all(rows.map((r,i)=>sb.from("checklist_items").update({sort_order:(i+1)*10}).eq("id",r.dataset.id)));
+  panelDirty=true;
+}
+function attachCatDrag(handle,block,container,checklistId){_pointerDrag(handle,block,container,{selector:".cat-block",onDone:c=>saveCatOrder(c,checklistId)})}
+async function saveCatOrder(container,checklistId){
+  const blocks=[...container.querySelectorAll(".cat-block[data-cat-id]")];
+  await Promise.all(blocks.map((b,i)=>sb.from("checklist_categories").update({sort_order:(i+1)*10}).eq("id",b.dataset.catId)));
+  panelDirty=true;
 }
 
 async function addChecklistCategory(){
   if(!currentChecklistId)return;
-  const title=await showModal({title:"Neue Kategorie",input:{label:"Name",placeholder:"z.B. Ausrüstung"}});
-  if(!title)return;
-  loading(true,"Speichere…");
+  const title=await showModal({title:"Neue Kategorie",input:{label:"Name",placeholder:"z.B. Dokumente"}});
+  if(!title)return;loading(true,"Speichere…");
   await sb.from("checklist_categories").insert({checklist_id:currentChecklistId,title,sort_order:Date.now()%100000});
   loading(false);toast("Kategorie hinzugefügt");panelDirty=true;loadDetailPanel(currentChecklistId);
 }
 
 async function archiveChecklist(id,fromPanel=false){
-  const ok=await showModal({title:"Archivieren?",sub:"Die Checkliste wird archiviert und ausgeblendet.",confirmLabel:"Archivieren",danger:true});
-  if(!ok)return;
-  loading(true,"Archiviere…");
+  const ok=await showModal({title:"Archivieren?",sub:"Die Checkliste wird ausgeblendet.",confirmLabel:"Archivieren",danger:true});
+  if(!ok)return;loading(true,"Archiviere…");
   await sb.from("checklists").update({archived:true,deleted_at:new Date().toISOString(),deleted_by:user.id}).eq("id",id);
   loading(false);toast("Archiviert");
   if(fromPanel){panelDirty=true;closeDetailPanel()}else loadChecklists();
 }
 
+async function loadArchivedChecklists(){
+  const section=$("archivedClSection"),list=$("archivedClList");
+  section.style.display="";
+  list.innerHTML='<div style="display:flex;justify-content:center;padding:24px"><div class="spinner"></div></div>';
+  section.scrollIntoView({behavior:"smooth",block:"start"});
+  let query=sb.from("checklists").select("*,profiles(display_name,email)").not("deleted_at","is",null).order("deleted_at",{ascending:false});
+  if(!isSuper)query=query.eq("owner_id",user.id);
+  const{data,error}=await query;
+  if(error){list.textContent=error.message;return}
+  if(!data||!data.length){list.innerHTML='<div class="empty-state" style="padding:28px 0"><div class="empty-icon">🗂️</div><div class="empty-title">Keine archivierten Checklisten</div></div>';return}
+  const grid=q("div");grid.className="cl-grid";
+  (data||[]).forEach(cl=>{
+    const ownerName=cl.profiles?cl.profiles.display_name||cl.profiles.email:"";
+    const card=q("div");card.className="cl-card";card.style.opacity=".7";
+    card.innerHTML='<div class="cl-ring">'+ringSVG(0)+'</div><div class="cl-body"><div class="cl-title">'+escHtml((cl.icon||"📋")+" "+cl.title)+'</div><div class="cl-desc">'+(isSuper&&ownerName?escHtml(ownerName):"Archiviert")+'</div><div class="cl-meta"><span class="cl-date">Archiviert: '+fmtDate(cl.deleted_at)+'</span></div><div class="cl-actions"></div></div>';
+    const actions=card.querySelector(".cl-actions");
+    const btnR=q("button");btnR.textContent="Wiederherstellen";
+    btnR.onclick=async e=>{e.stopPropagation();loading(true,"Stelle wieder her…");await sb.from("checklists").update({archived:false,deleted_at:null,deleted_by:null}).eq("id",cl.id);loading(false);toast("Wiederhergestellt");card.remove();loadChecklists()};
+    const btnD=q("button");btnD.textContent="Löschen";btnD.className="btn-danger";
+    btnD.onclick=async e=>{
+      e.stopPropagation();
+      const ok=await showModal({title:"Endgültig löschen?",sub:'"'+cl.title+'" wird unwiderruflich gelöscht.',confirmLabel:"Löschen",danger:true});
+      if(!ok)return;loading(true,"Lösche…");
+      const cats=await sb.from("checklist_categories").select("id").eq("checklist_id",cl.id);
+      const cIds=(cats.data||[]).map(c=>c.id);
+      if(cIds.length)await sb.from("checklist_items").delete().in("category_id",cIds);
+      await sb.from("checklist_categories").delete().eq("checklist_id",cl.id);
+      await sb.from("checklists").delete().eq("id",cl.id);
+      loading(false);toast("Endgültig gelöscht");card.remove();
+    };
+    actions.append(btnR,btnD);grid.appendChild(card);
+  });
+  list.innerHTML="";list.appendChild(grid);
+}
+
 async function duplicateChecklist(id){
-  // No run() wrapper — contains modal, must stay outside loader
   const c=await sb.from("checklists").select("*").eq("id",id).single();
   if(c.error){alert(c.error.message);return}
   const title=await showModal({title:"Checkliste duplizieren",input:{label:"Name der Kopie",value:c.data.title+" Kopie"}});
-  if(!title)return;
-  loading(true,"Dupliziere…");
+  if(!title)return;loading(true,"Dupliziere…");
   const r=await sb.from("checklists").insert({organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,title,description:c.data.description,icon:c.data.icon}).select().single();
   if(r.error){alert(r.error.message);loading(false);return}
   const cats=await sb.from("checklist_categories").select("*").eq("checklist_id",id).order("sort_order");
   for(const cat of cats.data||[]){
     const nc=await sb.from("checklist_categories").insert({checklist_id:r.data.id,title:cat.title,sort_order:cat.sort_order}).select().single();
     const items=await sb.from("checklist_items").select("*").eq("category_id",cat.id).order("sort_order");
-    if(items.data?.length)await sb.from("checklist_items").insert(items.data.map(i=>({category_id:nc.data.id,title:i.title,sort_order:i.sort_order,is_checked:false})));
+    if(items.data&&items.data.length)await sb.from("checklist_items").insert(items.data.map(i=>({category_id:nc.data.id,title:i.title,sort_order:i.sort_order,is_checked:false})));
   }
-  loading(false);await loadChecklists();toast("Dupliziert ✓");
+  loading(false);await loadChecklists();toast("✓ Dupliziert");
+}
+
+async function createEmptyChecklist(){
+  const title=await showModal({title:"Leere Checkliste erstellen",input:{label:"Titel",placeholder:"z.B. Meine Checkliste",value:""}});
+  if(!title)return;
+  const ownerId=await showOwnerPicker(owner());
+  if(!ownerId)return;
+  loading(true,"Erstelle…");
+  const r=await sb.from("checklists").insert({organization_id:orgId,owner_id:ownerId,created_by:user.id,updated_by:user.id,title,icon:"📋"}).select().single();
+  if(r.error){alert(r.error.message);loading(false);return}
+  loading(false);
+  if(ownerId!==user.id){const users=await getAllUsers();const u=users.find(u=>u.id===ownerId);setActing(ownerId,u?u.display_name||u.email:"")}
+  await loadChecklists();openDetailPanel(r.data.id);toast("Checkliste erstellt");
+}
+
+async function pickTemplateAndCreate(){
+  loading(true,"Lade Vorlagen…");
+  const{data,error}=await sb.from("templates").select("*").is("deleted_at",null).order("title");
+  loading(false);
+  if(error||!data||!data.length){toast("Keine Vorlagen vorhanden.");return}
+  const values=data.map(t=>t.id);
+  const labels=data.map(t=>(t.icon||"📂")+" "+t.title);
+  const chosen=await showSelectModal("Vorlage wählen",values[0],values,labels);
+  if(!chosen)return;
+  const tpl=data.find(t=>t.id===chosen);
+  if(tpl)await makeChecklist(tpl);
+}
+
+async function makeChecklist(t){
+  const title=await showModal({title:"Checkliste erstellen",input:{label:"Titel",value:t.title+" "+new Date().toLocaleDateString("de-CH")}});
+  if(!title)return;
+  const ownerId=await showOwnerPicker(owner());
+  if(!ownerId)return;
+  loading(true,"Erstelle…");
+  const r=await sb.from("checklists").insert({organization_id:orgId,owner_id:ownerId,created_by:user.id,updated_by:user.id,template_id:t.id,title,description:t.description,icon:t.icon}).select().single();
+  if(r.error){alert(r.error.message);loading(false);return}
+  const cats=await sb.from("template_categories").select("*").eq("template_id",t.id).order("sort_order");
+  for(const c of cats.data||[]){
+    const nc=await sb.from("checklist_categories").insert({checklist_id:r.data.id,title:c.title,sort_order:c.sort_order}).select().single();
+    const items=await sb.from("template_items").select("*").eq("category_id",c.id).order("sort_order");
+    if(items.data&&items.data.length)await sb.from("checklist_items").insert(items.data.map(i=>({category_id:nc.data.id,title:i.title,sort_order:i.sort_order,is_checked:false})));
+  }
+  loading(false);
+  if(ownerId!==user.id){const users=await getAllUsers();const u=users.find(u=>u.id===ownerId);setActing(ownerId,u?u.display_name||u.email:"")}
+  await loadChecklists();show("Check");openDetailPanel(r.data.id);toast("Checkliste erstellt");
 }
 
 /* ── Templates ── */
 async function loadTemplates(){
   const box=$("tplList");
-  box.innerHTML=`<div style="display:flex;justify-content:center;padding:40px"><div class="spinner"></div></div>`;
+  box.innerHTML='<div style="display:flex;justify-content:center;padding:48px"><div class="spinner"></div></div>';
   const{data,error}=await sb.from("templates").select("*").is("deleted_at",null).order("title");
   if(error){box.textContent=error.message;return}
-  if(!data?.length){box.innerHTML=`<div class="empty-state"><div class="empty-icon">📂</div><div class="empty-title">Noch keine Vorlagen</div><div class="empty-sub">Erstelle eine eigene Vorlage oder füge Standardvorlagen hinzu.</div></div>`;return}
+  const global=(data||[]).filter(t=>t.is_global);
+  const mine=(data||[]).filter(t=>!t.is_global&&t.owner_id===owner());
+  const others=(data||[]).filter(t=>!t.is_global&&t.owner_id!==owner());
+  if(!data||!data.length){box.innerHTML='<div class="empty-state"><div class="empty-icon">📂</div><div class="empty-title">Noch keine Vorlagen</div><div class="empty-sub">Erstelle eine eigene Vorlage oder füge Standardvorlagen hinzu.</div></div>';return}
+  box.innerHTML="";
+  function renderSection(title,icon,templates,canEdit){
+    if(!templates.length)return;
+    const section=q("div");section.className="tpl-section";
+    section.innerHTML='<div class="tpl-section-title">'+icon+'<span>'+title+'</span></div><div class="tpl-section-divider"></div>';
+    const grid=q("div");grid.className="tpl-grid";
+    templates.forEach(t=>{
+      const card=q("div");card.className="tpl-card";
+      card.innerHTML='<div class="tpl-card-head"><span class="tpl-icon">'+(t.icon||"📂")+'</span><span class="tpl-name">'+escHtml(t.title)+'</span></div><div class="tpl-desc">'+escHtml(t.description||"")+'</div><div class="tpl-actions"></div>';
+      const a=card.querySelector(".tpl-actions");
+      const b1=q("button");b1.className="btn btn-primary btn-sm";b1.textContent="Checkliste erstellen";b1.onclick=()=>makeChecklist(t);
+      a.append(b1);
+      if(canEdit){
+        const b2=q("button");b2.className="btn btn-ghost btn-sm";b2.textContent="Bearbeiten";b2.onclick=()=>openTemplateEditor(t.id);
+        const b3=q("button");b3.className="btn btn-danger btn-sm";b3.textContent="Löschen";b3.onclick=()=>deleteTemplate(t.id);
+        a.append(b2,b3);
+      }
+      grid.appendChild(card);
+    });
+    section.appendChild(grid);box.appendChild(section);
+  }
+  const globIcon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a12 12 0 0 1 0 18M12 3a12 12 0 0 0 0 18M3 12h18"/></svg>';
+  const meIcon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>';
+  const othIcon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6"/><circle cx="17" cy="8" r="3"/><path d="M21 20c0-3.3-2.7-6-6-6"/></svg>';
+  renderSection("Globale Vorlagen",globIcon,global,isSuper);
+  renderSection("Meine Vorlagen",meIcon,mine,true);
+  renderSection("Vorlagen von anderen",othIcon,others,isSuper);
+}
+
+async function loadArchivedTemplates(){
+  const section=$("archivedTplSection"),list=$("archivedTplList");
+  section.style.display="";list.innerHTML='<div style="display:flex;justify-content:center;padding:24px"><div class="spinner"></div></div>';
+  section.scrollIntoView({behavior:"smooth",block:"start"});
+  let query=sb.from("templates").select("*,profiles(display_name,email)").not("deleted_at","is",null).order("title");
+  if(!isSuper)query=query.eq("owner_id",user.id);
+  const{data,error}=await query;
+  if(error){list.textContent=error.message;return}
+  if(!data||!data.length){list.innerHTML='<div class="empty-state" style="padding:28px 0"><div class="empty-icon">🗂️</div><div class="empty-title">Keine archivierten Vorlagen</div></div>';return}
   const grid=q("div");grid.className="tpl-grid";
   (data||[]).forEach(t=>{
-    const card=q("div");card.className="tpl-card";
-    card.innerHTML=`<div class="tpl-card-head"><span class="tpl-icon">${t.icon||"📂"}</span><span class="tpl-name">${escHtml(t.title)}</span></div><div class="tpl-desc">${escHtml(t.description||"")}</div><div class="tpl-actions"></div>`;
-    const actions=card.querySelector(".tpl-actions");
-    const b1=q("button");b1.className="btn btn-primary btn-sm";b1.textContent="Checkliste erstellen";b1.onclick=()=>makeChecklist(t);
-    const b2=q("button");b2.className="btn btn-ghost btn-sm";b2.textContent="Bearbeiten";b2.onclick=()=>openTemplateEditor(t.id);
-    const b3=q("button");b3.className="btn btn-danger btn-sm";b3.textContent="Löschen";b3.onclick=()=>deleteTemplate(t.id);
-    actions.append(b1,b2,b3);grid.appendChild(card);
+    const ownerName=t.profiles?t.profiles.display_name||t.profiles.email:"";
+    const card=q("div");card.className="tpl-card";card.style.opacity=".7";
+    card.innerHTML='<div class="tpl-card-head"><span class="tpl-icon">'+(t.icon||"📂")+'</span><span class="tpl-name">'+escHtml(t.title)+'</span></div><div class="tpl-desc">'+escHtml(t.description||"")+(isSuper&&ownerName?' <span style="color:var(--muted);font-size:11px">· '+escHtml(ownerName)+'</span>':"")+'<div style="margin-top:4px;font-size:11px;color:var(--muted)">Archiviert: '+fmtDate(t.deleted_at)+'</div></div><div class="tpl-actions"></div>';
+    const a=card.querySelector(".tpl-actions");
+    const btnR=q("button");btnR.className="btn btn-primary btn-sm";
+    btnR.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 .49-4.36L1 10"/></svg> Wiederherstellen';
+    btnR.onclick=async()=>{loading(true,"Stelle wieder her…");await sb.from("templates").update({deleted_at:null,deleted_by:null}).eq("id",t.id);loading(false);toast("Vorlage wiederhergestellt");card.remove();await loadTemplates()};
+    const btnD=q("button");btnD.className="btn btn-danger btn-sm";btnD.textContent="Endgültig löschen";
+    btnD.onclick=async()=>{
+      const ok=await showModal({title:"Endgültig löschen?",sub:'"'+t.title+'" wird unwiderruflich gelöscht.',confirmLabel:"Löschen",danger:true});
+      if(!ok)return;loading(true,"Lösche…");
+      const cats=await sb.from("template_categories").select("id").eq("template_id",t.id);
+      const cIds=(cats.data||[]).map(c=>c.id);
+      if(cIds.length)await sb.from("template_items").delete().in("category_id",cIds);
+      await sb.from("template_categories").delete().eq("template_id",t.id);
+      await sb.from("templates").delete().eq("id",t.id);
+      loading(false);toast("Endgültig gelöscht");card.remove();
+    };
+    a.append(btnR,btnD);grid.appendChild(card);
   });
-  box.innerHTML="";box.appendChild(grid);
+  list.innerHTML="";list.appendChild(grid);
 }
 
 async function openTemplateEditor(id){
@@ -620,20 +882,28 @@ async function openTemplateEditor(id){
     const box=$("tplEditor");
     let tpl={title:"",description:"",icon:"📂"};
     if(id){const r=await sb.from("templates").select("*").eq("id",id).single();tpl=r.data}
-    box.innerHTML=`<h2>${id?"Vorlage bearbeiten":"Neue Vorlage"}</h2>
-    <div style="display:grid;gap:4px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));margin-bottom:14px">
-      <div class="form-group"><label>Titel</label><input id="edTitle" value="${escAttr(tpl.title||"")}"></div>
-      <div class="form-group"><label>Beschreibung</label><input id="edDesc" value="${escAttr(tpl.description||"")}"></div>
-      <div class="form-group"><label>Icon</label><input id="edIcon" value="${escAttr(tpl.icon||"📂")}" style="max-width:80px"></div>
-    </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
-      <button class="btn btn-primary btn-sm" id="saveTpl">Speichern</button>
-      <button class="btn btn-ghost btn-sm" id="addCat">+ Kategorie hinzufügen</button>
-      <button class="btn btn-ghost btn-sm" id="closeTplEditor">Schliessen</button>
-    </div>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Erstelle zuerst Kategorien, dann Punkte direkt darunter.</p>
-    <div id="edCats"></div>`;
-    $("saveTpl").onclick=()=>run("Speichere…",saveTemplateMeta);
+    let userOptions="";
+    if(isSuper){
+      const{data:profiles}=await sb.from("profiles").select("id,display_name,email").order("display_name");
+      userOptions=(profiles||[]).map(p=>'<option value="'+escAttr(p.id)+'"'+(tpl.owner_id===p.id||(!tpl.owner_id&&p.id===user.id)?' selected':'')+'>'+escHtml(p.display_name||p.email)+'</option>').join("");
+    }
+    const globalChk=tpl.is_global?' checked':'';
+    box.innerHTML='<h2>'+(id?"Vorlage bearbeiten":"Neue Vorlage")+'</h2>'
+      +'<div style="display:grid;gap:4px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));margin-bottom:14px">'
+      +'<div class="form-group"><label>Titel</label><input id="edTitle" value="'+escAttr(tpl.title||"")+'"></div>'
+      +'<div class="form-group"><label>Beschreibung</label><input id="edDesc" value="'+escAttr(tpl.description||"")+'"></div>'
+      +'<div class="form-group"><label>Icon</label><input id="edIcon" value="'+escAttr(tpl.icon||"📂")+'" style="max-width:80px"></div>'
+      +(isSuper?'<div class="form-group"><label>Besitzer</label><select id="edOwner">'+userOptions+'</select></div>':"")
+      +'</div>'
+      +(isSuper?'<label style="display:flex;align-items:center;gap:8px;font-size:14px;margin-bottom:14px;cursor:pointer"><input type="checkbox" id="edIsGlobal" style="width:18px;height:18px;accent-color:var(--accent)"'+globalChk+'> <span>Globale Vorlage <span style="font-size:12px;color:var(--muted)">(für alle sichtbar)</span></span></label>':"")
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">'
+      +'<button class="btn btn-primary btn-sm" id="saveTpl">Speichern</button>'
+      +'<button class="btn btn-ghost btn-sm" id="addCat">+ Kategorie</button>'
+      +'<button class="btn btn-ghost btn-sm" id="closeTplEditor">Schliessen</button>'
+      +'</div>'
+      +'<p style="font-size:13px;color:var(--muted);margin-bottom:12px">Erst Kategorien erstellen, dann Punkte hinzufügen.</p>'
+      +'<div id="edCats"></div>';
+    $("saveTpl").onclick=()=>saveTemplateMeta().then(ok=>ok&&loadTemplates());
     $("addCat").onclick=()=>addTemplateCategory();
     $("closeTplEditor").onclick=()=>wrap.classList.remove("show");
     if(id){const cats=await sb.from("template_categories").select("*").eq("template_id",id).order("sort_order");for(const c of cats.data||[])await renderTplCategory(c)}
@@ -642,35 +912,35 @@ async function openTemplateEditor(id){
 }
 
 async function saveTemplateMeta(){
-  const data={organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,title:$("edTitle").value.trim(),description:$("edDesc").value.trim(),icon:$("edIcon").value.trim()||"📂",is_global:isSuper};
+  const isGlobal=isSuper&&$("edIsGlobal")&&$("edIsGlobal").checked;
+  const forOwner=($("edOwner")&&$("edOwner").value)||owner();
+  const data={organization_id:orgId,owner_id:forOwner,created_by:user.id,updated_by:user.id,title:($("edTitle").value||"").trim(),description:($("edDesc").value||"").trim(),icon:($("edIcon").value||"").trim()||"📂",is_global:!!isGlobal};
   if(!data.title){toast("Titel fehlt");return false}
-  if(currentTpl){const e=await sb.from("templates").update({title:data.title,description:data.description,icon:data.icon,updated_by:user.id}).eq("id",currentTpl);if(e.error){alert(e.error.message);return false}}
+  if(currentTpl){const e=await sb.from("templates").update({title:data.title,description:data.description,icon:data.icon,is_global:!!isGlobal,updated_by:user.id}).eq("id",currentTpl);if(e.error){alert(e.error.message);return false}}
   else{const r=await sb.from("templates").insert(data).select().single();if(r.error){alert(r.error.message);return false}currentTpl=r.data.id}
-  await loadTemplates();toast("Vorlage gespeichert");return true;
+  toast("Vorlage gespeichert");return true;
 }
 
 async function addTemplateCategory(){
   if(!currentTpl){const ok=await saveTemplateMeta();if(!ok||!currentTpl)return}
   const title=await showModal({title:"Neue Kategorie",input:{label:"Name",placeholder:"z.B. Ausrüstung"}});
-  if(!title)return;
-  loading(true,"Speichere…");
+  if(!title)return;loading(true,"Speichere…");
   const r=await sb.from("template_categories").insert({template_id:currentTpl,title,sort_order:Date.now()%100000}).select().single();
-  loading(false);
-  if(r.error){alert(r.error.message);return}
+  loading(false);if(r.error){alert(r.error.message);return}
   await renderTplCategory(r.data);toast("Kategorie hinzugefügt");
 }
 
 async function renderTplCategory(c){
   const wrap=q("div");wrap.className="cat-editor";wrap.id="tplcat-"+c.id;
-  wrap.innerHTML=`<div class="cat-editor-head"><h4>${escHtml(c.title)}</h4></div><div id="tplitems-${c.id}"></div>`;
+  wrap.innerHTML='<div class="cat-editor-head"><h4>'+escHtml(c.title)+'</h4></div><div id="tplitems-'+c.id+'"></div>';
   const del=q("button");del.className="btn btn-danger btn-sm";del.textContent="Löschen";
   del.onclick=async()=>{
-    const ok=await showModal({title:`Kategorie "${c.title}" löschen?`,confirmLabel:"Löschen",danger:true});
+    const ok=await showModal({title:'"'+c.title+'" löschen?',confirmLabel:"Löschen",danger:true});
     if(!ok)return;loading(true,"Lösche…");await sb.from("template_categories").delete().eq("id",c.id);loading(false);wrap.remove();toast("Kategorie gelöscht");
   };
   wrap.querySelector(".cat-editor-head").appendChild(del);
   const addRow=q("div");addRow.className="inline-add";addRow.style.cssText="border:1px solid var(--border);border-radius:10px;padding:6px 10px;margin-top:8px";
-  const inp=q("input");inp.placeholder="Neuer Punkt in "+c.title;
+  const inp=q("input");inp.placeholder="Neuer Punkt…";
   const plus=q("button");plus.innerHTML="+";
   const doAdd=async()=>{
     const title=inp.value.trim();if(!title){toast("Bitte Punkt eingeben");return}
@@ -690,7 +960,7 @@ async function loadTplItems(catId){
     const sp=q("span");sp.textContent="• "+it.title;sp.style.flex="1";sp.style.fontSize="14px";
     const del=q("button");del.className="btn btn-ghost btn-sm";del.textContent="×";del.style.cssText="padding:4px 8px;color:var(--danger);border-color:#fca5a5";
     del.onclick=async()=>{
-      const ok=await showModal({title:`"${it.title}" löschen?`,confirmLabel:"Löschen",danger:true});
+      const ok=await showModal({title:'"'+it.title+'" löschen?',confirmLabel:"Löschen",danger:true});
       if(!ok)return;loading(true,"Lösche…");await sb.from("template_items").delete().eq("id",it.id);loading(false);toast("Punkt gelöscht");row.remove();
     };
     row.append(sp,del);box.appendChild(row);
@@ -698,107 +968,259 @@ async function loadTplItems(catId){
 }
 
 async function deleteTemplate(id){
-  const ok=await showModal({title:"Vorlage löschen?",sub:"Diese Aktion kann nicht rückgängig gemacht werden.",confirmLabel:"Löschen",danger:true});
-  if(!ok)return;
-  loading(true,"Lösche…");
+  const ok=await showModal({title:"Vorlage löschen?",sub:"Kann nicht rückgängig gemacht werden.",confirmLabel:"Löschen",danger:true});
+  if(!ok)return;loading(true,"Lösche…");
   await sb.from("templates").update({deleted_at:new Date().toISOString(),deleted_by:user.id}).eq("id",id);
   loading(false);await loadTemplates();$("tplEditorWrap").classList.remove("show");toast("Vorlage gelöscht");
 }
 
-async function makeChecklist(t){
-  // No run() wrapper — contains modal
-  const title=await showModal({title:"Checkliste erstellen",input:{label:"Titel",value:t.title+" "+new Date().toLocaleDateString("de-CH")}});
-  if(!title)return;
-  loading(true,"Erstelle…");
-  const r=await sb.from("checklists").insert({organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,template_id:t.id,title,description:t.description,icon:t.icon}).select().single();
-  if(r.error){alert(r.error.message);loading(false);return}
-  const cats=await sb.from("template_categories").select("*").eq("template_id",t.id).order("sort_order");
-  for(const c of cats.data||[]){
-    const nc=await sb.from("checklist_categories").insert({checklist_id:r.data.id,title:c.title,sort_order:c.sort_order}).select().single();
-    const items=await sb.from("template_items").select("*").eq("category_id",c.id).order("sort_order");
-    if(items.data?.length)await sb.from("checklist_items").insert(items.data.map(i=>({category_id:nc.data.id,title:i.title,sort_order:i.sort_order,is_checked:false})));
-  }
-  loading(false);await loadChecklists();show("Check");openDetailPanel(r.data.id);toast("Checkliste erstellt");
-}
-
-/* ── Admin ── */
-async function loadUsers(){
-  const box=$("users");box.innerHTML="";
-  const{data,error}=await sb.from("profiles").select("*").order("display_name");
-  if(error){box.textContent=error.message;return}
-  (data||[]).forEach(u=>{
-    const row=q("div");row.className="user-row";
-    const av=q("div");av.className="user-avatar";av.textContent=(u.display_name||u.email||"?")[0].toUpperCase();
-    const info=q("div");info.className="user-info";info.innerHTML=`<div class="uname">${escHtml(u.display_name||"—")}</div><div class="uemail">${escHtml(u.email||"—")}</div>`;
-    const btn=q("button");btn.className="btn btn-ghost btn-sm";btn.textContent="Als User arbeiten";
-    btn.onclick=()=>{setActing(u.id,u.display_name);show("Check")};
-    row.append(av,info,btn);box.appendChild(row);
-  });
-}
-
-async function addUser(){
-  const id=$("newUserId").value.trim(),email=$("newUserEmail").value.trim(),name=$("newUserName").value.trim(),role=$("newUserRole").value;
-  if(!id||!email||!name){toast("UUID, E-Mail und Name nötig");return}
-  loading(true,"Speichere…");
-  const p=await sb.from("profiles").upsert({id,email,display_name:name});
-  if(p.error){alert(p.error.message);loading(false);return}
-  const m=await sb.from("organization_members").insert({organization_id:orgId,user_id:id,role});
-  if(m.error){alert(m.error.message);loading(false);return}
-  loading(false);loadUsers();toast("Benutzer gespeichert");
-}
-
 async function seedStandardTemplates(){
   const templates=[["Camping","Packliste fürs Camping","🏕️","Schlafen\n- Zelt\n- Schlafsack\n- Isomatte\n\nKochen\n- Gaskocher\n- Geschirr\n- Besteck\n- Wasser"],["Wandern","Vorlage für Wanderausflüge","🎒","Ausrüstung\n- Wanderschuhe\n- Rucksack\n- Regenjacke\n\nVerpflegung\n- Wasser\n- Snacks\n- Sandwich"],["Flugreise","Vorlage für Reisen mit Flug","✈️","Dokumente\n- Pass/ID\n- Boardingpass\n- Versicherung\n\nHandgepäck\n- Kopfhörer\n- Ladegerät\n- Powerbank"],["Einkauf","Allgemeine Einkaufsliste","🛒","Lebensmittel\n- Brot\n- Milch\n- Früchte\n\nHaushalt\n- Küchenpapier\n- Müllsäcke"]];
-  loading(true,"Ergänze Vorlagen…");
-  for(const t of templates)await createTemplateFromSeed(t);
-  loading(false);await loadTemplates();toast("Standardvorlagen ergänzt");
+  loading(true,"Prüfe Vorlagen…");
+  const{data:existing}=await sb.from("templates").select("title").is("deleted_at",null);
+  const existingTitles=new Set((existing||[]).map(t=>t.title));
+  const toCreate=templates.filter(t=>!existingTitles.has(t[0]));
+  if(!toCreate.length){loading(false);toast("Alle Standardvorlagen sind bereits vorhanden.");return}
+  for(const t of toCreate)await createTemplateFromSeed(t);
+  loading(false);await loadTemplates();toast(toCreate.length+" Vorlage"+(toCreate.length!==1?"n":"")+" hinzugefügt");
 }
 
 async function createTemplateFromSeed(t){
   const r=await sb.from("templates").insert({organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,title:t[0],description:t[1],icon:t[2],is_global:isSuper}).select().single();
-  if(r.error)return;
-  let cur=null,n=10,i=10;
-  for(const line of t[3].split(/\n/).map(x=>x.trim()).filter(Boolean)){
+  if(r.error)return;let cur=null,n=10,i=10;
+  for(const line of t[3].split("\n").map(x=>x.trim()).filter(Boolean)){
     if(line.startsWith("-")){if(cur)await sb.from("template_items").insert({category_id:cur,title:line.replace(/^-\s*/,""),sort_order:i});i+=10}
     else{const c=await sb.from("template_categories").insert({template_id:r.data.id,title:line,sort_order:n}).select().single();cur=c.data.id;n+=10;i=10}
   }
 }
 
-/* ── XSS helpers ── */
-function escHtml(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
-function escAttr(s){return String(s).replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
+/* ── Admin ── */
+async function loadUsers(){
+  const box=$("users");
+  box.innerHTML='<div style="display:flex;justify-content:center;padding:24px"><div class="spinner"></div></div>';
+  const[profRes,memRes]=await Promise.all([
+    sb.from("profiles").select("*").order("display_name"),
+    sb.from("organization_members").select("user_id,role").eq("organization_id",orgId)
+  ]);
+  if(profRes.error){box.textContent=profRes.error.message;return}
+  const roleMap={};(memRes.data||[]).forEach(m=>roleMap[m.user_id]=m.role);
+  const roleLabel={user:"User",admin:"Admin",super_admin:"Super Admin"};
+  box.innerHTML="";
+  if(!profRes.data||!profRes.data.length){box.innerHTML='<p style="color:var(--muted);font-size:14px">Noch keine Benutzer.</p>';return}
+  (profRes.data||[]).forEach(u=>{
+    const role=roleMap[u.id]||"user";
+    const isSelf=u.id===user.id;
+    const row=q("div");row.className="user-row";
+    const av=q("div");av.className="user-avatar";av.textContent=(u.display_name||u.email||"?")[0].toUpperCase();
+    const info=q("div");info.className="user-info";
+    info.innerHTML='<div class="uname">'+escHtml(u.display_name||"—")+(isSelf?' <span style="font-size:11px;color:var(--accent);font-weight:400">(Du)</span>':"")+'</div><div class="uemail">'+escHtml(u.email||"—")+'</div><div style="font-size:11px;color:var(--muted);margin-top:2px">'+(roleLabel[role]||role)+'</div>';
+    const actions=q("div");actions.style.cssText="display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0";
+    const btnCl=q("button");btnCl.className="btn btn-ghost btn-sm";btnCl.title="Checklisten anzeigen";
+    btnCl.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M9 12l2 2 4-4"/></svg>';
+    btnCl.onclick=()=>loadUserChecklists(u.id,u.display_name||u.email);
+    const btnAct=q("button");btnAct.className="btn btn-ghost btn-sm";btnAct.title="Als User arbeiten";
+    btnAct.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>';
+    btnAct.onclick=()=>{
+      setActing(u.id,u.display_name||u.email);show("Check");
+      const sel=$("checkUserSelect");if(sel)[...sel.options].forEach(o=>{if(o.value===u.id)o.selected=true});
+    };
+    const btnEdit=q("button");btnEdit.className="btn btn-ghost btn-sm";btnEdit.title="Bearbeiten";
+    btnEdit.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+    btnEdit.onclick=()=>openEditUserPanel(u,role);
+    const btnDel=q("button");btnDel.className="btn btn-danger btn-sm";btnDel.title="Löschen";
+    btnDel.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>';
+    btnDel.onclick=()=>deleteUser(u);
+    btnDel.disabled=isSelf;if(isSelf)btnDel.style.opacity="0.3";
+    actions.append(btnCl,btnAct,btnEdit,btnDel);
+    row.append(av,info,actions);box.appendChild(row);
+  });
+}
 
-/* ── CSS for item delete button ── */
-const style=document.createElement("style");
-style.textContent=`.item-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:0 4px;line-height:1;opacity:0;transition:opacity .15s,color .15s;flex-shrink:0}.checkrow:hover .item-del{opacity:1}.item-del:hover{color:var(--danger)}`;
-document.head.appendChild(style);
+async function loadUserChecklists(uid,uname){
+  const section=$("adminClSection"),list=$("adminClList");
+  $("adminClUser").textContent=uname;section.style.display="";
+  list.innerHTML='<div style="display:flex;justify-content:center;padding:24px"><div class="spinner"></div></div>';
+  section.scrollIntoView({behavior:"smooth",block:"nearest"});
+  const{data,error}=await sb.from("checklists").select("*").eq("owner_id",uid).is("deleted_at",null).order("created_at",{ascending:false});
+  if(error){list.textContent=error.message;return}
+  if(!data||!data.length){list.innerHTML='<p style="color:var(--muted);font-size:14px;padding:12px 0">Keine Checklisten vorhanden.</p>';return}
+  list.innerHTML="";
+  (data||[]).forEach(cl=>{
+    const row=q("div");row.style.cssText="display:flex;align-items:center;gap:12px;padding:11px 8px;border-top:1px solid var(--border);cursor:pointer;border-radius:8px;transition:background .15s";
+    row.innerHTML='<span style="font-size:20px;flex-shrink:0">'+(cl.icon||"📋")+'</span><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escHtml(cl.title)+'</div><div style="font-size:12px;color:var(--muted)">'+fmtDate(cl.created_at)+'</div></div><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--muted);flex-shrink:0"><path d="M9 18l6-6-6-6"/></svg>';
+    row.onmouseenter=()=>row.style.background="var(--bg)";row.onmouseleave=()=>row.style.background="";
+    row.onclick=()=>{setActing(uid,uname);show("Check");const sel=$("checkUserSelect");if(sel)[...sel.options].forEach(o=>{if(o.value===uid)o.selected=true});setTimeout(()=>openDetailPanel(cl.id),100)};
+    list.appendChild(row);
+  });
+}
+
+function openEditUserPanel(u,currentRole){
+  const overlay=$("editUserOverlay"),panel=$("editUserPanel");
+  $("editUserTitle").textContent=u.display_name||u.email||"Benutzer bearbeiten";
+  const body=$("editUserBody");
+  body.innerHTML='<div style="background:var(--bg);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:13px;color:var(--muted)"><span style="font-weight:600;color:var(--text)">'+escHtml(u.email||"—")+'</span><br>Login-E-Mail (nicht änderbar)</div>'
+    +'<div class="form-group"><label>Benutzername</label><input id="euName" value="'+escAttr(u.display_name||"")+'"></div>'
+    +'<div class="form-group"><label>Rolle</label><select id="euRole"><option value="user"'+(currentRole==="user"?" selected":"")+'>User</option><option value="admin"'+(currentRole==="admin"?" selected":"")+'>Admin</option><option value="super_admin"'+(currentRole==="super_admin"?" selected":"")+'>Super Admin</option></select></div>'
+    +'<div style="border-top:1px solid var(--border);padding-top:18px;margin-top:4px">'
+    +'<h4 style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Neues Passwort setzen</h4>'
+    +'<div class="form-group"><label>Neues Passwort</label><input id="euPw" type="password" placeholder="Leer lassen = unverändert"></div>'
+    +'<div class="form-group"><label>Passwort bestätigen</label><input id="euPw2" type="password" placeholder="Wiederholen"></div>'
+    +'</div>'
+    +'<div id="euMsg" style="font-size:13px;min-height:18px;margin-bottom:10px;color:var(--danger)"></div>'
+    +'<div style="display:flex;gap:8px"><button class="btn btn-primary" id="euSave" style="flex:1">Speichern</button><button class="btn btn-ghost" id="euCancel">Abbrechen</button></div>';
+  const closePanel=()=>{overlay.style.opacity="0";overlay.style.pointerEvents="none";panel.style.transform="translateX(100%)"};
+  $("euCancel").onclick=closePanel;
+  $("editUserClose").onclick=closePanel;
+  overlay.onclick=e=>{if(e.target===overlay)closePanel()};
+  $("euSave").onclick=async()=>{
+    const name=$("euName").value.trim(),role=$("euRole").value,pw=$("euPw").value,pw2=$("euPw2").value;
+    const msg=$("euMsg");msg.style.color="var(--danger)";msg.textContent="";
+    if(!name){msg.textContent="Benutzername darf nicht leer sein.";return}
+    if(pw&&pw.length<6){msg.textContent="Passwort muss mindestens 6 Zeichen haben.";return}
+    if(pw&&pw!==pw2){msg.textContent="Passwörter stimmen nicht überein.";return}
+    loading(true,"Speichere…");
+    const pRes=await sb.from("profiles").update({display_name:name}).eq("id",u.id);
+    if(pRes.error){msg.textContent=pRes.error.message;loading(false);return}
+    const mRes=await sb.from("organization_members").update({role}).eq("user_id",u.id).eq("organization_id",orgId);
+    if(mRes.error){msg.textContent=mRes.error.message;loading(false);return}
+    if(pw){
+      try{
+        const sessionRes=await sb.auth.getSession();
+        const token=sessionRes.data&&sessionRes.data.session?sessionRes.data.session.access_token:null;
+        if(!token){msg.textContent="Keine gültige Session.";loading(false);return}
+        const res=await fetch(SUPABASE_URL+"/functions/v1/set-user-password",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({user_id:u.id,password:pw})});
+        let json={};try{json=await res.json()}catch(_){}
+        if(!res.ok||json.error){msg.textContent=json.error||"Passwort-Fehler (HTTP "+res.status+")";loading(false);return}
+      }catch(err){msg.textContent="Netzwerkfehler: "+err.message;loading(false);return}
+    }
+    loading(false);msg.style.color="var(--success)";msg.textContent="✓ Gespeichert";
+    setTimeout(()=>closePanel(),800);loadUsers();toast("Benutzer aktualisiert");
+  };
+  overlay.style.opacity="1";overlay.style.pointerEvents="all";panel.style.transform="translateX(0)";
+  setTimeout(()=>$("euName")&&$("euName").focus(),100);
+}
+
+async function deleteUser(u){
+  const ok=await showModal({title:escHtml(u.display_name||u.email)+" löschen?",sub:"Der User wird aus der Organisation entfernt.",confirmLabel:"Entfernen",danger:true});
+  if(!ok)return;loading(true,"Entferne…");
+  await sb.from("organization_members").delete().eq("user_id",u.id).eq("organization_id",orgId);
+  await sb.from("profiles").delete().eq("id",u.id);
+  loading(false);loadUsers();toast("Benutzer entfernt");
+}
+
+async function addUser(){
+  const email=$("newUserEmail").value.trim(),name=$("newUserName").value.trim(),pw=$("newUserPw").value,role=$("newUserRole").value;
+  const msgEl=$("adminMsg");msgEl.textContent="";msgEl.style.color="var(--danger)";
+  if(!name||!email||!pw){msgEl.textContent="Name, E-Mail und Passwort sind erforderlich.";return}
+  if(pw.length<6){msgEl.textContent="Passwort muss mindestens 6 Zeichen haben.";return}
+  loading(true,"Lege User an…");
+  try{
+    const session=await sb.auth.getSession();
+    const token=session.data&&session.data.session?session.data.session.access_token:null;
+    const res=await fetch(SUPABASE_URL+"/functions/v1/create-user",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({email,password:pw,display_name:name,organization_id:orgId,role})});
+    const json=await res.json();
+    if(!res.ok||json.error){msgEl.textContent=json.error||"Fehler beim Anlegen.";loading(false);return}
+    $("newUserName").value="";$("newUserEmail").value="";$("newUserPw").value="";
+    msgEl.style.color="var(--success)";msgEl.textContent="✓ User erfolgreich angelegt.";
+    _allUsers=null;loadUsers();toast("User angelegt");
+  }catch(e){msgEl.textContent=e.message||"Netzwerkfehler."}
+  loading(false);
+}
+
+/* ── Own password change ── */
+function openChangePwModal(){
+  const overlay=$("changePwOverlay"),box=$("changePwBox");
+  $("newPw1").value="";$("newPw2").value="";$("changePwMsg").textContent="";
+  overlay.style.opacity="1";overlay.style.pointerEvents="all";box.style.transform="scale(1) translateY(0)";
+  closeSidebar();setTimeout(()=>$("newPw1").focus(),80);
+}
+function closeChangePwModal(){
+  const overlay=$("changePwOverlay"),box=$("changePwBox");
+  overlay.style.opacity="0";overlay.style.pointerEvents="none";box.style.transform="scale(.95) translateY(10px)";
+}
+async function submitChangePw(){
+  const pw=$("newPw1").value,pw2=$("newPw2").value,msg=$("changePwMsg");
+  msg.style.color="var(--danger)";msg.textContent="";
+  if(!pw){msg.textContent="Bitte Passwort eingeben.";return}
+  if(pw.length<6){msg.textContent="Mindestens 6 Zeichen.";return}
+  if(pw!==pw2){msg.textContent="Passwörter stimmen nicht überein.";return}
+  loading(true,"Speichere…");
+  const{error}=await sb.auth.updateUser({password:pw});
+  loading(false);
+  if(error){msg.textContent=error.message;return}
+  msg.style.color="var(--success)";msg.textContent="✓ Passwort geändert.";
+  setTimeout(()=>closeChangePwModal(),1200);toast("Passwort geändert");
+}
+
+/* ── CSS: item-del always visible on touch ── */
+const _style=document.createElement("style");
+_style.textContent=".item-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:0 4px;line-height:1;opacity:0;transition:opacity .15s,color .15s;flex-shrink:0}.checkrow:hover .item-del{opacity:1}.item-del:hover{color:var(--danger)}@media(hover:none){.item-del{opacity:.4}}";
+document.head.appendChild(_style);
 
 /* ── Event wiring ── */
 document.addEventListener("DOMContentLoaded",()=>{
   initClient();
-  $("loginBtn").onclick=doLogin;
-  $("loginPw").onkeydown=e=>{if(e.key==="Enter")doLogin()};
-  $("logoutBtn").onclick=doLogout;
-  $("menuBtn").onclick=openSidebar;
-  $("sidebarBackdrop").onclick=closeSidebar;
-  $("stopActing").onclick=()=>setActing(null,"");
-  $("bCheck").onclick=()=>show("Check");
-  $("bTpl").onclick=()=>show("Tpl");
-  $("bAdmin").onclick=()=>show("Admin");
-  $("bbCheck").onclick=()=>show("Check");
-  $("bbTpl").onclick=()=>show("Tpl");
-  $("bbAdmin").onclick=()=>show("Admin");
-  $("refreshCheck").onclick=()=>{loading(true,"Aktualisiere…");loadChecklists().finally(()=>loading(false))};
-  $("newTpl").onclick=()=>openTemplateEditor(null);
-  $("seedMore").onclick=()=>seedStandardTemplates();
-  $("addUser").onclick=addUser;
-  $("detailClose").onclick=closeDetailPanel;
-  $("detailAddCat").onclick=()=>addChecklistCategory();
+  on("loginBtn",doLogin);
+  onkey("loginPw",e=>{if(e.key==="Enter")doLogin()});
+  on("logoutBtn",doLogout);
+  on("logoutBtnDesktop",doLogout);
+  on("darkToggle",toggleDark);
+  on("darkToggleDesktop",toggleDark);
+  on("editUserClose",()=>{$("editUserOverlay").style.opacity="0";$("editUserOverlay").style.pointerEvents="none";$("editUserPanel").style.transform="translateX(100%)"});
+  on("changePwBtn",()=>openChangePwModal());
+  on("changePwCancel",()=>closeChangePwModal());
+  on("changePwConfirm",()=>submitChangePw());
+  onkey("newPw1",e=>{if(e.key==="Enter")submitChangePw()});
+  onkey("newPw2",e=>{if(e.key==="Enter")submitChangePw()});
+  applyDark(false);
+  if(window.innerWidth<=768){const d=$("desktopActions");if(d)d.style.display="none"}
+  on("menuBtn",openSidebar);
+  on("sidebarBackdrop",closeSidebar);
+  on("stopActing",()=>setActing(null,""));
+  on("bCheck",()=>show("Check"));on("bTpl",()=>show("Tpl"));on("bAdmin",()=>show("Admin"));
+  on("bbCheck",()=>show("Check"));on("bbTpl",()=>show("Tpl"));on("bbAdmin",()=>show("Admin"));
+  on("refreshCheck",()=>{loading(true,"Aktualisiere…");loadChecklists().finally(()=>loading(false))});
+  on("newEmptyCl",()=>createEmptyChecklist());
+  on("newFromTplCl",()=>pickTemplateAndCreate());
+  on("showArchivedCl",()=>loadArchivedChecklists());
+  on("closeArchivedCl",()=>{$("archivedClSection").style.display="none"});
+  on("newTpl",()=>openTemplateEditor(null));
+  on("seedMore",()=>seedStandardTemplates());
+  on("showArchivedTpl",()=>loadArchivedTemplates());
+  on("closeArchivedTpl",()=>{$("archivedTplSection").style.display="none"});
+  on("adminClClose",()=>{$("adminClSection").style.display="none"});
+  on("addUser",addUser);
   $("detailOverlay").onclick=e=>{if(e.target===$("detailOverlay"))closeDetailPanel()};
+  on("detailClose",closeDetailPanel);
+  on("detailAddCat",()=>addChecklistCategory());
+  on("detailArchive",()=>archiveChecklist(currentChecklistId,true));
   checkSession();
 });
-
 if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js");
 </script>
+<!-- Edit User Panel -->
+<div id="editUserOverlay" style="position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:150;opacity:0;pointer-events:none;transition:opacity .22s ease">
+  <div id="editUserPanel" style="position:fixed;top:0;right:0;bottom:0;width:min(420px,100vw);background:var(--surface);border-left:1px solid var(--border);box-shadow:var(--shadow-lg);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .26s cubic-bezier(.4,0,.2,1);z-index:151;overflow-y:auto;padding:24px">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+      <button id="editUserClose" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:6px;border-radius:8px;display:flex;transition:background .15s"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      <h2 style="font-size:18px;font-weight:700;flex:1" id="editUserTitle">Benutzer bearbeiten</h2>
+    </div>
+    <div id="editUserBody"></div>
+  </div>
+</div>
+<!-- Change Password Modal -->
+<div id="changePwOverlay" style="position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s ease">
+  <div style="background:var(--surface);border-radius:20px;box-shadow:var(--shadow-lg);padding:24px;width:100%;max-width:380px;transform:scale(.95) translateY(10px);transition:transform .22s ease" id="changePwBox">
+    <h3 style="font-size:17px;font-weight:700;margin-bottom:4px">Passwort ändern</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:18px">Wähle ein neues Passwort für deinen Account.</p>
+    <div class="form-group"><label>Neues Passwort</label><input id="newPw1" type="password" placeholder="Min. 6 Zeichen"></div>
+    <div class="form-group"><label>Passwort bestätigen</label><input id="newPw2" type="password" placeholder="Wiederholen"></div>
+    <div id="changePwMsg" style="font-size:13px;min-height:18px;margin-bottom:10px"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-ghost btn-sm" id="changePwCancel">Abbrechen</button>
+      <button class="btn btn-primary btn-sm" id="changePwConfirm">Speichern</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
