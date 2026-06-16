@@ -1921,58 +1921,62 @@ async function createTemplateFromSeed(t){
 }
 
 /* ── Event wiring ── */
+// Safe onclick helper — skips if element not found
+function on(id,fn){const el=$(id);if(el)el.onclick=fn}
+function onkey(id,fn){const el=$(id);if(el)el.onkeydown=fn}
+
 document.addEventListener("DOMContentLoaded",async()=>{
-  // Share links work without login — check first
-  const shareId=new URLSearchParams(location.search).get("share");
-  if(shareId){initClient();await checkShareMode();return}
   initClient();
-  $("loginBtn").onclick=doLogin;
-  $("loginPw").onkeydown=e=>{if(e.key==="Enter")doLogin()};
-  $("logoutBtn").onclick=doLogout;
-  $("logoutBtnDesktop").onclick=doLogout;
-  $("darkToggleDesktop").onclick=toggleDark;
-  $("editUserClose").onclick=()=>{$("editUserOverlay").style.opacity="0";$("editUserOverlay").style.pointerEvents="none";$("editUserPanel").style.transform="translateX(100%)"};
-  $("changePwBtn").onclick=()=>openChangePwModal();
-  $("changePwCancel").onclick=()=>closeChangePwModal();
-  $("changePwConfirm").onclick=()=>submitChangePw();
-  $("newPw1").onkeydown=$("newPw2").onkeydown=e=>{if(e.key==="Enter")submitChangePw()};
-  $("darkToggle").onclick=toggleDark;
-  // Init icon based on current state (light by default)
+
+  // Share links: show read-only view, skip everything else
+  const shareId=new URLSearchParams(location.search).get("share");
+  if(shareId){await checkShareMode();return}
+
+  // Normal app wiring
+  on("loginBtn",doLogin);
+  onkey("loginPw",e=>{if(e.key==="Enter")doLogin()});
+  on("logoutBtn",doLogout);
+  on("logoutBtnDesktop",doLogout);
+  on("darkToggle",toggleDark);
+  on("darkToggleDesktop",toggleDark);
+  on("editUserClose",()=>{$("editUserOverlay").style.opacity="0";$("editUserOverlay").style.pointerEvents="none";$("editUserPanel").style.transform="translateX(100%)"});
+  on("changePwBtn",()=>openChangePwModal());
+  on("changePwCancel",()=>closeChangePwModal());
+  on("changePwConfirm",()=>submitChangePw());
+  onkey("newPw1",e=>{if(e.key==="Enter")submitChangePw()});
+  onkey("newPw2",e=>{if(e.key==="Enter")submitChangePw()});
   applyDark(false);
-  // Hide desktop actions on mobile (topbar has them)
-  if(window.innerWidth<=768) {
-    const d=$("desktopActions"); if(d)d.style.display="none";
-  }
-  $("menuBtn").onclick=openSidebar;
-  $("sidebarBackdrop").onclick=closeSidebar;
-  $("stopActing").onclick=()=>setActing(null,"");
-  $("bCheck").onclick=()=>show("Check");
-  $("bTpl").onclick=()=>show("Tpl");
-  $("bAdmin").onclick=()=>show("Admin");
-  $("bbCheck").onclick=()=>show("Check");
-  $("bbTpl").onclick=()=>show("Tpl");
-  $("bbAdmin").onclick=()=>show("Admin");
-  $("refreshCheck").onclick=()=>{loading(true,"Aktualisiere…");loadChecklists().finally(()=>loading(false))};
-  $("newEmptyCl").onclick=()=>createEmptyChecklist();
-  $("newFromTplCl").onclick=()=>pickTemplateAndCreate();
-  $("newTpl").onclick=()=>openTemplateEditor(null);
-  $("adminClClose").onclick=()=>{$("adminClSection").style.display="none"};
-  $("seedMore").onclick=()=>seedStandardTemplates();
-  $("showArchivedTpl").onclick=()=>loadArchivedTemplates();
-  $("closeArchivedTpl").onclick=()=>{$("archivedTplSection").style.display="none"};
-  $("addUser").onclick=addUser;
-  $("detailClose").onclick=closeDetailPanel;
-  $("detailAddCat").onclick=()=>addChecklistCategory();
-  $("detailExport").onclick=()=>openExportModal(currentChecklistId);
-  $("detailShare").onclick=()=>openShareModal(currentChecklistId);
+  if(window.innerWidth<=768){const d=$("desktopActions");if(d)d.style.display="none"}
+  on("menuBtn",openSidebar);
+  on("sidebarBackdrop",closeSidebar);
+  on("stopActing",()=>setActing(null,""));
+  on("bCheck",()=>show("Check"));
+  on("bTpl",()=>show("Tpl"));
+  on("bAdmin",()=>show("Admin"));
+  on("bbCheck",()=>show("Check"));
+  on("bbTpl",()=>show("Tpl"));
+  on("bbAdmin",()=>show("Admin"));
+  on("refreshCheck",()=>{loading(true,"Aktualisiere…");loadChecklists().finally(()=>loading(false))});
+  on("newEmptyCl",()=>createEmptyChecklist());
+  on("newFromTplCl",()=>pickTemplateAndCreate());
+  on("newTpl",()=>openTemplateEditor(null));
+  on("adminClClose",()=>{$("adminClSection").style.display="none"});
+  on("seedMore",()=>seedStandardTemplates());
+  on("showArchivedTpl",()=>loadArchivedTemplates());
+  on("closeArchivedTpl",()=>{$("archivedTplSection").style.display="none"});
+  on("addUser",addUser);
+  on("detailClose",closeDetailPanel);
+  on("detailAddCat",()=>addChecklistCategory());
+  on("detailExport",()=>openExportModal(currentChecklistId));
+  on("detailShare",()=>openShareModal(currentChecklistId));
+  on("showArchivedCl",()=>loadArchivedChecklists());
+  on("closeArchivedCl",()=>{$("archivedClSection").style.display="none"});
+  on("exportClose",closeExportModal);
+  on("exportPdf",()=>exportChecklist("pdf"));
+  on("exportCsv",()=>exportChecklist("csv"));
+  on("shareClose",closeShareModal);
+  on("shareCopy",copyShareUrl);
   $("detailOverlay").onclick=e=>{if(e.target===$("detailOverlay"))closeDetailPanel()};
-  $("showArchivedCl").onclick=()=>loadArchivedChecklists();
-  $("closeArchivedCl").onclick=()=>{$("archivedClSection").style.display="none"};
-  $("exportClose").onclick=closeExportModal;
-  $("exportPdf").onclick=()=>exportChecklist("pdf");
-  $("exportCsv").onclick=()=>exportChecklist("csv");
-  $("shareClose").onclick=closeShareModal;
-  $("shareCopy").onclick=copyShareUrl;
   $("exportOverlay").onclick=e=>{if(e.target===$("exportOverlay"))closeExportModal()};
   $("shareOverlay").onclick=e=>{if(e.target===$("shareOverlay"))closeShareModal()};
   checkSession();
