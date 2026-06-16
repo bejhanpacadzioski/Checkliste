@@ -11,26 +11,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{
-  --bg:#f1f5f9;--surface:#fff;--border:#e2e8f0;--text:#0f172a;--muted:#64748b;
-  --accent:#6366f1;--accent2:#818cf8;--danger:#ef4444;--success:#22c55e;
-  --sidebar-w:240px;--r:16px;
-  --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06);
-  --shadow-lg:0 8px 32px rgba(0,0,0,.14);
-}
-html.dark{--bg:#0f172a;--surface:#1e293b;--border:#334155;--text:#f1f5f9;--muted:#94a3b8}
+:root{--bg:#f1f5f9;--surface:#fff;--border:#e2e8f0;--text:#0f172a;--muted:#64748b;--accent:#6366f1;--accent2:#818cf8;--danger:#ef4444;--success:#22c55e;--sidebar-w:240px;--r:16px;--shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06);--shadow-lg:0 8px 32px rgba(0,0,0,.14)}
+@media(prefers-color-scheme:dark){:root{--bg:#0f172a;--surface:#1e293b;--border:#334155;--text:#f1f5f9;--muted:#94a3b8}}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.5}
-
-/* Shell */
 #shell{display:flex;min-height:100dvh}
-
-/* Sidebar */
 #sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100dvh;overflow-y:auto;padding:20px 12px;transition:transform .25s ease}
 .sidebar-logo{display:flex;align-items:center;gap:10px;padding:0 8px 20px;border-bottom:1px solid var(--border);margin-bottom:16px}
 .sidebar-logo svg{width:28px;height:28px;flex-shrink:0}
 .sidebar-logo .lname{font-weight:700;font-size:15px;letter-spacing:-.3px}
-.sidebar-logo .lsub{font-size:11px;color:var(--muted);font-weight:400;display:block}
+.sidebar-logo .lsub{font-size:11px;color:var(--muted);font-weight:400;display:block;letter-spacing:0}
 nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;font-size:14px;font-weight:500;color:var(--muted);cursor:pointer;border:none;background:none;width:100%;text-align:left;transition:background .15s,color .15s;font-family:inherit}
 .nav-item:hover{background:var(--bg);color:var(--text)}
@@ -45,8 +35,6 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 .acting-badge{display:none;align-items:center;gap:6px;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;color:var(--accent);margin-bottom:8px}
 .acting-badge.show{display:flex}
 .acting-badge button{background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);line-height:1;padding:0}
-
-/* Main */
 #main{flex:1;min-width:0;display:flex;flex-direction:column}
 #topbar{display:none;align-items:center;gap:10px;padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:30}
 #topbar .logo-text{font-weight:700;font-size:16px;flex:1}
@@ -55,108 +43,50 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 .page-title{font-size:22px;font-weight:700;letter-spacing:-.4px}
 .page-sub{font-size:14px;color:var(--muted);margin-top:2px}
 #content{padding:20px 24px 32px;flex:1}
-
-/* Checklist cards */
 .cl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-top:18px}
 .cl-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:16px 18px;cursor:pointer;transition:box-shadow .18s,transform .18s,border-color .18s;display:flex;gap:14px;align-items:flex-start}
 .cl-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px);border-color:var(--accent)}
-.cl-card.done-card{border-color:rgba(34,197,94,.4);background:linear-gradient(135deg,var(--surface) 0%,rgba(34,197,94,.04) 100%)}
 .cl-ring{flex-shrink:0;width:52px;height:52px}
 .cl-ring svg{width:52px;height:52px}
 .cl-body{flex:1;min-width:0}
 .cl-title{font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cl-desc{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cl-meta{font-size:12px;color:var(--muted);margin-top:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.cl-date{font-size:11px;color:var(--muted);opacity:.7}
-.cl-done-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:#16a34a;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:99px;padding:2px 8px}
+.cl-meta{font-size:12px;color:var(--muted);margin-top:6px}
 .cl-actions{display:flex;gap:6px;margin-top:10px}
 .cl-actions button{font-size:12px;padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;font-family:inherit;font-weight:500;transition:background .15s,color .15s}
 .cl-actions button:hover{background:var(--bg);color:var(--text)}
 .cl-actions .btn-arch:hover{background:#fef2f2;color:var(--danger);border-color:#fca5a5}
-
-/* Detail panel */
 #detailOverlay{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:100;opacity:0;pointer-events:none;transition:opacity .22s ease}
 #detailOverlay.open{opacity:1;pointer-events:all}
 #detailPanel{position:fixed;top:0;right:0;bottom:0;width:min(520px,100vw);background:var(--surface);border-left:1px solid var(--border);box-shadow:var(--shadow-lg);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .26s cubic-bezier(.4,0,.2,1);z-index:101}
 #detailOverlay.open #detailPanel{transform:translateX(0)}
-.detail-header{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
-.detail-close{background:none;border:none;cursor:pointer;color:var(--muted);padding:6px;display:flex;border-radius:8px;transition:background .15s;flex-shrink:0}
+.detail-header{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0}
+.detail-close{background:none;border:none;cursor:pointer;color:var(--muted);padding:4px;display:flex;border-radius:8px;transition:background .15s;flex-shrink:0}
 .detail-close:hover{background:var(--bg)}
-.detail-title-wrap{flex:1;min-width:0}
-.detail-title{font-size:16px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;border-radius:6px;padding:2px 4px;transition:background .15s;display:block}
-.detail-title:hover{background:var(--bg)}
-.detail-title-edit{font-size:16px;font-weight:700;border:none;outline:none;background:var(--bg);border-radius:6px;padding:2px 4px;width:100%;font-family:inherit;color:var(--text);display:none}
-.detail-title-edit.active{display:block}
-.detail-title.editing{display:none}
-.detail-header-actions{display:flex;gap:6px;flex-shrink:0}
-.detail-header-actions .btn-label{display:inline}
-.detail-body{flex:1;overflow-y:auto;padding:20px;-webkit-overflow-scrolling:touch}
-
-/* Progress */
-.progress-wrap{margin-bottom:20px}
-.detail-progress-bar{height:7px;background:var(--border);border-radius:99px;overflow:hidden;margin:8px 0 5px}
+.detail-title{font-size:17px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.detail-body{flex:1;overflow-y:auto;padding:20px}
+.detail-progress-bar{height:6px;background:var(--border);border-radius:99px;overflow:hidden;margin:8px 0 4px}
 .detail-progress-bar .bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px;transition:width .4s ease}
-.detail-progress-bar .bar.complete{background:linear-gradient(90deg,#16a34a,#22c55e)}
 .detail-progress-label{font-size:13px;color:var(--muted)}
-
-/* Drag & Drop */
-.drag-handle{display:flex;align-items:center;cursor:grab;color:var(--border);padding:0 4px 0 0;flex-shrink:0;touch-action:none;transition:color .15s}
-.drag-handle:hover,.drag-handle.active{color:var(--muted)}
-.drag-handle:active{cursor:grabbing}
-.cat-drag-handle{display:flex;align-items:center;cursor:grab;color:var(--border);padding:2px 6px 2px 0;touch-action:none;transition:color .15s}
-.cat-drag-handle:hover{color:var(--muted)}
-.cat-drag-handle:active{cursor:grabbing}
-.dragging{opacity:.35;background:var(--accent);border-radius:8px}
-.drag-over-top{box-shadow:0 -2px 0 var(--accent)!important}
-.drag-over-bottom{box-shadow:0 2px 0 var(--accent)!important}
-/* Category blocks */
 .cat-block{margin-bottom:18px}
-.cat-header{display:flex;align-items:center;gap:6px;margin-bottom:8px}
-.cat-header h3{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);flex:1}
-.cat-del-btn{background:none;border:none;cursor:pointer;color:transparent;font-size:15px;padding:2px 5px;border-radius:6px;transition:color .15s,background .15s;line-height:1}
-.cat-header:hover .cat-del-btn{color:var(--muted)}
-.cat-del-btn:hover{color:var(--danger)!important;background:#fef2f2}
+.cat-block h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:8px}
 .cat-inner{background:var(--bg);border-radius:12px;overflow:hidden}
-.checkrow{display:flex;align-items:center;gap:10px;padding:11px 14px;border-top:1px solid var(--border);position:relative}
+.checkrow{display:flex;align-items:center;gap:12px;padding:12px 14px;border-top:1px solid var(--border)}
 .checkrow:first-child{border-top:none}
 .checkrow input[type=checkbox]{width:20px;height:20px;flex-shrink:0;cursor:pointer;accent-color:var(--accent)}
-.checkrow label{cursor:pointer;flex:1;font-size:14px;transition:color .15s;word-break:break-word}
+.checkrow label{cursor:pointer;flex:1;font-size:14px;transition:color .15s}
 .checkrow label.done{text-decoration:line-through;color:var(--muted)}
-.item-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:2px 4px;line-height:1;border-radius:5px;transition:color .15s,background .15s;flex-shrink:0;opacity:0}
-.checkrow:hover .item-del{opacity:1}
-.item-del:hover{color:var(--danger);background:#fef2f2}
-/* Touch devices: always show delete */
-@media(hover:none){.item-del{opacity:.4}}
 .inline-add{display:flex;gap:8px;align-items:center;padding:10px 14px;border-top:1px solid var(--border)}
 .inline-add input{flex:1;border:none;background:transparent;font-size:13px;color:var(--text);font-family:inherit;outline:none}
 .inline-add input::placeholder{color:var(--muted)}
-.inline-add button{background:var(--accent);color:#fff;border:none;width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s,transform .1s}
-.inline-add button:active{transform:scale(.9)}
+.inline-add button{background:var(--accent);color:#fff;border:none;width:28px;height:28px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .15s}
 .inline-add button:hover{opacity:.85}
-.empty-cat-hint{padding:14px;font-size:13px;color:var(--muted);text-align:center;font-style:italic}
-
-/* Completion banner */
-.complete-banner{
-  display:flex;align-items:center;gap:10px;
-  background:linear-gradient(135deg,rgba(34,197,94,.12),rgba(22,163,74,.08));
-  border:1px solid rgba(34,197,94,.3);border-radius:12px;
-  padding:12px 14px;margin-bottom:18px;
-  font-weight:600;font-size:14px;color:#16a34a;
-  animation:fadeIn .4s ease;
-}
-@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
-
-/* Templates */
-.tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:12px}
-.tpl-section{margin-bottom:28px}
-.tpl-section-title{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:4px;padding:0 2px}
-.tpl-section-title svg{width:14px;height:14px;flex-shrink:0}
-.tpl-section-divider{height:1px;background:var(--border);margin-bottom:12px}
+.tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:18px}
 .tpl-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:16px 18px}
 .tpl-card-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .tpl-icon{font-size:24px;line-height:1}
 .tpl-name{font-weight:600;font-size:15px}
-.tpl-desc{font-size:12px;color:var(--muted);margin-bottom:12px;min-height:16px}
+.tpl-desc{font-size:12px;color:var(--muted);margin-bottom:12px}
 .tpl-actions{display:flex;gap:6px;flex-wrap:wrap}
 #tplEditorWrap{display:none;margin-top:20px}
 #tplEditorWrap.show{display:block}
@@ -165,60 +95,44 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 .cat-editor{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px}
 .cat-editor-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .cat-editor-head h4{flex:1;font-size:14px;font-weight:600;margin:0}
-
-/* Admin */
 .user-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--border)}
 .user-row:first-child{border-top:none}
 .user-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .user-info{flex:1;min-width:0}
 .user-info .uname{font-weight:600;font-size:14px}
 .user-info .uemail{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
-/* Buttons */
 .btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:10px;padding:9px 16px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity .15s,transform .1s}
 .btn:active{transform:scale(.97)}
-.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
 .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
-.btn-primary:hover:not(:disabled){opacity:.9}
+.btn-primary:hover{opacity:.9}
 .btn-ghost{background:none;border:1px solid var(--border);color:var(--text)}
 .btn-ghost:hover{background:var(--bg)}
 .btn-danger{background:#fef2f2;border:1px solid #fca5a5;color:var(--danger)}
 .btn-danger:hover{background:#fee2e2}
 .btn-sm{padding:6px 12px;font-size:13px;border-radius:8px}
-.btn-icon{padding:7px;border-radius:9px}
-
-/* Forms */
 .form-group{margin-bottom:14px}
-.form-group label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+.form-group label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
 .form-group input,.form-group select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s}
 .form-group input:focus,.form-group select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.12)}
-
-/* Modal */
 #modalOverlay{position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s ease}
 #modalOverlay.open{opacity:1;pointer-events:all}
 .modal-box{background:var(--surface);border-radius:20px;box-shadow:var(--shadow-lg);padding:24px;width:100%;max-width:400px;transform:scale(.95) translateY(10px);transition:transform .22s ease}
 #modalOverlay.open .modal-box{transform:scale(1) translateY(0)}
-.modal-title{font-size:17px;font-weight:700;margin-bottom:4px}
+.modal-title{font-size:17px;font-weight:700;margin-bottom:6px}
 .modal-sub{font-size:14px;color:var(--muted);margin-bottom:4px}
 .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
-
-/* Toast */
-#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:#0f172a;color:#f8fafc;border-radius:12px;padding:11px 20px;font-size:14px;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,.3);z-index:300;opacity:0;transition:opacity .2s,transform .2s;white-space:nowrap;pointer-events:none;display:flex;align-items:center;gap:8px}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#0f172a;color:#f8fafc;border-radius:12px;padding:11px 20px;font-size:14px;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,.3);z-index:300;opacity:0;transition:opacity .2s,transform .2s;white-space:nowrap;pointer-events:none}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-/* Loader */
 #loader{position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:250;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
 #loader.show{opacity:1;pointer-events:all}
 .loader-box{background:var(--surface);border-radius:16px;padding:20px 28px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-lg);font-weight:600;font-size:15px}
 .spinner{width:22px;height:22px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* Login */
 #loginScreen{display:none;min-height:100dvh;align-items:center;justify-content:center;background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);padding:20px}
 #loginScreen.show{display:flex}
 .login-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:36px 32px;width:100%;max-width:380px;backdrop-filter:blur(20px)}
 .login-logo{margin-bottom:28px;text-align:center}
-.login-logo img,.login-logo svg{width:56px;height:56px;margin-bottom:12px;border-radius:14px}
+.login-logo svg{width:44px;height:44px;margin-bottom:10px}
 .login-logo h1{font-size:22px;font-weight:700;color:#f1f5f9;letter-spacing:-.4px}
 .login-logo p{font-size:13px;color:#94a3b8;margin-top:4px}
 .login-box .form-group label{color:#94a3b8}
@@ -226,79 +140,40 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 .login-box .form-group input:focus{border-color:var(--accent);background:rgba(255,255,255,.08)}
 #loginBtn{width:100%;padding:12px;font-size:15px;margin-top:4px;border-radius:12px}
 #loginMsg{text-align:center;font-size:13px;color:#ef4444;margin-top:10px;min-height:18px}
-
-/* Empty state */
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center}
 .empty-icon{font-size:48px;margin-bottom:14px;opacity:.5}
 .empty-title{font-size:16px;font-weight:600;margin-bottom:6px}
 .empty-sub{font-size:14px;color:var(--muted);margin-bottom:20px}
-
-/* Confetti canvas */
-#confetti{position:fixed;inset:0;pointer-events:none;z-index:400;opacity:0;transition:opacity .5s}
-#confetti.show{opacity:1}
-
-/* Bottom nav (mobile) */
 #bottomNav{display:none}
-
-/* Responsive */
 @media(max-width:768px){
   #sidebar{position:fixed;top:0;left:0;bottom:0;z-index:50;transform:translateX(-100%);box-shadow:var(--shadow-lg)}
   #sidebar.open{transform:translateX(0)}
   #sidebarBackdrop{display:none;position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:49}
   #sidebarBackdrop.show{display:block}
   #topbar{display:flex}
-  #main{padding-bottom:72px}
+  #main{padding-bottom:70px}
   .page-header{padding:16px 16px 0}
-  #content{padding:14px}
+  #content{padding:16px}
   #bottomNav{display:grid;grid-template-columns:repeat(3,1fr);position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--border);padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:40}
-  .bnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:500;color:var(--muted);font-family:inherit;border-radius:10px;transition:color .15s}
+  .bnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:500;color:var(--muted);font-family:inherit;border-radius:10px;transition:background .15s,color .15s}
   .bnav-item svg{width:22px;height:22px}
   .bnav-item.active{color:var(--accent)}
   .bnav-item.hidden{display:none}
   .cl-grid,.tpl-grid{grid-template-columns:1fr}
   .page-title{font-size:19px}
-  #detailPanel{width:100vw;border-left:none;border-radius:20px 20px 0 0;top:auto;height:94dvh;transform:translateY(100%)}
+  #detailPanel{width:100vw;border-left:none;border-radius:20px 20px 0 0;top:auto;height:92dvh;transform:translateY(100%)}
   #detailOverlay.open #detailPanel{transform:translateY(0)}
-  .detail-header-actions .btn-label{display:none}
-  .detail-header-actions .btn-sm{padding:7px;border-radius:9px}
-  .detail-header{gap:8px}
-  /* Drag handle on mobile */
-  #detailPanel::before{content:'';display:block;width:40px;height:4px;border-radius:99px;background:var(--border);margin:0 auto 14px;flex-shrink:0}
-  .detail-header-actions .btn-sm{padding:5px 10px;font-size:12px}
 }
 </style>
 </head>
 <body>
 
-<!-- Login -->
 <div id="loginScreen">
   <div class="login-box">
     <div class="login-logo">
-      <!-- Inline icon SVG on login screen -->
-      <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="border-radius:14px">
-        <defs>
-          <linearGradient id="lbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1e1b4b"/><stop offset="100%" stop-color="#312e81"/></linearGradient>
-          <linearGradient id="lcr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c2410c"/><stop offset="100%" stop-color="#7c2d12"/></linearGradient>
-          <linearGradient id="lac" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#818cf8"/></linearGradient>
-          <filter id="lglow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-        </defs>
-        <rect width="512" height="512" rx="112" fill="url(#lbg)"/>
-        <path d="M 60 420 Q 180 360 256 300 Q 330 240 450 260" fill="none" stroke="rgba(99,102,241,0.2)" stroke-width="28" stroke-linecap="round"/>
-        <path d="M 155 210 L 175 330 Q 178 348 200 350 L 312 350 Q 334 348 337 330 L 357 210 Z" fill="#1e1b4b" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
-        <ellipse cx="256" cy="212" rx="102" ry="18" fill="url(#lcr)" opacity="0.95"/>
-        <ellipse cx="240" cy="206" rx="52" ry="7" fill="rgba(251,191,36,0.35)"/>
-        <ellipse cx="256" cy="358" rx="120" ry="14" fill="#1e1b4b" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
-        <ellipse cx="256" cy="354" rx="108" ry="10" fill="#27244f"/>
-        <path d="M 350 255 Q 405 255 405 295 Q 405 335 350 335" fill="none" stroke="#27244f" stroke-width="18" stroke-linecap="round"/>
-        <path d="M 350 255 Q 398 255 398 295 Q 398 335 350 335" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="14" stroke-linecap="round"/>
-        <circle cx="358" cy="168" r="58" fill="url(#lac)" filter="url(#lglow)"/>
-        <circle cx="358" cy="168" r="53" fill="url(#lac)"/>
-        <polyline points="331,168 350,188 387,148" fill="none" stroke="white" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M 210 185 Q 200 165 210 145 Q 220 125 210 108" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="5" stroke-linecap="round"/>
-        <path d="M 256 180 Q 246 158 256 138 Q 266 118 256 100" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="5" stroke-linecap="round"/>
-      </svg>
+      <svg viewBox="0 0 44 44" fill="none"><rect width="44" height="44" rx="12" fill="url(#lg)"/><path d="M14 22h6m0 0 4-6 4 6M20 22v6" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="lg" x1="0" y1="0" x2="44" y2="44"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#818cf8"/></linearGradient></defs></svg>
       <h1>Checklists</h1>
-      <p>by Bejhan · Anmelden</p>
+      <p>Melde dich an, um fortzufahren</p>
     </div>
     <div class="form-group"><label>E-Mail</label><input id="loginEmail" type="email" autocomplete="email" placeholder="name@domain.ch"></div>
     <div class="form-group"><label>Passwort</label><input id="loginPw" type="password" autocomplete="current-password" placeholder="••••••••"></div>
@@ -307,41 +182,17 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
   </div>
 </div>
 
-<!-- App shell -->
 <div id="shell" style="display:none">
   <div id="sidebarBackdrop"></div>
   <aside id="sidebar">
-    <div style="display:flex;justify-content:flex-end;gap:6px;margin-bottom:12px" id="desktopActions">
-      <button id="darkToggleDesktop" title="Dark Mode" style="background:none;border:1px solid var(--border);border-radius:8px;padding:6px 8px;cursor:pointer;color:var(--muted);display:flex;align-items:center;transition:background .15s,color .15s">
-        <svg id="darkIconDesktop" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg>
-      </button>
-      <button id="logoutBtnDesktop" style="background:none;border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;font-family:inherit;transition:background .15s;white-space:nowrap">Abmelden</button>
-    </div>
     <div class="sidebar-logo">
-      <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="border-radius:7px">
-        <defs>
-          <linearGradient id="sbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1e1b4b"/><stop offset="100%" stop-color="#312e81"/></linearGradient>
-          <linearGradient id="scr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c2410c"/><stop offset="100%" stop-color="#7c2d12"/></linearGradient>
-          <linearGradient id="sac" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#818cf8"/></linearGradient>
-        </defs>
-        <rect width="512" height="512" rx="112" fill="url(#sbg)"/>
-        <path d="M 60 420 Q 180 360 256 300 Q 330 240 450 260" fill="none" stroke="rgba(99,102,241,0.2)" stroke-width="28" stroke-linecap="round"/>
-        <path d="M 155 210 L 175 330 Q 178 348 200 350 L 312 350 Q 334 348 337 330 L 357 210 Z" fill="#1e1b4b" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
-        <ellipse cx="256" cy="212" rx="102" ry="18" fill="url(#scr)" opacity="0.95"/>
-        <ellipse cx="240" cy="206" rx="52" ry="7" fill="rgba(251,191,36,0.35)"/>
-        <ellipse cx="256" cy="358" rx="120" ry="14" fill="#1e1b4b"/>
-        <ellipse cx="256" cy="354" rx="108" ry="10" fill="#27244f"/>
-        <path d="M 350 255 Q 405 255 405 295 Q 405 335 350 335" fill="none" stroke="#27244f" stroke-width="18" stroke-linecap="round"/>
-        <circle cx="358" cy="168" r="53" fill="url(#sac)"/>
-        <polyline points="331,168 350,188 387,148" fill="none" stroke="white" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M 210 185 Q 200 165 210 145 Q 220 125 210 108" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="5" stroke-linecap="round"/>
-      </svg>
+      <svg viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="8" fill="url(#slg)"/><path d="M9 14h4m0 0 3-4 3 4M13 14v4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="slg" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#818cf8"/></linearGradient></defs></svg>
       <div><span class="lname">Checklists</span><span class="lsub">by Bejhan</span></div>
     </div>
     <div class="acting-badge" id="actingBadge">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
       <span id="actingName">—</span>
-      <button id="stopActing">✕</button>
+      <button id="stopActing" title="Beenden">✕</button>
     </div>
     <nav class="snav">
       <button class="nav-item active" id="bCheck">
@@ -357,139 +208,49 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
     <div class="suser">
       <span class="uname" id="sUserName">—</span>
       <span class="uemail" id="sUserEmail">—</span>
-      <button id="changePwBtn" style="width:100%;margin-top:8px;background:none;border:1px solid var(--border);border-radius:8px;padding:7px;font-size:13px;color:var(--muted);cursor:pointer;font-family:inherit;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        Passwort ändern
-      </button>
+      <button id="logoutBtn">Abmelden</button>
     </div>
   </aside>
 
   <div id="main">
     <header id="topbar">
-      <button id="menuBtn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+      <button id="menuBtn" aria-label="Menü"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
       <span class="logo-text">Checklists</span>
-      <button id="darkToggle" title="Dark Mode" style="background:none;border:1px solid var(--border);border-radius:8px;padding:7px;cursor:pointer;color:var(--muted);display:flex;align-items:center;transition:background .15s,color .15s;flex-shrink:0">
-        <svg id="darkIcon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg>
-      </button>
-      <button id="logoutBtn" style="background:none;border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;font-family:inherit;transition:background .15s;white-space:nowrap">Abmelden</button>
     </header>
-    <div id="content">
 
-      <!-- Checklists view -->
+    <div id="content">
       <div id="vCheck">
         <div class="page-header">
-          <div><h1 class="page-title">Checklisten</h1><p class="page-sub" id="checkSub"></p></div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-            <button class="btn btn-ghost btn-sm" id="newEmptyCl">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-              Leere Checkliste
-            </button>
-            <button class="btn btn-primary btn-sm" id="newFromTplCl">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>
-              Aus Vorlage
-            </button>
-            <button class="btn btn-ghost btn-sm" id="showArchivedCl">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg>
-              Archiviert
-            </button>
-            <button class="btn btn-ghost btn-sm" id="refreshCheck">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
-            </button>
-          </div>
+          <div><h1 class="page-title">Checklisten</h1><p class="page-sub" id="checkSub">Lade…</p></div>
+          <button class="btn btn-ghost btn-sm" id="refreshCheck"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>Aktualisieren</button>
         </div>
-        <!-- User filter (admin/superadmin only) -->
-        <div id="checkUserFilter" style="display:none;margin-top:14px">
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-            <label style="font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Benutzer</label>
-            <select id="checkUserSelect" style="flex:1;min-width:200px;padding:8px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none;cursor:pointer">
-              <option value="">Meine Checklisten</option>
-            </select>
-          </div>
-        </div>
-        <div id="checkList" style="margin-top:14px"></div>
-        <!-- Archived checklists section -->
-        <div id="archivedClSection" style="display:none;margin-top:24px">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
-            <div class="tpl-section-title" style="flex:1">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg>
-              Archivierte Checklisten
-            </div>
-            <button class="btn btn-ghost btn-sm" id="closeArchivedCl">Schliessen</button>
-          </div>
-          <div class="tpl-section-divider"></div>
-          <div id="archivedClList"></div>
-        </div>
+        <div id="checkList" style="margin-top:18px"></div>
       </div>
 
-      <!-- Templates view -->
       <div id="vTpl" style="display:none">
         <div class="page-header">
-          <div><h1 class="page-title">Vorlagen</h1><p class="page-sub">Vorlagen verwalten</p></div>
+          <div><h1 class="page-title">Vorlagen</h1><p class="page-sub">Vorlagen verwalten und Checklisten erstellen</p></div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="btn btn-ghost btn-sm" id="seedMore">Standardvorlagen</button>
-            <button class="btn btn-ghost btn-sm" id="showArchivedTpl">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg>
-              Archiviert
-            </button>
-            <button class="btn btn-primary btn-sm" id="newTpl">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Neue Vorlage
-            </button>
+            <button class="btn btn-primary btn-sm" id="newTpl"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Neue Vorlage</button>
           </div>
         </div>
         <div id="tplList" style="margin-top:18px"></div>
-        <!-- Archived templates section -->
-        <div id="archivedTplSection" style="display:none;margin-top:24px">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
-            <div class="tpl-section-title" style="flex:1">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg>
-              Archivierte Vorlagen
-            </div>
-            <button class="btn btn-ghost btn-sm" id="closeArchivedTpl">Schliessen</button>
-          </div>
-          <div class="tpl-section-divider"></div>
-          <div id="archivedTplList"></div>
-        </div>
         <div id="tplEditorWrap"><div class="editor-card" id="tplEditor"></div></div>
       </div>
 
-      <!-- Admin view -->
       <div id="vAdmin" style="display:none">
-        <div class="page-header">
-          <div><h1 class="page-title">Admin</h1><p class="page-sub">Benutzer &amp; Inhalte verwalten</p></div>
-        </div>
-        <div style="margin-top:18px;display:flex;flex-direction:column;gap:16px">
-
-          <!-- New user form -->
-          <div class="editor-card">
-            <h3 style="font-size:15px;font-weight:700;margin-bottom:4px">Neuer Benutzer</h3>
-            <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Der User wird direkt angelegt und kann sich sofort einloggen.</p>
-            <div style="display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">
-              <div class="form-group"><label>Name</label><input id="newUserName" placeholder="z.B. Anna Müller"></div>
-              <div class="form-group"><label>E-Mail</label><input id="newUserEmail" type="email" placeholder="anna@firma.ch"></div>
-              <div class="form-group"><label>Initiales Passwort</label><input id="newUserPw" type="password" placeholder="Min. 6 Zeichen"></div>
-              <div class="form-group"><label>Rolle</label><select id="newUserRole"><option value="user">User</option><option value="admin">Admin</option><option value="super_admin">Super Admin</option></select></div>
-            </div>
-            <div id="adminMsg" style="font-size:13px;margin-bottom:10px;min-height:18px"></div>
-            <button class="btn btn-primary btn-sm" id="addUser">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-              Benutzer anlegen
-            </button>
+        <div class="page-header"><div><h1 class="page-title">Admin</h1><p class="page-sub">Benutzer verwalten</p></div></div>
+        <div style="margin-top:18px" class="editor-card">
+          <h3 style="font-size:15px;font-weight:700;margin-bottom:14px">Neuer Benutzer</h3>
+          <div style="display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">
+            <div class="form-group"><label>Auth UUID</label><input id="newUserId" placeholder="xxxxxxxx-xxxx-…"></div>
+            <div class="form-group"><label>E-Mail</label><input id="newUserEmail" type="email"></div>
+            <div class="form-group"><label>Name</label><input id="newUserName"></div>
+            <div class="form-group"><label>Rolle</label><select id="newUserRole"><option value="user">User</option><option value="admin">Admin</option><option value="super_admin">Super Admin</option></select></div>
           </div>
-
-          <!-- User list -->
-          <div class="editor-card">
-            <h3 style="font-size:15px;font-weight:700;margin-bottom:14px">Alle Benutzer</h3>
-            <div id="users"></div>
-          </div>
-
-          <!-- Checklists of all users -->
-          <div class="editor-card" id="adminClSection" style="display:none">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-              <h3 style="font-size:15px;font-weight:700;flex:1">Checklisten von <span id="adminClUser">—</span></h3>
-              <button class="btn btn-ghost btn-sm" id="adminClClose">Schliessen</button>
-            </div>
-            <div id="adminClList"></div>
-          </div>
+          <button class="btn btn-primary btn-sm" id="addUser">Benutzer hinzufügen</button>
+          <div id="users" style="margin-top:16px"></div>
         </div>
       </div>
     </div>
@@ -502,108 +263,23 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
   </nav>
 </div>
 
-<!-- Share Modal -->
-<div id="shareOverlay" style="position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s ease">
-  <div style="background:var(--surface);border-radius:20px;box-shadow:var(--shadow-lg);padding:24px;width:100%;max-width:420px;transform:scale(.95) translateY(10px);transition:transform .22s ease" id="shareBox">
-    <h3 style="font-size:17px;font-weight:700;margin-bottom:4px">Checkliste teilen</h3>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Dieser Link gibt read-only Zugriff — ohne Login einsehbar.</p>
-    <div style="display:flex;gap:8px;margin-bottom:14px">
-      <input id="shareUrl" readonly style="flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:13px;font-family:inherit;outline:none" value="">
-      <button class="btn btn-primary btn-sm" id="shareCopy">Kopieren</button>
-    </div>
-    <p style="font-size:12px;color:var(--muted);margin-bottom:16px">Der Link zeigt immer den aktuellen Stand der Checkliste.</p>
-    <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn btn-ghost btn-sm" id="shareClose">Schliessen</button>
-    </div>
-  </div>
-</div>
-
-<!-- Export Modal -->
-<div id="exportOverlay" style="position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s ease">
-  <div style="background:var(--surface);border-radius:20px;box-shadow:var(--shadow-lg);padding:24px;width:100%;max-width:340px;transform:scale(.95) translateY(10px);transition:transform .22s ease" id="exportBox">
-    <h3 style="font-size:17px;font-weight:700;margin-bottom:4px">Exportieren</h3>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:18px">Format wählen:</p>
-    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px">
-      <button class="btn btn-primary" id="exportPdf">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        Als PDF exportieren
-      </button>
-      <button class="btn btn-ghost" id="exportCsv">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-        Als CSV exportieren
-      </button>
-    </div>
-    <div style="display:flex;justify-content:flex-end">
-      <button class="btn btn-ghost btn-sm" id="exportClose">Schliessen</button>
-    </div>
-  </div>
-</div>
-
-<!-- Edit User Panel -->
-<div id="editUserOverlay" style="position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:150;opacity:0;pointer-events:none;transition:opacity .22s ease">
-  <div id="editUserPanel" style="position:fixed;top:0;right:0;bottom:0;width:min(420px,100vw);background:var(--surface);border-left:1px solid var(--border);box-shadow:var(--shadow-lg);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .26s cubic-bezier(.4,0,.2,1);z-index:151;overflow-y:auto;padding:24px">
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
-      <button id="editUserClose" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:6px;border-radius:8px;display:flex;transition:background .15s"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-      <h2 style="font-size:18px;font-weight:700;flex:1" id="editUserTitle">Benutzer bearbeiten</h2>
-    </div>
-    <div id="editUserBody"></div>
-  </div>
-</div>
-
-<!-- Change Password Modal (own password) -->
-<div id="changePwOverlay" style="position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s ease">
-  <div style="background:var(--surface);border-radius:20px;box-shadow:var(--shadow-lg);padding:24px;width:100%;max-width:380px;transform:scale(.95) translateY(10px);transition:transform .22s ease" id="changePwBox">
-    <h3 style="font-size:17px;font-weight:700;margin-bottom:4px">Passwort ändern</h3>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:18px">Wähle ein neues Passwort für deinen Account.</p>
-    <div class="form-group"><label>Neues Passwort</label><input id="newPw1" type="password" placeholder="Min. 6 Zeichen"></div>
-    <div class="form-group"><label>Passwort bestätigen</label><input id="newPw2" type="password" placeholder="Wiederholen"></div>
-    <div id="changePwMsg" style="font-size:13px;min-height:18px;margin-bottom:10px"></div>
-    <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn btn-ghost btn-sm" id="changePwCancel">Abbrechen</button>
-      <button class="btn btn-primary btn-sm" id="changePwConfirm">Speichern</button>
-    </div>
-  </div>
-</div>
-
-<!-- Detail Panel -->
 <div id="detailOverlay">
   <div id="detailPanel">
     <div class="detail-header">
-      <button class="detail-close" id="detailClose">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg>
-      </button>
-      <div class="detail-title-wrap">
-        <span class="detail-title" id="detailTitle" title="Klicken zum Bearbeiten">—</span>
-        <input class="detail-title-edit" id="detailTitleEdit" type="text">
-      </div>
-      <div class="detail-header-actions">
-        <button class="btn btn-ghost btn-sm" id="detailAddCat" title="Neue Kategorie">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg><span class="btn-label">Kategorie</span>
-        </button>
-        <button class="btn btn-ghost btn-sm" id="detailExport" title="Exportieren">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          <span class="btn-label">Export</span>
-        </button>
-        <button class="btn btn-ghost btn-sm" id="detailShare" title="Teilen">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-          <span class="btn-label">Teilen</span>
-        </button>
-        <button class="btn btn-danger btn-sm" id="detailArchive"><span class="btn-label">Archivieren</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg></button>
-      </div>
+      <button class="detail-close" id="detailClose"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      <span class="detail-title" id="detailTitle">—</span>
+      <button class="btn btn-ghost btn-sm" id="detailAddCat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Kategorie</button>
+      <button class="btn btn-danger btn-sm" id="detailArchive">Archivieren</button>
     </div>
     <div class="detail-body" id="detailBody"></div>
   </div>
 </div>
 
-<!-- Modal -->
 <div id="modalOverlay">
   <div class="modal-box">
     <div class="modal-title" id="modalTitle"></div>
     <div class="modal-sub" id="modalSub"></div>
-    <div class="form-group" id="modalInputWrap" style="display:none">
-      <label id="modalInputLabel">Wert</label>
-      <input id="modalInput" type="text">
-    </div>
+    <div class="form-group" id="modalInputWrap" style="display:none"><label id="modalInputLabel">Wert</label><input id="modalInput" type="text"></div>
     <div class="modal-actions">
       <button class="btn btn-ghost btn-sm" id="modalCancel">Abbrechen</button>
       <button class="btn btn-primary btn-sm" id="modalConfirm">OK</button>
@@ -611,11 +287,9 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
   </div>
 </div>
 
-<!-- Confetti canvas -->
-<canvas id="confetti"></canvas>
-
 <div id="toast"></div>
 <div id="loader"><div class="loader-box"><div class="spinner"></div><span id="loaderText">Lade…</span></div></div>
+
 
 <script>
 const SUPABASE_URL="https://hcxqhyswdaycfnxivhnm.supabase.co";
@@ -624,83 +298,33 @@ let sb,user,orgId,isSuper=false,actingAs=null,currentTpl=null,currentChecklistId
 const $=id=>document.getElementById(id),q=t=>document.createElement(t);
 
 /* ── Toast ── */
-function toast(msg,dur=2400){
-  const el=$("toast");el.innerHTML=msg;el.classList.add("show");
-  clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),dur);
-}
+function toast(msg,dur=2200){const el=$("toast");el.textContent=msg;el.classList.add("show");clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),dur)}
 
-/* ── Loader ── */
+/* ── Loader: only for non-modal ops ── */
 function loading(on,txt="Lade…"){$("loaderText").textContent=txt;$("loader").classList.toggle("show",on)}
 
-/* ── Modal ── */
+/* ── Modal (replaces prompt/confirm — never wrap in loading()) ── */
 function showModal({title,sub="",input=null,danger=false,confirmLabel="OK"}){
   return new Promise(resolve=>{
     $("modalTitle").textContent=title;$("modalSub").textContent=sub;
     const wrap=$("modalInputWrap");
-    if(input){wrap.style.display="";$("modalInputLabel").textContent=input.label||"";$("modalInput").value=input.value||"";$("modalInput").placeholder=input.placeholder||"";setTimeout(()=>$("modalInput").focus(),80)}
+    if(input){wrap.style.display="";$("modalInputLabel").textContent=input.label||"";$("modalInput").value=input.value||"";$("modalInput").placeholder=input.placeholder||"";setTimeout(()=>$("modalInput").focus(),100)}
     else{wrap.style.display="none"}
     $("modalConfirm").textContent=confirmLabel;
     $("modalConfirm").className="btn btn-sm "+(danger?"btn-danger":"btn-primary");
     $("modalOverlay").classList.add("open");
-    const close=val=>{$("modalOverlay").classList.remove("open");$("modalConfirm").onclick=null;$("modalCancel").onclick=null;$("modalInput").onkeydown=null;resolve(val)};
+    const close=val=>{$("modalOverlay").classList.remove("open");$("modalConfirm").onclick=null;$("modalCancel").onclick=null;resolve(val)};
     $("modalConfirm").onclick=()=>close(input?$("modalInput").value.trim():true);
     $("modalCancel").onclick=()=>close(null);
-    $("modalInput").onkeydown=e=>{if(e.key==="Enter")close(input?$("modalInput").value.trim():true);if(e.key==="Escape")close(null)};
+    $("modalInput").onkeydown=e=>{if(e.key==="Enter")close(input?$("modalInput").value.trim():true)};
   })
 }
 
-/* ── Escape key closes panel/modal ── */
-document.addEventListener("keydown",e=>{
-  if(e.key==="Escape"){
-    if($("modalOverlay").classList.contains("open")){$("modalOverlay").classList.remove("open");return}
-    if($("detailOverlay").classList.contains("open")){closeDetailPanel();return}
-  }
-});
-
 /* ── Progress ring ── */
-function ringSVG(pct){
+function ringSVG(pct,size=52){
   const r=20,c=2*Math.PI*r,offset=c-(pct/100)*c;
   const color=pct===100?"#22c55e":"#6366f1";
-  const track=pct===100?"rgba(34,197,94,.2)":"#e2e8f0";
-  return `<svg width="52" height="52" viewBox="0 0 48 48"><circle cx="24" cy="24" r="${r}" fill="none" stroke="${track}" stroke-width="4"/><circle cx="24" cy="24" r="${r}" fill="none" stroke="${color}" stroke-width="4" stroke-dasharray="${c.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}" stroke-linecap="round" transform="rotate(-90 24 24)"/><text x="24" y="28" text-anchor="middle" font-size="11" font-weight="700" fill="${color}" font-family="Inter,sans-serif">${pct}%</text></svg>`
-}
-
-/* ── Confetti ── */
-function celebrate(){
-  const canvas=$("confetti");canvas.classList.add("show");
-  const ctx=canvas.getContext("2d");
-  canvas.width=window.innerWidth;canvas.height=window.innerHeight;
-  const colors=["#6366f1","#818cf8","#22c55e","#f59e0b","#ec4899","#06b6d4"];
-  const pieces=Array.from({length:80},()=>({
-    x:Math.random()*canvas.width,y:-20,
-    vx:(Math.random()-.5)*4,vy:Math.random()*4+2,
-    r:Math.random()*6+3,color:colors[Math.floor(Math.random()*colors.length)],
-    angle:Math.random()*360,va:(Math.random()-.5)*8,life:1
-  }));
-  let frame=0;
-  function draw(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    pieces.forEach(p=>{
-      p.x+=p.vx;p.y+=p.vy;p.angle+=p.va;p.life-=.012;
-      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.angle*Math.PI/180);
-      ctx.globalAlpha=Math.max(0,p.life);ctx.fillStyle=p.color;
-      ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r);ctx.restore();
-    });
-    frame++;if(frame<120)requestAnimationFrame(draw);
-    else{canvas.classList.remove("show");ctx.clearRect(0,0,canvas.width,canvas.height)}
-  }
-  draw();
-}
-
-/* ── XSS helpers ── */
-function escHtml(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
-function escAttr(s){return String(s).replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
-
-/* ── Format date ── */
-function fmtDate(iso){
-  if(!iso)return"";
-  const d=new Date(iso);
-  return d.toLocaleDateString("de-CH",{day:"2-digit",month:"2-digit",year:"2-digit"});
+  return `<svg width="${size}" height="${size}" viewBox="0 0 48 48"><circle cx="24" cy="24" r="${r}" fill="none" stroke="#e2e8f0" stroke-width="4"/><circle cx="24" cy="24" r="${r}" fill="none" stroke="${color}" stroke-width="4" stroke-dasharray="${c.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}" stroke-linecap="round" transform="rotate(-90 24 24)"/><text x="24" y="28" text-anchor="middle" font-size="11" font-weight="700" fill="${color}" font-family="Inter,sans-serif">${pct}%</text></svg>`
 }
 
 /* ── Navigation ── */
@@ -713,44 +337,24 @@ function show(v){
   closeSidebar();
   if(v==="Admin")loadUsers();
 }
+
+/* ── Sidebar (mobile) ── */
 function openSidebar(){$("sidebar").classList.add("open");$("sidebarBackdrop").classList.add("show")}
 function closeSidebar(){$("sidebar").classList.remove("open");$("sidebarBackdrop").classList.remove("show")}
 
-/* ── Detail panel ── */
+/* ── Detail Panel ── */
 function openDetailPanel(id){
   currentChecklistId=id;panelDirty=false;
   $("detailOverlay").classList.add("open");
   document.body.style.overflow="hidden";
-  // Reset title edit state
-  $("detailTitle").classList.remove("editing");$("detailTitleEdit").classList.remove("active");
   loadDetailPanel(id);
 }
 function closeDetailPanel(){
   $("detailOverlay").classList.remove("open");
   document.body.style.overflow="";
+  // Only reload list if something actually changed in the panel
   if(panelDirty)loadChecklists();
   panelDirty=false;
-}
-
-/* ── Inline title editing ── */
-function initTitleEdit(id,currentTitle){
-  const titleEl=$("detailTitle"),editEl=$("detailTitleEdit");
-  titleEl.onclick=()=>{
-    editEl.value=currentTitle;
-    titleEl.classList.add("editing");editEl.classList.add("active");
-    editEl.focus();editEl.select();
-  };
-  const saveTitle=async()=>{
-    const val=editEl.value.trim();
-    titleEl.classList.remove("editing");editEl.classList.remove("active");
-    if(!val||val===currentTitle)return;
-    await sb.from("checklists").update({title:val,updated_by:user.id}).eq("id",id);
-    currentTitle=val;
-    titleEl.textContent=val;
-    panelDirty=true;toast("Titel gespeichert");
-  };
-  editEl.onblur=saveTitle;
-  editEl.onkeydown=e=>{if(e.key==="Enter")saveTitle();if(e.key==="Escape"){titleEl.classList.remove("editing");editEl.classList.remove("active")}};
 }
 
 function owner(){return actingAs||user.id}
@@ -762,21 +366,8 @@ function setActing(id,name){
 }
 
 /* ── Auth ── */
-function initClient(){sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}})}
-
-/* ── Dark mode ── */
-const MOON_ICON=`<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;
-const SUN_ICON=`<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>`;
-
-function applyDark(on){
-  document.documentElement.classList.toggle("dark",!!on);
-  [$("darkIcon"),$("darkIconDesktop")].forEach(el=>{if(el)el.innerHTML=on?SUN_ICON:MOON_ICON});
-}
-
-async function toggleDark(){
-  const isDark=document.documentElement.classList.contains("dark");
-  applyDark(!isDark);
-  await sb.from("profiles").update({dark_mode:!isDark}).eq("id",user.id);
+function initClient(){
+  sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 }
 
 async function doLogin(){
@@ -785,13 +376,19 @@ async function doLogin(){
   const{error}=await sb.auth.signInWithPassword({email,password:pw});
   $("loginBtn").textContent="Anmelden";$("loginBtn").disabled=false;
   if(error){$("loginMsg").textContent=error.message;return}
-  $("loginMsg").textContent="";await loadApp();
+  $("loginMsg").textContent="";
+  await loadApp();
 }
-async function doLogout(){await sb.auth.signOut();$("shell").style.display="none";$("loginScreen").classList.add("show");toast("Abgemeldet")}
+
+async function doLogout(){
+  await sb.auth.signOut();
+  $("shell").style.display="none";$("loginScreen").classList.add("show");
+  toast("Abgemeldet");
+}
+
 async function checkSession(){
   const{data}=await sb.auth.getSession();
-  if(data.session)await loadApp();
-  else $("loginScreen").classList.add("show");
+  if(data.session)await loadApp();else $("loginScreen").classList.add("show");
 }
 
 async function loadApp(){
@@ -802,72 +399,48 @@ async function loadApp(){
     const p=await sb.from("profiles").select("*").eq("id",user.id).single();
     $("sUserName").textContent=p.data?.display_name||user.email;
     $("sUserEmail").textContent=user.email;
-    // Apply dark mode from profile (default: off)
-    applyDark(p.data?.dark_mode===true);
     const m=await sb.from("organization_members").select("organization_id,role").eq("user_id",user.id);
     orgId=m.data?.[0]?.organization_id;
     isSuper=(m.data||[]).some(x=>x.role==="super_admin");
     [$("bAdmin"),$("bbAdmin")].forEach(el=>{if(el)el.classList.toggle("hidden",!isSuper)});
     await Promise.all([loadTemplates(),loadChecklists()]);
-    // Init user filter for admins
-    if(isSuper){
-      const filter=$("checkUserFilter");
-      const sel=$("checkUserSelect");
-      filter.style.display="";
-      const users=await getAllUsers();
-      // Add "All users" option
-      sel.innerHTML=`<option value="">Alle Checklisten</option><option value="${user.id}" selected>Meine Checklisten</option>`
-        +users.filter(u=>u.id!==user.id).map(u=>`<option value="${u.id}">${escHtml(u.display_name||u.email)}</option>`).join("");
-      sel.onchange=()=>{
-        const uid=sel.value;
-        if(!uid){setActing(null,"");return}
-        if(uid===user.id){setActing(null,"");return}
-        const u=users.find(u=>u.id===uid);
-        setActing(uid,u?.display_name||u?.email||"");
-      };
-    }
   }finally{loading(false)}
 }
 
 /* ── Checklists ── */
 async function loadChecklists(){
   const box=$("checkList");
-  box.innerHTML=`<div style="display:flex;justify-content:center;padding:48px"><div class="spinner"></div></div>`;
+  box.innerHTML=`<div style="display:flex;justify-content:center;padding:40px"><div class="spinner"></div></div>`;
   const{data,error}=await sb.from("checklists").select("*").is("deleted_at",null).order("created_at",{ascending:false});
   if(error){box.textContent=error.message;return}
-  const count=data?.length||0;
-  $("checkSub").textContent=count?`${count} Checklist${count!==1?"en":""}`:""
-  if(!count){
+  $("checkSub").textContent=data?.length?`${data.length} Checklist${data.length!==1?"en":""}`:""
+  if(!data?.length){
     box.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Noch keine Checklisten</div><div class="empty-sub">Erstelle eine Checkliste aus einer Vorlage.</div><button class="btn btn-primary" id="goTpl">Zu den Vorlagen</button></div>`;
     $("goTpl").onclick=()=>show("Tpl");return;
   }
-  // One query for all categories, one for all items
-  const clIds=data.map(cl=>cl.id);
-  const allCats=await sb.from("checklist_categories").select("id,checklist_id").in("checklist_id",clIds);
-  const catIds=(allCats.data||[]).map(c=>c.id);
-  const allItems=catIds.length?await sb.from("checklist_items").select("category_id,is_checked").in("category_id",catIds):{data:[]};
-  const catToCl={};(allCats.data||[]).forEach(c=>catToCl[c.id]=c.checklist_id);
-  const prog={};clIds.forEach(id=>prog[id]={done:0,total:0});
-  (allItems.data||[]).forEach(it=>{const cl=catToCl[it.category_id];if(!cl)return;prog[cl].total++;if(it.is_checked)prog[cl].done++});
+
+  // Fetch all items in one query instead of N*2 queries
+  const allCatIds=[];
+  const checklistIds=(data||[]).map(cl=>cl.id);
+  const allCats=await sb.from("checklist_categories").select("id,checklist_id").in("checklist_id",checklistIds);
+  (allCats.data||[]).forEach(c=>allCatIds.push(c.id));
+  const allItems=allCatIds.length?await sb.from("checklist_items").select("category_id,is_checked").in("category_id",allCatIds):{data:[]};
+
+  // Build progress map
+  const catToChecklist={};(allCats.data||[]).forEach(c=>catToChecklist[c.id]=c.checklist_id);
+  const progressMap={};checklistIds.forEach(id=>progressMap[id]={done:0,total:0});
+  (allItems.data||[]).forEach(it=>{
+    const clId=catToChecklist[it.category_id];if(!clId)return;
+    progressMap[clId].total++;
+    if(it.is_checked)progressMap[clId].done++;
+  });
 
   const grid=q("div");grid.className="cl-grid";
   (data||[]).forEach(cl=>{
-    const{done,total}=prog[cl.id]||{done:0,total:0};
+    const{done,total}=progressMap[cl.id]||{done:0,total:0};
     const pct=total?Math.round(done/total*100):0;
-    const isComplete=total>0&&pct===100;
-    const card=q("div");card.className="cl-card"+(isComplete?" done-card":"");
-    card.innerHTML=`
-      <div class="cl-ring">${ringSVG(pct)}</div>
-      <div class="cl-body">
-        <div class="cl-title">${cl.icon||"📋"} ${escHtml(cl.title)}</div>
-        <div class="cl-desc">${escHtml(cl.description||"Keine Beschreibung")}</div>
-        <div class="cl-meta">
-          <span>${done}/${total} erledigt</span>
-          ${isComplete?'<span class="cl-done-badge"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg>Fertig</span>':''}
-          <span class="cl-date">${fmtDate(cl.created_at)}</span>
-        </div>
-        <div class="cl-actions"><button class="btn-dup">Duplizieren</button><button class="btn-arch">Archivieren</button></div>
-      </div>`;
+    const card=q("div");card.className="cl-card";
+    card.innerHTML=`<div class="cl-ring">${ringSVG(pct)}</div><div class="cl-body"><div class="cl-title">${cl.icon||"📋"} ${escHtml(cl.title)}</div><div class="cl-desc">${escHtml(cl.description||"Keine Beschreibung")}</div><div class="cl-meta">${done}/${total} erledigt</div><div class="cl-actions"><button class="btn-dup">Duplizieren</button><button class="btn-arch">Archivieren</button></div></div>`;
     card.querySelector(".btn-dup").onclick=e=>{e.stopPropagation();duplicateChecklist(cl.id)};
     card.querySelector(".btn-arch").onclick=e=>{e.stopPropagation();archiveChecklist(cl.id)};
     card.onclick=()=>openDetailPanel(cl.id);
@@ -879,271 +452,135 @@ async function loadChecklists(){
 /* ── Detail panel ── */
 async function loadDetailPanel(id){
   const body=$("detailBody");
-  body.innerHTML=`<div style="display:flex;justify-content:center;padding:48px"><div class="spinner"></div></div>`;
+  body.innerHTML=`<div style="display:flex;justify-content:center;padding:40px"><div class="spinner"></div></div>`;
   const[clRes,catsRes]=await Promise.all([
     sb.from("checklists").select("*").eq("id",id).single(),
     sb.from("checklist_categories").select("*").eq("checklist_id",id).order("sort_order")
   ]);
-  const cl=clRes.data;
-  $("detailTitle").textContent=`${cl.icon||"📋"} ${cl.title}`;
-  $("detailTitle").title="Titel klicken zum Bearbeiten";
+  $("detailTitle").textContent=`${clRes.data.icon||"📋"} ${clRes.data.title}`;
   $("detailArchive").onclick=()=>archiveChecklist(id,true);
-  initTitleEdit(id,cl.title);
 
+  // Fetch all items for all categories in one query
   const catIds=(catsRes.data||[]).map(c=>c.id);
   const itemsRes=catIds.length?await sb.from("checklist_items").select("*").in("category_id",catIds).order("sort_order"):{data:[]};
-  const itemsByCat={};(itemsRes.data||[]).forEach(it=>{(itemsByCat[it.category_id]=itemsByCat[it.category_id]||[]).push(it)});
+  const itemsByCat={};
+  (itemsRes.data||[]).forEach(it=>{(itemsByCat[it.category_id]=itemsByCat[it.category_id]||[]).push(it)});
+
   let total=0,done=0;
   (itemsRes.data||[]).forEach(it=>{total++;if(it.is_checked)done++});
   const pct=total?Math.round(done/total*100):0;
-  const wasComplete=pct===100;
 
-  function buildProgress(dn,tot){
-    const p=tot?Math.round(dn/tot*100):0;
-    const complete=p===100&&tot>0;
-    return `<div class="progress-wrap">
-      ${complete?`<div class="complete-banner"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l5 5L20 7"/></svg>Alle Punkte erledigt – super!</div>`:""}
-      <div class="detail-progress-bar"><div class="bar${complete?' complete':''}" style="width:${p}%"></div></div>
-      <div class="detail-progress-label">${dn} von ${tot} erledigt · ${p}%</div>
-    </div>`;
-  }
+  body.innerHTML=`<div style="margin-bottom:18px"><div class="detail-progress-bar"><div class="bar" style="width:${pct}%"></div></div><div class="detail-progress-label">${done} von ${total} erledigt · ${pct}%</div></div>`;
 
-  body.innerHTML=buildProgress(done,total);
-
+  // Helper to update progress bar without reloading
   function refreshProgress(){
     const allCbs=body.querySelectorAll('input[type=checkbox]');
     const tot=allCbs.length,dn=[...allCbs].filter(c=>c.checked).length;
-    const nowComplete=dn===tot&&tot>0;
-    body.querySelector(".progress-wrap").outerHTML=buildProgress(dn,tot);
-    // Re-insert since outerHTML replaced it
-    body.insertAdjacentHTML("afterbegin",buildProgress(dn,tot));
-    body.querySelector(".progress-wrap+.progress-wrap")?.remove();
-    if(nowComplete&&!wasComplete)celebrate();
+    const p=tot?Math.round(dn/tot*100):0;
+    body.querySelector(".bar").style.width=p+"%";
+    body.querySelector(".detail-progress-label").textContent=`${dn} von ${tot} erledigt · ${p}%`;
   }
 
-  if(!catsRes.data?.length){
-    body.innerHTML+=`<div class="empty-cat-hint">Noch keine Kategorien. Klicke oben auf „+ Kategorie", um loszulegen.</div>`;
-    return;
-  }
-
-  const catContainer=q("div");catContainer.id="cat-container-"+id;
-  for(const cat of catsRes.data){
-    const block=q("div");block.className="cat-block";block.dataset.catId=cat.id;
-    const catHead=q("div");catHead.className="cat-header";
-
-    // Category drag handle
-    const catHandle=q("div");catHandle.className="cat-drag-handle";catHandle.title="Kategorie ziehen zum Sortieren";
-    catHandle.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>`;
-
-    const catTitle=q("h3");catTitle.textContent=cat.title;
-    const catDel=q("button");catDel.className="cat-del-btn";catDel.textContent="×";catDel.title="Kategorie löschen";
+  for(const cat of catsRes.data||[]){
+    const block=q("div");block.className="cat-block";
+    const catHead=q("div");catHead.style.cssText="display:flex;align-items:center;gap:8px;margin-bottom:8px";
+    const catTitle=q("h3");catTitle.textContent=cat.title;catTitle.style.cssText="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);flex:1";
+    const catDel=q("button");catDel.className="btn btn-ghost btn-sm";catDel.style.cssText="padding:3px 8px;font-size:12px;color:var(--muted)";catDel.textContent="×";
     catDel.onclick=async()=>{
-      const ok=await showModal({title:`Kategorie löschen?`,sub:`"${cat.title}" und alle Einträge darin werden gelöscht.`,confirmLabel:"Löschen",danger:true});
-      if(!ok)return;loading(true,"Lösche…");
+      const ok=await showModal({title:`Kategorie "${cat.title}" löschen?`,sub:"Alle Einträge dieser Kategorie werden gelöscht.",confirmLabel:"Löschen",danger:true});
+      if(!ok)return;
+      loading(true,"Lösche…");
       await sb.from("checklist_items").delete().eq("category_id",cat.id);
       await sb.from("checklist_categories").delete().eq("id",cat.id);
       loading(false);toast("Kategorie gelöscht");panelDirty=true;loadDetailPanel(id);
     };
-    catHead.append(catHandle,catTitle,catDel);block.appendChild(catHead);
-    attachCatDrag(catHandle,block,catContainer,id);
+    catHead.append(catTitle,catDel);block.appendChild(catHead);
 
     const inner=q("div");inner.className="cat-inner";
     const items=itemsByCat[cat.id]||[];
-
     items.forEach(it=>{
-      inner.appendChild(makeCheckrow(it,id,inner,refreshProgress));
+      const row=q("div");row.className="checkrow";
+      const cb=q("input");cb.type="checkbox";cb.checked=it.is_checked;cb.id="cb-"+it.id;
+      const lbl=q("label");lbl.htmlFor="cb-"+it.id;lbl.textContent=it.title;
+      if(it.is_checked)lbl.classList.add("done");
+      // Delete button per item
+      const delBtn=q("button");delBtn.className="item-del";delBtn.innerHTML="×";delBtn.title="Eintrag löschen";
+      delBtn.onclick=async(e)=>{
+        e.stopPropagation();
+        const ok=await showModal({title:`"${it.title}" löschen?`,confirmLabel:"Löschen",danger:true});
+        if(!ok)return;
+        loading(true,"Lösche…");
+        await sb.from("checklist_items").delete().eq("id",it.id);
+        loading(false);toast("Eintrag gelöscht");panelDirty=true;row.remove();refreshProgress();
+      };
+      cb.onchange=async()=>{
+        lbl.classList.toggle("done",cb.checked);
+        await sb.from("checklist_items").update({is_checked:cb.checked,checked_at:cb.checked?new Date().toISOString():null,checked_by:cb.checked?user.id:null}).eq("id",it.id);
+        toast(cb.checked?"✓ Erledigt":"Zurückgesetzt");
+        panelDirty=true;
+        refreshProgress();
+      };
+      row.append(cb,lbl,delBtn);inner.appendChild(row);
     });
-
     const addRow=q("div");addRow.className="inline-add";
     const inp=q("input");inp.placeholder="Neuer Eintrag…";
-    const plusBtn=q("button");plusBtn.innerHTML=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><path d="M12 5v14M5 12h14"/></svg>`;
+    const plusBtn=q("button");plusBtn.innerHTML="+";
     const doAdd=async()=>{
       const title=inp.value.trim();if(!title)return;
-      plusBtn.disabled=true;
       loading(true,"Speichere…");
       const res=await sb.from("checklist_items").insert({category_id:cat.id,title,sort_order:Date.now()%100000,is_checked:false}).select().single();
-      loading(false);plusBtn.disabled=false;
-      if(res.error){alert(res.error.message);return}
+      loading(false);if(res.error){alert(res.error.message);return}
       inp.value="";toast("Eintrag hinzugefügt");panelDirty=true;
-      inner.insertBefore(makeCheckrow(res.data,id,inner,refreshProgress),addRow);
-      refreshProgress();inp.focus();
+      // Add row inline without full reload
+      const newIt=res.data;
+      const newRow=q("div");newRow.className="checkrow";
+      const ncb=q("input");ncb.type="checkbox";ncb.id="cb-"+newIt.id;
+      const nlbl=q("label");nlbl.htmlFor="cb-"+newIt.id;nlbl.textContent=newIt.title;
+      const nDel=q("button");nDel.className="item-del";nDel.innerHTML="×";nDel.title="Eintrag löschen";
+      nDel.onclick=async(e)=>{
+        e.stopPropagation();
+        const ok=await showModal({title:`"${newIt.title}" löschen?`,confirmLabel:"Löschen",danger:true});
+        if(!ok)return;
+        loading(true,"Lösche…");await sb.from("checklist_items").delete().eq("id",newIt.id);loading(false);toast("Eintrag gelöscht");panelDirty=true;newRow.remove();refreshProgress();
+      };
+      ncb.onchange=async()=>{
+        nlbl.classList.toggle("done",ncb.checked);
+        await sb.from("checklist_items").update({is_checked:ncb.checked,checked_at:ncb.checked?new Date().toISOString():null,checked_by:ncb.checked?user.id:null}).eq("id",newIt.id);
+        toast(ncb.checked?"✓ Erledigt":"Zurückgesetzt");panelDirty=true;refreshProgress();
+      };
+      newRow.append(ncb,nlbl,nDel);inner.insertBefore(newRow,addRow);refreshProgress();
     };
     plusBtn.onclick=doAdd;inp.onkeydown=e=>{if(e.key==="Enter")doAdd()};
     addRow.append(inp,plusBtn);inner.appendChild(addRow);
-    block.appendChild(inner);catContainer.appendChild(block);
+    block.appendChild(inner);body.appendChild(block);
   }
-  body.appendChild(catContainer);
-}
-
-function attachCatDrag(handle,block,container,checklistId){
-  _pointerDrag(handle,block,container,{
-    selector:".cat-block",
-    labelFn:el=>el.querySelector("h3")?.textContent||"",
-    onDone:(c)=>saveCatOrder(c,checklistId)
-  });
-}
-
-async function saveCatOrder(container,checklistId){
-  const blocks=[...container.querySelectorAll(".cat-block[data-cat-id]")];
-  await Promise.all(blocks.map((b,i)=>sb.from("checklist_categories").update({sort_order:(i+1)*10}).eq("id",b.dataset.catId)));
-  panelDirty=true;
-}
-
-function makeCheckrow(it,checklistId,container,refreshProgress){
-  const row=q("div");row.className="checkrow";row.dataset.id=it.id;
-
-  // Drag handle
-  const handle=q("div");handle.className="drag-handle";handle.title="Ziehen zum Sortieren";
-  handle.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>`;
-
-  const cb=q("input");cb.type="checkbox";cb.checked=it.is_checked;cb.id="cb-"+it.id;
-  const lbl=q("label");lbl.htmlFor="cb-"+it.id;lbl.textContent=it.title;
-  if(it.is_checked)lbl.classList.add("done");
-  const delBtn=q("button");delBtn.className="item-del";delBtn.innerHTML="×";delBtn.title="Löschen";
-  delBtn.onclick=async e=>{
-    e.stopPropagation();
-    const ok=await showModal({title:`Eintrag löschen?`,sub:`"${it.title}"`,confirmLabel:"Löschen",danger:true});
-    if(!ok)return;
-    loading(true,"Lösche…");await sb.from("checklist_items").delete().eq("id",it.id);loading(false);
-    toast("Eintrag gelöscht");panelDirty=true;row.remove();refreshProgress();
-  };
-  cb.onchange=async()=>{
-    lbl.classList.toggle("done",cb.checked);
-    await sb.from("checklist_items").update({is_checked:cb.checked,checked_at:cb.checked?new Date().toISOString():null,checked_by:cb.checked?user.id:null}).eq("id",it.id);
-    toast(cb.checked?"✓ Erledigt":"↩ Zurückgesetzt");panelDirty=true;refreshProgress();
-  };
-  row.append(handle,cb,lbl,delBtn);
-
-  // Attach drag behaviour
-  attachItemDrag(handle,row,container);
-  return row;
-}
-
-/* ── Drag & Drop via Pointer Events (no HTML5 drag API) ── */
-let _drag=null; // global drag state
-
-function _pointerDrag(handle, el, container, {
-  selector,        // CSS selector to find siblings
-  labelFn,         // fn(el) → display text for ghost
-  onDone           // fn(container) → called after drop to save order
-}){
-  let pressTimer=null;
-
-  handle.style.touchAction="none";
-
-  handle.addEventListener("pointerdown", e=>{
-    // Only primary button / single touch
-    if(e.button!==0&&e.pointerType==="mouse")return;
-    pressTimer=setTimeout(()=>startDrag(e), e.pointerType==="touch"?400:0);
-    if(e.pointerType!=="touch") startDrag(e); // immediate on mouse
-    else{
-      // wait for longpress; cancel on move
-      const cancelOnMove=()=>{clearTimeout(pressTimer);handle.removeEventListener("pointermove",cancelOnMove)};
-      handle.addEventListener("pointermove",cancelOnMove,{once:true,passive:true});
-    }
-  });
-
-  function startDrag(e){
-    clearTimeout(pressTimer);
-    if(_drag)return;
-    navigator.vibrate&&navigator.vibrate(40);
-    handle.setPointerCapture(e.pointerId);
-
-    // Build ghost from element clone
-    const rect=el.getBoundingClientRect();
-    const ghost=el.cloneNode(true);
-    ghost.style.cssText=`position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;opacity:.85;pointer-events:none;z-index:9999;background:var(--surface);border-radius:10px;box-shadow:var(--shadow-lg);transition:none`;
-    document.body.appendChild(ghost);
-
-    el.classList.add("dragging");
-    _drag={el,container,ghost,offsetX:e.clientX-rect.left,offsetY:e.clientY-rect.top,selector,onDone,lastTarget:null};
-
-    handle.addEventListener("pointermove",onMove);
-    handle.addEventListener("pointerup",onUp,{once:true});
-    handle.addEventListener("pointercancel",onUp,{once:true});
-  }
-
-  function onMove(e){
-    if(!_drag)return;
-    const{ghost,el,container,offsetX,offsetY,selector}=_drag;
-    const x=e.clientX-offsetX, y=e.clientY-offsetY;
-    ghost.style.left=x+"px";
-    ghost.style.top=y+"px";
-
-    // Find target sibling
-    ghost.style.display="none";
-    const under=document.elementFromPoint(e.clientX,e.clientY);
-    ghost.style.display="";
-    const target=under?.closest(selector);
-    clearIndicators(container,selector);
-    if(target&&target!==el&&target.parentNode===container){
-      const r=target.getBoundingClientRect();
-      const above=e.clientY<r.top+r.height/2;
-      target.classList.add(above?"drag-over-top":"drag-over-bottom");
-      _drag.lastTarget={target,above};
-    } else {
-      _drag.lastTarget=null;
-    }
-  }
-
-  function onUp(){
-    if(!_drag)return;
-    handle.removeEventListener("pointermove",onMove);
-    const{el,container,ghost,lastTarget,onDone}=_drag;
-    ghost.remove();
-    el.classList.remove("dragging");
-    clearIndicators(container,selector);
-    if(lastTarget){
-      const{target,above}=lastTarget;
-      if(above) container.insertBefore(el,target);
-      else target.after(el);
-    }
-    _drag=null;
-    onDone(container);
-  }
-}
-
-function clearIndicators(container,selector){
-  container.querySelectorAll(selector).forEach(el=>{
-    el.classList.remove("drag-over-top","drag-over-bottom");
-  });
-}
-
-function attachItemDrag(handle,row,container){
-  _pointerDrag(handle,row,container,{
-    selector:".checkrow",
-    labelFn:el=>el.querySelector("label")?.textContent||"",
-    onDone:saveItemOrder
-  });
-}
-
-async function saveItemOrder(container){
-  const rows=[...container.querySelectorAll(".checkrow[data-id]")];
-  await Promise.all(rows.map((r,i)=>sb.from("checklist_items").update({sort_order:(i+1)*10}).eq("id",r.dataset.id)));
-  panelDirty=true;
 }
 
 async function addChecklistCategory(){
   if(!currentChecklistId)return;
-  const title=await showModal({title:"Neue Kategorie",input:{label:"Name",placeholder:"z.B. Dokumente"}});
-  if(!title)return;loading(true,"Speichere…");
+  const title=await showModal({title:"Neue Kategorie",input:{label:"Name",placeholder:"z.B. Ausrüstung"}});
+  if(!title)return;
+  loading(true,"Speichere…");
   await sb.from("checklist_categories").insert({checklist_id:currentChecklistId,title,sort_order:Date.now()%100000});
   loading(false);toast("Kategorie hinzugefügt");panelDirty=true;loadDetailPanel(currentChecklistId);
 }
 
 async function archiveChecklist(id,fromPanel=false){
-  const ok=await showModal({title:"Archivieren?",sub:"Die Checkliste wird ausgeblendet.",confirmLabel:"Archivieren",danger:true});
-  if(!ok)return;loading(true,"Archiviere…");
+  const ok=await showModal({title:"Archivieren?",sub:"Die Checkliste wird archiviert und ausgeblendet.",confirmLabel:"Archivieren",danger:true});
+  if(!ok)return;
+  loading(true,"Archiviere…");
   await sb.from("checklists").update({archived:true,deleted_at:new Date().toISOString(),deleted_by:user.id}).eq("id",id);
   loading(false);toast("Archiviert");
   if(fromPanel){panelDirty=true;closeDetailPanel()}else loadChecklists();
 }
 
 async function duplicateChecklist(id){
+  // No run() wrapper — contains modal, must stay outside loader
   const c=await sb.from("checklists").select("*").eq("id",id).single();
   if(c.error){alert(c.error.message);return}
   const title=await showModal({title:"Checkliste duplizieren",input:{label:"Name der Kopie",value:c.data.title+" Kopie"}});
-  if(!title)return;loading(true,"Dupliziere…");
+  if(!title)return;
+  loading(true,"Dupliziere…");
   const r=await sb.from("checklists").insert({organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,title,description:c.data.description,icon:c.data.icon}).select().single();
   if(r.error){alert(r.error.message);loading(false);return}
   const cats=await sb.from("checklist_categories").select("*").eq("checklist_id",id).order("sort_order");
@@ -1152,67 +589,27 @@ async function duplicateChecklist(id){
     const items=await sb.from("checklist_items").select("*").eq("category_id",cat.id).order("sort_order");
     if(items.data?.length)await sb.from("checklist_items").insert(items.data.map(i=>({category_id:nc.data.id,title:i.title,sort_order:i.sort_order,is_checked:false})));
   }
-  loading(false);await loadChecklists();toast("✓ Dupliziert");
+  loading(false);await loadChecklists();toast("Dupliziert ✓");
 }
 
 /* ── Templates ── */
 async function loadTemplates(){
   const box=$("tplList");
-  box.innerHTML=`<div style="display:flex;justify-content:center;padding:48px"><div class="spinner"></div></div>`;
+  box.innerHTML=`<div style="display:flex;justify-content:center;padding:40px"><div class="spinner"></div></div>`;
   const{data,error}=await sb.from("templates").select("*").is("deleted_at",null).order("title");
   if(error){box.textContent=error.message;return}
-
-  // Split into three groups
-  const global=(data||[]).filter(t=>t.is_global);
-  const mine=(data||[]).filter(t=>!t.is_global&&t.owner_id===owner());
-  const others=(data||[]).filter(t=>!t.is_global&&t.owner_id!==owner());
-
-  if(!data?.length){
-    box.innerHTML=`<div class="empty-state"><div class="empty-icon">📂</div><div class="empty-title">Noch keine Vorlagen</div><div class="empty-sub">Erstelle eine eigene Vorlage oder füge Standardvorlagen hinzu.</div></div>`;return;
-  }
-
-  box.innerHTML="";
-
-  function renderSection(title, icon, templates, canEdit){
-    if(!templates.length)return;
-    const section=q("div");section.className="tpl-section";
-    section.innerHTML=`<div class="tpl-section-title">${icon}<span>${title}</span></div><div class="tpl-section-divider"></div>`;
-    const grid=q("div");grid.className="tpl-grid";
-    templates.forEach(t=>{
-      const card=q("div");card.className="tpl-card";
-      card.innerHTML=`<div class="tpl-card-head"><span class="tpl-icon">${t.icon||"📂"}</span><span class="tpl-name">${escHtml(t.title)}</span></div><div class="tpl-desc">${escHtml(t.description||"")}</div><div class="tpl-actions"></div>`;
-      const a=card.querySelector(".tpl-actions");
-      const b1=q("button");b1.className="btn btn-primary btn-sm";b1.textContent="Checkliste erstellen";b1.onclick=()=>makeChecklist(t);
-      a.append(b1);
-      if(canEdit){
-        const b2=q("button");b2.className="btn btn-ghost btn-sm";b2.textContent="Bearbeiten";b2.onclick=()=>openTemplateEditor(t.id);
-        const b3=q("button");b3.className="btn btn-danger btn-sm";b3.textContent="Löschen";b3.onclick=()=>deleteTemplate(t.id);
-        a.append(b2,b3);
-      }
-      grid.appendChild(card);
-    });
-    section.appendChild(grid);
-    box.appendChild(section);
-  }
-
-  renderSection(
-    "Globale Vorlagen",
-    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a12 12 0 0 1 0 18M12 3a12 12 0 0 0 0 18M3 12h18"/></svg>`,
-    global,
-    isSuper  // nur Super Admin darf globale bearbeiten/löschen
-  );
-  renderSection(
-    "Meine Vorlagen",
-    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>`,
-    mine,
-    true  // eigene Vorlagen immer editierbar
-  );
-  renderSection(
-    "Vorlagen von anderen",
-    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6"/><circle cx="17" cy="8" r="3"/><path d="M21 20c0-3.3-2.7-6-6-6"/></svg>`,
-    others,
-    isSuper  // nur Super Admin darf fremde bearbeiten/löschen
-  );
+  if(!data?.length){box.innerHTML=`<div class="empty-state"><div class="empty-icon">📂</div><div class="empty-title">Noch keine Vorlagen</div><div class="empty-sub">Erstelle eine eigene Vorlage oder füge Standardvorlagen hinzu.</div></div>`;return}
+  const grid=q("div");grid.className="tpl-grid";
+  (data||[]).forEach(t=>{
+    const card=q("div");card.className="tpl-card";
+    card.innerHTML=`<div class="tpl-card-head"><span class="tpl-icon">${t.icon||"📂"}</span><span class="tpl-name">${escHtml(t.title)}</span></div><div class="tpl-desc">${escHtml(t.description||"")}</div><div class="tpl-actions"></div>`;
+    const actions=card.querySelector(".tpl-actions");
+    const b1=q("button");b1.className="btn btn-primary btn-sm";b1.textContent="Checkliste erstellen";b1.onclick=()=>makeChecklist(t);
+    const b2=q("button");b2.className="btn btn-ghost btn-sm";b2.textContent="Bearbeiten";b2.onclick=()=>openTemplateEditor(t.id);
+    const b3=q("button");b3.className="btn btn-danger btn-sm";b3.textContent="Löschen";b3.onclick=()=>deleteTemplate(t.id);
+    actions.append(b1,b2,b3);grid.appendChild(card);
+  });
+  box.innerHTML="";box.appendChild(grid);
 }
 
 async function openTemplateEditor(id){
@@ -1223,42 +620,31 @@ async function openTemplateEditor(id){
     const box=$("tplEditor");
     let tpl={title:"",description:"",icon:"📂"};
     if(id){const r=await sb.from("templates").select("*").eq("id",id).single();tpl=r.data}
-    // Fetch user list for owner picker (admin only)
-    let userOptions="";
-    if(isSuper){
-      const{data:profiles}=await sb.from("profiles").select("id,display_name,email").order("display_name");
-      userOptions=(profiles||[]).map(p=>`<option value="${escAttr(p.id)}"${(tpl.owner_id===p.id||(!tpl.owner_id&&p.id===user.id))?" selected":""}>${escHtml(p.display_name||p.email)}</option>`).join("");
-    }
     box.innerHTML=`<h2>${id?"Vorlage bearbeiten":"Neue Vorlage"}</h2>
     <div style="display:grid;gap:4px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));margin-bottom:14px">
       <div class="form-group"><label>Titel</label><input id="edTitle" value="${escAttr(tpl.title||"")}"></div>
       <div class="form-group"><label>Beschreibung</label><input id="edDesc" value="${escAttr(tpl.description||"")}"></div>
       <div class="form-group"><label>Icon</label><input id="edIcon" value="${escAttr(tpl.icon||"📂")}" style="max-width:80px"></div>
-      ${isSuper?`<div class="form-group"><label>Besitzer</label><select id="edOwner">${userOptions}</select></div>`:""}
     </div>
-    ${isSuper?`<label style="display:flex;align-items:center;gap:8px;font-size:14px;margin-bottom:14px;cursor:pointer"><input type="checkbox" id="edIsGlobal" style="width:18px;height:18px;accent-color:var(--accent)"${tpl.is_global?" checked":""}> <span>Globale Vorlage <span style="font-size:12px;color:var(--muted)">(für alle sichtbar)</span></span></label>`:""}
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
       <button class="btn btn-primary btn-sm" id="saveTpl">Speichern</button>
-      <button class="btn btn-ghost btn-sm" id="addCat">+ Kategorie</button>
+      <button class="btn btn-ghost btn-sm" id="addCat">+ Kategorie hinzufügen</button>
       <button class="btn btn-ghost btn-sm" id="closeTplEditor">Schliessen</button>
     </div>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Erst Kategorien erstellen, dann Punkte hinzufügen.</p>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Erstelle zuerst Kategorien, dann Punkte direkt darunter.</p>
     <div id="edCats"></div>`;
-    $("saveTpl").onclick=()=>run2("Speichere…",saveTemplateMeta);
+    $("saveTpl").onclick=()=>run("Speichere…",saveTemplateMeta);
     $("addCat").onclick=()=>addTemplateCategory();
     $("closeTplEditor").onclick=()=>wrap.classList.remove("show");
     if(id){const cats=await sb.from("template_categories").select("*").eq("template_id",id).order("sort_order");for(const c of cats.data||[])await renderTplCategory(c)}
     wrap.scrollIntoView({behavior:"smooth",block:"start"});
   }finally{loading(false)}
 }
-async function run2(label,fn){loading(true,label);try{return await fn()}catch(e){alert(e.message||e)}finally{loading(false)}}
 
 async function saveTemplateMeta(){
-  const isGlobal=isSuper&&$("edIsGlobal")?.checked;
-  const forOwner=$("edOwner")?.value||owner();
-  const data={organization_id:orgId,owner_id:forOwner,created_by:user.id,updated_by:user.id,title:$("edTitle").value.trim(),description:$("edDesc").value.trim(),icon:$("edIcon").value.trim()||"📂",is_global:!!isGlobal};
+  const data={organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,title:$("edTitle").value.trim(),description:$("edDesc").value.trim(),icon:$("edIcon").value.trim()||"📂",is_global:isSuper};
   if(!data.title){toast("Titel fehlt");return false}
-  if(currentTpl){const e=await sb.from("templates").update({title:data.title,description:data.description,icon:data.icon,is_global:!!isGlobal,updated_by:user.id}).eq("id",currentTpl);if(e.error){alert(e.error.message);return false}}
+  if(currentTpl){const e=await sb.from("templates").update({title:data.title,description:data.description,icon:data.icon,updated_by:user.id}).eq("id",currentTpl);if(e.error){alert(e.error.message);return false}}
   else{const r=await sb.from("templates").insert(data).select().single();if(r.error){alert(r.error.message);return false}currentTpl=r.data.id}
   await loadTemplates();toast("Vorlage gespeichert");return true;
 }
@@ -1266,9 +652,11 @@ async function saveTemplateMeta(){
 async function addTemplateCategory(){
   if(!currentTpl){const ok=await saveTemplateMeta();if(!ok||!currentTpl)return}
   const title=await showModal({title:"Neue Kategorie",input:{label:"Name",placeholder:"z.B. Ausrüstung"}});
-  if(!title)return;loading(true,"Speichere…");
+  if(!title)return;
+  loading(true,"Speichere…");
   const r=await sb.from("template_categories").insert({template_id:currentTpl,title,sort_order:Date.now()%100000}).select().single();
-  loading(false);if(r.error){alert(r.error.message);return}
+  loading(false);
+  if(r.error){alert(r.error.message);return}
   await renderTplCategory(r.data);toast("Kategorie hinzugefügt");
 }
 
@@ -1277,12 +665,12 @@ async function renderTplCategory(c){
   wrap.innerHTML=`<div class="cat-editor-head"><h4>${escHtml(c.title)}</h4></div><div id="tplitems-${c.id}"></div>`;
   const del=q("button");del.className="btn btn-danger btn-sm";del.textContent="Löschen";
   del.onclick=async()=>{
-    const ok=await showModal({title:`"${c.title}" löschen?`,confirmLabel:"Löschen",danger:true});
+    const ok=await showModal({title:`Kategorie "${c.title}" löschen?`,confirmLabel:"Löschen",danger:true});
     if(!ok)return;loading(true,"Lösche…");await sb.from("template_categories").delete().eq("id",c.id);loading(false);wrap.remove();toast("Kategorie gelöscht");
   };
   wrap.querySelector(".cat-editor-head").appendChild(del);
   const addRow=q("div");addRow.className="inline-add";addRow.style.cssText="border:1px solid var(--border);border-radius:10px;padding:6px 10px;margin-top:8px";
-  const inp=q("input");inp.placeholder="Neuer Punkt…";
+  const inp=q("input");inp.placeholder="Neuer Punkt in "+c.title;
   const plus=q("button");plus.innerHTML="+";
   const doAdd=async()=>{
     const title=inp.value.trim();if(!title){toast("Bitte Punkt eingeben");return}
@@ -1310,70 +698,19 @@ async function loadTplItems(catId){
 }
 
 async function deleteTemplate(id){
-  const ok=await showModal({title:"Vorlage löschen?",sub:"Kann nicht rückgängig gemacht werden.",confirmLabel:"Löschen",danger:true});
-  if(!ok)return;loading(true,"Lösche…");
+  const ok=await showModal({title:"Vorlage löschen?",sub:"Diese Aktion kann nicht rückgängig gemacht werden.",confirmLabel:"Löschen",danger:true});
+  if(!ok)return;
+  loading(true,"Lösche…");
   await sb.from("templates").update({deleted_at:new Date().toISOString(),deleted_by:user.id}).eq("id",id);
   loading(false);await loadTemplates();$("tplEditorWrap").classList.remove("show");toast("Vorlage gelöscht");
 }
 
-// Fetch all users for admin picker (cached)
-let _allUsers=null;
-async function getAllUsers(){
-  if(_allUsers)return _allUsers;
-  const{data}=await sb.from("profiles").select("id,display_name,email").order("display_name");
-  _allUsers=data||[];return _allUsers;
-}
-function invalidateUserCache(){_allUsers=null}
-
-async function showOwnerPicker(defaultOwnerId){
-  if(!isSuper)return defaultOwnerId||owner();
-  const users=await getAllUsers();
-  const values=users.map(u=>u.id);
-  const labels=users.map(u=>u.display_name||u.email||u.id);
-  const def=defaultOwnerId||user.id;
-  return await showSelectModal("Für wen?",def,values,labels);
-}
-
-async function createEmptyChecklist(){
-  const title=await showModal({title:"Leere Checkliste erstellen",input:{label:"Titel",placeholder:"z.B. Meine Checkliste",value:""}});
-  if(!title)return;
-  const ownerId=await showOwnerPicker(owner());
-  if(!ownerId)return;
-  loading(true,"Erstelle…");
-  const r=await sb.from("checklists").insert({organization_id:orgId,owner_id:ownerId,created_by:user.id,updated_by:user.id,title,icon:"📋"}).select().single();
-  if(r.error){alert(r.error.message);loading(false);return}
-  loading(false);
-  // If created for another user, act as them to open it
-  if(ownerId!==user.id){
-    const users=await getAllUsers();
-    const u=users.find(u=>u.id===ownerId);
-    setActing(ownerId,u?.display_name||u?.email||"");
-  }
-  await loadChecklists();openDetailPanel(r.data.id);toast("Checkliste erstellt");
-}
-
-async function pickTemplateAndCreate(){
-  // Load templates, show picker modal
-  loading(true,"Lade Vorlagen…");
-  const{data,error}=await sb.from("templates").select("*").is("deleted_at",null).order("title");
-  loading(false);
-  if(error||!data?.length){toast("Keine Vorlagen vorhanden — erstelle zuerst eine Vorlage.");return}
-  // Build a select modal with templates
-  const values=data.map(t=>t.id);
-  const labels=data.map(t=>`${t.icon||"📂"} ${t.title}`);
-  const chosen=await showSelectModal("Vorlage wählen",values[0],values,labels);
-  if(!chosen)return;
-  const tpl=data.find(t=>t.id===chosen);
-  if(tpl)await makeChecklist(tpl);
-}
-
 async function makeChecklist(t){
+  // No run() wrapper — contains modal
   const title=await showModal({title:"Checkliste erstellen",input:{label:"Titel",value:t.title+" "+new Date().toLocaleDateString("de-CH")}});
   if(!title)return;
-  const ownerId=await showOwnerPicker(owner());
-  if(!ownerId)return;
   loading(true,"Erstelle…");
-  const r=await sb.from("checklists").insert({organization_id:orgId,owner_id:ownerId,created_by:user.id,updated_by:user.id,template_id:t.id,title,description:t.description,icon:t.icon}).select().single();
+  const r=await sb.from("checklists").insert({organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,template_id:t.id,title,description:t.description,icon:t.icon}).select().single();
   if(r.error){alert(r.error.message);loading(false);return}
   const cats=await sb.from("template_categories").select("*").eq("template_id",t.id).order("sort_order");
   for(const c of cats.data||[]){
@@ -1381,601 +718,86 @@ async function makeChecklist(t){
     const items=await sb.from("template_items").select("*").eq("category_id",c.id).order("sort_order");
     if(items.data?.length)await sb.from("checklist_items").insert(items.data.map(i=>({category_id:nc.data.id,title:i.title,sort_order:i.sort_order,is_checked:false})));
   }
-  loading(false);
-  if(ownerId!==user.id){
-    const users=await getAllUsers();
-    const u=users.find(u=>u.id===ownerId);
-    setActing(ownerId,u?.display_name||u?.email||"");
-  }
-  await loadChecklists();show("Check");openDetailPanel(r.data.id);toast("Checkliste erstellt");
+  loading(false);await loadChecklists();show("Check");openDetailPanel(r.data.id);toast("Checkliste erstellt");
 }
 
 /* ── Admin ── */
 async function loadUsers(){
-  const box=$("users");
-  box.innerHTML=`<div style="display:flex;justify-content:center;padding:24px"><div class="spinner"></div></div>`;
-  // Load profiles + their roles in parallel
-  const[profRes,memRes]=await Promise.all([
-    sb.from("profiles").select("*").order("display_name"),
-    sb.from("organization_members").select("user_id,role").eq("organization_id",orgId)
-  ]);
-  if(profRes.error){box.textContent=profRes.error.message;return}
-  const roleMap={};(memRes.data||[]).forEach(m=>roleMap[m.user_id]=m.role);
-  const roleLabel={user:"User",admin:"Admin",super_admin:"Super Admin"};
-  box.innerHTML="";
-  if(!profRes.data?.length){box.innerHTML=`<p style="color:var(--muted);font-size:14px">Noch keine Benutzer.</p>`;return}
-  (profRes.data||[]).forEach(u=>{
-    const role=roleMap[u.id]||"user";
-    const isSelf=u.id===user.id;
+  const box=$("users");box.innerHTML="";
+  const{data,error}=await sb.from("profiles").select("*").order("display_name");
+  if(error){box.textContent=error.message;return}
+  (data||[]).forEach(u=>{
     const row=q("div");row.className="user-row";
     const av=q("div");av.className="user-avatar";av.textContent=(u.display_name||u.email||"?")[0].toUpperCase();
-    const info=q("div");info.className="user-info";
-    info.innerHTML=`<div class="uname">${escHtml(u.display_name||"—")}${isSelf?` <span style="font-size:11px;color:var(--accent);font-weight:400">(Du)</span>`:""}</div><div class="uemail">${escHtml(u.email||"—")}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${roleLabel[role]||role}</div>`;
-    const actions=q("div");actions.style.cssText="display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0";
-    // View checklists
-    const btnCl=q("button");btnCl.className="btn btn-ghost btn-sm";btnCl.title="Checklisten anzeigen";
-    btnCl.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M9 12l2 2 4-4"/></svg>`;
-    btnCl.onclick=()=>loadUserChecklists(u.id,u.display_name||u.email);
-    // Act as user
-    const btnAct=q("button");btnAct.className="btn btn-ghost btn-sm";btnAct.title="Als User arbeiten";
-    btnAct.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>`;
-    btnAct.onclick=()=>{
-      setActing(u.id,u.display_name||u.email);show("Check");
-      const sel=$("checkUserSelect");
-      if(sel)[...sel.options].forEach(o=>{if(o.value===u.id)o.selected=true});
-    };
-    // Edit
-    const btnEdit=q("button");btnEdit.className="btn btn-ghost btn-sm";btnEdit.title="Bearbeiten";
-    btnEdit.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
-    btnEdit.onclick=()=>editUser(u,role);
-    // Delete (not self)
-    const btnDel=q("button");btnDel.className="btn btn-danger btn-sm";btnDel.title="Löschen";
-    btnDel.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>`;
-    btnDel.onclick=()=>deleteUser(u);
-    btnDel.disabled=isSelf;btnDel.style.opacity=isSelf?"0.3":"";
-    actions.append(btnCl,btnAct,btnEdit,btnDel);
-    row.append(av,info,actions);box.appendChild(row);
-  });
-}
-
-function openEditUserPanel(u,currentRole){
-  const overlay=$("editUserOverlay");const panel=$("editUserPanel");
-  $("editUserTitle").textContent=u.display_name||u.email||"Benutzer bearbeiten";
-  const body=$("editUserBody");
-  body.innerHTML=`
-    <div style="background:var(--bg);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:13px;color:var(--muted)">
-      <span style="font-weight:600;color:var(--text)">${escHtml(u.email||"—")}</span><br>Login-E-Mail (nicht änderbar)
-    </div>
-    <div class="form-group"><label>Benutzername</label><input id="euName" value="${escAttr(u.display_name||"")}"></div>
-    <div class="form-group"><label>Rolle</label>
-      <select id="euRole">
-        <option value="user"${currentRole==="user"?" selected":""}>User</option>
-        <option value="admin"${currentRole==="admin"?" selected":""}>Admin</option>
-        <option value="super_admin"${currentRole==="super_admin"?" selected":""}>Super Admin</option>
-      </select>
-    </div>
-    <div style="border-top:1px solid var(--border);padding-top:18px;margin-top:4px">
-      <h4 style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Neues Passwort setzen</h4>
-      <div class="form-group"><label>Neues Passwort</label><input id="euPw" type="password" placeholder="Leer lassen = unverändert"></div>
-      <div class="form-group"><label>Passwort bestätigen</label><input id="euPw2" type="password" placeholder="Wiederholen"></div>
-    </div>
-    <div id="euMsg" style="font-size:13px;min-height:18px;margin-bottom:10px;color:var(--danger)"></div>
-    <div style="display:flex;gap:8px">
-      <button class="btn btn-primary" id="euSave" style="flex:1">Speichern</button>
-      <button class="btn btn-ghost" id="euCancel">Abbrechen</button>
-    </div>`;
-
-  const closePanel=()=>{overlay.style.opacity="0";overlay.style.pointerEvents="none";panel.style.transform="translateX(100%)"};
-  $("euCancel").onclick=closePanel;
-  $("editUserClose").onclick=closePanel;
-  overlay.onclick=e=>{if(e.target===overlay)closePanel()};
-
-  $("euSave").onclick=async()=>{
-    const name=$("euName").value.trim();
-    const role=$("euRole").value;
-    const pw=$("euPw").value;
-    const pw2=$("euPw2").value;
-    const msg=$("euMsg");
-    msg.style.color="var(--danger)";msg.textContent="";
-    if(!name){msg.textContent="Benutzername darf nicht leer sein.";return}
-    if(pw&&pw.length<6){msg.textContent="Passwort muss mindestens 6 Zeichen haben.";return}
-    if(pw&&pw!==pw2){msg.textContent="Passwörter stimmen nicht überein.";return}
-    loading(true,"Speichere…");
-    // Update profile (only display_name, not email)
-    const pRes=await sb.from("profiles").update({display_name:name}).eq("id",u.id);
-    if(pRes.error){msg.textContent=pRes.error.message;loading(false);return}
-    // Update role
-    const mRes=await sb.from("organization_members").update({role}).eq("user_id",u.id).eq("organization_id",orgId);
-    if(mRes.error){msg.textContent=mRes.error.message;loading(false);return}
-    // Set password via Edge Function if provided
-    if(pw){
-      try{
-        const sessionRes=await sb.auth.getSession();
-        const token=sessionRes.data?.session?.access_token;
-        if(!token){msg.textContent="Keine gültige Session — bitte neu einloggen.";loading(false);return}
-        const res=await fetch(`${SUPABASE_URL}/functions/v1/set-user-password`,{
-          method:"POST",
-          headers:{"Content-Type":"application/json","Authorization":`Bearer ${token}`},
-          body:JSON.stringify({user_id:u.id,password:pw})
-        });
-        let json={};
-        try{json=await res.json()}catch(_){}
-        if(!res.ok||json.error){
-          msg.textContent=json.error||`Passwort-Fehler (HTTP ${res.status}). Edge Function deployed?`;
-          loading(false);return;
-        }
-      }catch(err){
-        msg.textContent="Netzwerkfehler: "+err.message;loading(false);return;
-      }
-    }
-    loading(false);
-    msg.style.color="var(--success)";msg.textContent="✓ Gespeichert";
-    setTimeout(()=>closePanel(),800);
-    loadUsers();toast("Benutzer aktualisiert");
-  };
-
-  overlay.style.opacity="1";overlay.style.pointerEvents="all";panel.style.transform="translateX(0)";
-  setTimeout(()=>$("euName")?.focus(),100);
-}
-
-async function editUser(u,currentRole){openEditUserPanel(u,currentRole)}
-
-function showSelectModal(title,currentVal,values,labels){
-  return new Promise(resolve=>{
-    $("modalTitle").textContent=title;$("modalSub").textContent="";
-    const wrap=$("modalInputWrap");wrap.style.display="";
-    $("modalInputLabel").textContent=title;
-    // Replace input with select temporarily
-    const inp=$("modalInput");inp.style.display="none";
-    let sel=document.getElementById("modalSelect");
-    if(!sel){sel=document.createElement("select");sel.id="modalSelect";sel.className=inp.className;inp.parentNode.insertBefore(sel,inp.nextSibling)}
-    sel.style.display="";sel.innerHTML=values.map((v,i)=>`<option value="${v}"${v===currentVal?" selected":""}>${labels[i]}</option>`).join("");
-    $("modalConfirm").textContent="Speichern";$("modalConfirm").className="btn btn-sm btn-primary";
-    $("modalOverlay").classList.add("open");
-    const close=val=>{$("modalOverlay").classList.remove("open");inp.style.display="";sel.style.display="none";$("modalConfirm").onclick=null;$("modalCancel").onclick=null;resolve(val)};
-    $("modalConfirm").onclick=()=>close(sel.value);
-    $("modalCancel").onclick=()=>close(null);
-    setTimeout(()=>sel.focus(),80);
-  })
-}
-
-async function deleteUser(u){
-  const ok=await showModal({title:`${escHtml(u.display_name||u.email)} löschen?`,sub:"Der User wird aus der Organisation entfernt. Der Auth-Account bleibt bestehen.",confirmLabel:"Entfernen",danger:true});
-  if(!ok)return;
-  loading(true,"Entferne…");
-  // Remove from org + profile (auth account requires service role — just remove from org)
-  await sb.from("organization_members").delete().eq("user_id",u.id).eq("organization_id",orgId);
-  await sb.from("profiles").delete().eq("id",u.id);
-  loading(false);loadUsers();toast("Benutzer entfernt");
-}
-
-async function loadUserChecklists(uid,uname){
-  const section=$("adminClSection");const list=$("adminClList");
-  $("adminClUser").textContent=uname;
-  section.style.display="";list.innerHTML=`<div style="display:flex;justify-content:center;padding:24px"><div class="spinner"></div></div>`;
-  section.scrollIntoView({behavior:"smooth",block:"nearest"});
-  const{data,error}=await sb.from("checklists").select("*").eq("owner_id",uid).is("deleted_at",null).order("created_at",{ascending:false});
-  if(error){list.textContent=error.message;return}
-  if(!data?.length){list.innerHTML=`<p style="color:var(--muted);font-size:14px;padding:12px 0">Keine Checklisten vorhanden.</p>`;return}
-  list.innerHTML="";
-  (data||[]).forEach(cl=>{
-    const row=q("div");row.style.cssText="display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--border);cursor:pointer;transition:background .15s;border-radius:8px;padding-left:8px;padding-right:8px";
-    row.innerHTML=`<span style="font-size:20px;flex-shrink:0">${cl.icon||"📋"}</span><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(cl.title)}</div><div style="font-size:12px;color:var(--muted)">${fmtDate(cl.created_at)}</div></div><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--muted);flex-shrink:0"><path d="M9 18l6-6-6-6"/></svg>`;
-    row.onmouseenter=()=>row.style.background="var(--bg)";
-    row.onmouseleave=()=>row.style.background="";
-    row.onclick=()=>{
-      // Set acting as user, switch to checklists view, open detail
-      setActing(uid,uname);
-      show("Check");
-      // Sync the user filter dropdown if visible
-      const sel=$("checkUserSelect");
-      if(sel){
-        [...sel.options].forEach(o=>{if(o.value===uid)o.selected=true});
-      }
-      setTimeout(()=>openDetailPanel(cl.id),100);
-    };
-    list.appendChild(row);
+    const info=q("div");info.className="user-info";info.innerHTML=`<div class="uname">${escHtml(u.display_name||"—")}</div><div class="uemail">${escHtml(u.email||"—")}</div>`;
+    const btn=q("button");btn.className="btn btn-ghost btn-sm";btn.textContent="Als User arbeiten";
+    btn.onclick=()=>{setActing(u.id,u.display_name);show("Check")};
+    row.append(av,info,btn);box.appendChild(row);
   });
 }
 
 async function addUser(){
-  const email=$("newUserEmail").value.trim();
-  const name=$("newUserName").value.trim();
-  const pw=$("newUserPw").value;
-  const role=$("newUserRole").value;
-  const msgEl=$("adminMsg");
-  msgEl.textContent="";msgEl.style.color="var(--danger)";
-  if(!name||!email||!pw){msgEl.textContent="Name, E-Mail und Passwort sind erforderlich.";return}
-  if(pw.length<6){msgEl.textContent="Passwort muss mindestens 6 Zeichen haben.";return}
-  loading(true,"Lege User an…");
-  try{
-    const session=await sb.auth.getSession();
-    const token=session.data.session?.access_token;
-    const res=await fetch(`${SUPABASE_URL}/functions/v1/create-user`,{
-      method:"POST",
-      headers:{"Content-Type":"application/json","Authorization":`Bearer ${token}`},
-      body:JSON.stringify({email,password:pw,display_name:name,organization_id:orgId,role})
-    });
-    const json=await res.json();
-    if(!res.ok||json.error){msgEl.textContent=json.error||"Fehler beim Anlegen.";loading(false);return}
-    // Clear form
-    $("newUserName").value="";$("newUserEmail").value="";$("newUserPw").value="";
-    msgEl.style.color="var(--success)";msgEl.textContent="✓ User erfolgreich angelegt.";
-    loadUsers();toast("User angelegt");
-  }catch(e){msgEl.textContent=e.message||"Netzwerkfehler."}
-  loading(false);
-}
-
-async function loadArchivedTemplates(){
-  const section=$("archivedTplSection");
-  const list=$("archivedTplList");
-  section.style.display="";
-  list.innerHTML=`<div style="display:flex;justify-content:center;padding:24px"><div class="spinner"></div></div>`;
-  section.scrollIntoView({behavior:"smooth",block:"start"});
-
-  // Users see only their own archived; admins/superadmins see all
-  let query=sb.from("templates").select("*,profiles(display_name,email)").not("deleted_at","is",null).order("title");
-  if(!isSuper) query=query.eq("owner_id",user.id);
-
-  const{data,error}=await query;
-  if(error){list.textContent=error.message;return}
-  if(!data?.length){list.innerHTML=`<div class="empty-state" style="padding:28px 0"><div class="empty-icon">🗂️</div><div class="empty-title">Keine archivierten Vorlagen</div></div>`;return}
-
-  const grid=q("div");grid.className="tpl-grid";
-  (data||[]).forEach(t=>{
-    const ownerName=t.profiles?.display_name||t.profiles?.email||"";
-    const card=q("div");card.className="tpl-card";
-    card.style.opacity="0.75";
-    card.innerHTML=`
-      <div class="tpl-card-head"><span class="tpl-icon">${t.icon||"📂"}</span><span class="tpl-name">${escHtml(t.title)}</span></div>
-      <div class="tpl-desc">${escHtml(t.description||"")}${isSuper&&ownerName?` <span style="color:var(--muted);font-size:11px">· ${escHtml(ownerName)}</span>`:""}
-        <div style="margin-top:4px;font-size:11px;color:var(--muted)">Archiviert: ${fmtDate(t.deleted_at)}</div>
-      </div>
-      <div class="tpl-actions"></div>`;
-    const a=card.querySelector(".tpl-actions");
-    // Restore
-    const btnRestore=q("button");btnRestore.className="btn btn-primary btn-sm";
-    btnRestore.innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 .49-4.36L1 10"/></svg> Wiederherstellen`;
-    btnRestore.onclick=async()=>{
-      loading(true,"Stelle wieder her…");
-      await sb.from("templates").update({deleted_at:null,deleted_by:null}).eq("id",t.id);
-      loading(false);toast("Vorlage wiederhergestellt");
-      card.remove();await loadTemplates();
-    };
-    // Permanent delete
-    const btnDel=q("button");btnDel.className="btn btn-danger btn-sm";btnDel.textContent="Endgültig löschen";
-    btnDel.onclick=async()=>{
-      const ok=await showModal({title:"Endgültig löschen?",sub:`"${t.title}" wird unwiderruflich gelöscht — alle Kategorien und Punkte werden entfernt.`,confirmLabel:"Löschen",danger:true});
-      if(!ok)return;
-      loading(true,"Lösche…");
-      // Delete items → categories → template
-      const cats=await sb.from("template_categories").select("id").eq("template_id",t.id);
-      const catIds=(cats.data||[]).map(c=>c.id);
-      if(catIds.length)await sb.from("template_items").delete().in("category_id",catIds);
-      await sb.from("template_categories").delete().eq("template_id",t.id);
-      await sb.from("templates").delete().eq("id",t.id);
-      loading(false);toast("Endgültig gelöscht");card.remove();
-    };
-    a.append(btnRestore,btnDel);
-    grid.appendChild(card);
-  });
-  list.innerHTML="";list.appendChild(grid);
-}
-
-/* ── Own password change ── */
-function openChangePwModal(){
-  const overlay=$("changePwOverlay"),box=$("changePwBox");
-  $("newPw1").value="";$("newPw2").value="";$("changePwMsg").textContent="";
-  overlay.style.opacity="1";overlay.style.pointerEvents="all";box.style.transform="scale(1) translateY(0)";
-  closeSidebar();setTimeout(()=>$("newPw1").focus(),80);
-}
-function closeChangePwModal(){
-  const overlay=$("changePwOverlay"),box=$("changePwBox");
-  overlay.style.opacity="0";overlay.style.pointerEvents="none";box.style.transform="scale(.95) translateY(10px)";
-}
-async function submitChangePw(){
-  const pw=$("newPw1").value,pw2=$("newPw2").value,msg=$("changePwMsg");
-  msg.style.color="var(--danger)";msg.textContent="";
-  if(!pw){msg.textContent="Bitte Passwort eingeben.";return}
-  if(pw.length<6){msg.textContent="Mindestens 6 Zeichen.";return}
-  if(pw!==pw2){msg.textContent="Passwörter stimmen nicht überein.";return}
+  const id=$("newUserId").value.trim(),email=$("newUserEmail").value.trim(),name=$("newUserName").value.trim(),role=$("newUserRole").value;
+  if(!id||!email||!name){toast("UUID, E-Mail und Name nötig");return}
   loading(true,"Speichere…");
-  const{error}=await sb.auth.updateUser({password:pw});
-  loading(false);
-  if(error){msg.textContent=error.message;return}
-  msg.style.color="var(--success)";msg.textContent="✓ Passwort geändert.";
-  setTimeout(()=>closeChangePwModal(),1200);
-  toast("Passwort geändert");
-}
-
-/* ── Archived Checklists ── */
-async function loadArchivedChecklists(){
-  const section=$("archivedClSection"),list=$("archivedClList");
-  section.style.display="";
-  list.innerHTML=`<div style="display:flex;justify-content:center;padding:24px"><div class="spinner"></div></div>`;
-  section.scrollIntoView({behavior:"smooth",block:"start"});
-  let query=sb.from("checklists").select("*,profiles(display_name,email)").not("deleted_at","is",null).order("deleted_at",{ascending:false});
-  if(!isSuper) query=query.eq("owner_id",user.id);
-  const{data,error}=await query;
-  if(error){list.textContent=error.message;return}
-  if(!data?.length){
-    list.innerHTML=`<div class="empty-state" style="padding:28px 0"><div class="empty-icon">🗂️</div><div class="empty-title">Keine archivierten Checklisten</div></div>`;return;
-  }
-  const grid=q("div");grid.className="cl-grid";
-  (data||[]).forEach(cl=>{
-    const ownerName=cl.profiles?.display_name||cl.profiles?.email||"";
-    const card=q("div");card.className="cl-card";card.style.opacity=".7";
-    card.innerHTML=`
-      <div class="cl-ring">${ringSVG(0)}</div>
-      <div class="cl-body">
-        <div class="cl-title">${cl.icon||"📋"} ${escHtml(cl.title)}</div>
-        <div class="cl-desc">${isSuper&&ownerName?escHtml(ownerName):"Archiviert"}</div>
-        <div class="cl-meta"><span class="cl-date">Archiviert: ${fmtDate(cl.deleted_at)}</span></div>
-        <div class="cl-actions"></div>
-      </div>`;
-    const actions=card.querySelector(".cl-actions");
-    const btnRestore=q("button");btnRestore.textContent="Wiederherstellen";
-    btnRestore.onclick=async e=>{
-      e.stopPropagation();
-      loading(true,"Stelle wieder her…");
-      await sb.from("checklists").update({archived:false,deleted_at:null,deleted_by:null}).eq("id",cl.id);
-      loading(false);toast("Wiederhergestellt");card.remove();loadChecklists();
-    };
-    const btnDel=q("button");btnDel.textContent="Löschen";btnDel.className="btn-danger";
-    btnDel.onclick=async e=>{
-      e.stopPropagation();
-      const ok=await showModal({title:"Endgültig löschen?",sub:`"${cl.title}" wird unwiderruflich gelöscht.`,confirmLabel:"Löschen",danger:true});
-      if(!ok)return;loading(true,"Lösche…");
-      const cats=await sb.from("checklist_categories").select("id").eq("checklist_id",cl.id);
-      const catIds=(cats.data||[]).map(c=>c.id);
-      if(catIds.length)await sb.from("checklist_items").delete().in("category_id",catIds);
-      await sb.from("checklist_categories").delete().eq("checklist_id",cl.id);
-      await sb.from("checklists").delete().eq("id",cl.id);
-      loading(false);toast("Endgültig gelöscht");card.remove();
-    };
-    actions.append(btnRestore,btnDel);
-    grid.appendChild(card);
-  });
-  list.innerHTML="";list.appendChild(grid);
-}
-
-/* ── Export ── */
-let _exportClId=null;
-
-function openExportModal(id){
-  _exportClId=id;
-  const overlay=$("exportOverlay"),box=$("exportBox");
-  overlay.style.opacity="1";overlay.style.pointerEvents="all";
-  box.style.transform="scale(1) translateY(0)";
-}
-function closeExportModal(){
-  const overlay=$("exportOverlay"),box=$("exportBox");
-  overlay.style.opacity="0";overlay.style.pointerEvents="none";
-  box.style.transform="scale(.95) translateY(10px)";
-}
-
-async function exportChecklist(format){
-  closeExportModal();
-  loading(true,"Exportiere…");
-  const id=_exportClId;
-  const[clRes,catsRes]=await Promise.all([
-    sb.from("checklists").select("*").eq("id",id).single(),
-    sb.from("checklist_categories").select("*").eq("checklist_id",id).order("sort_order")
-  ]);
-  const cl=clRes.data;
-  const catIds=(catsRes.data||[]).map(c=>c.id);
-  const itemsRes=catIds.length?await sb.from("checklist_items").select("*").in("category_id",catIds).order("sort_order"):{data:[]};
-  const itemsByCat={};(itemsRes.data||[]).forEach(it=>(itemsByCat[it.category_id]=itemsByCat[it.category_id]||[]).push(it));
-  loading(false);
-  if(format==="csv") exportCsv(cl,catsRes.data||[],itemsByCat);
-  else exportPdf(cl,catsRes.data||[],itemsByCat);
-}
-
-function exportCsv(cl,cats,itemsByCat){
-  const rows=[["Checkliste","Kategorie","Eintrag","Erledigt"]];
-  cats.forEach(cat=>{
-    (itemsByCat[cat.id]||[]).forEach(it=>{
-      rows.push([cl.title,cat.title,it.title,it.is_checked?"Ja":"Nein"]);
-    });
-  });
-  const csv=rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(",")).join("\n");
-  const blob=new Blob(["﻿"+csv],{type:"text/csv;charset=utf-8"});
-  const url=URL.createObjectURL(blob);
-  const a=q("a");a.href=url;a.download=`${cl.title}.csv`;a.click();
-  URL.revokeObjectURL(url);toast("CSV exportiert");
-}
-
-function exportPdf(cl,cats,itemsByCat){
-  const done=(items)=>items.filter(i=>i.is_checked).length;
-  const total=(items)=>items.length;
-  let html=`<!DOCTYPE html><html><head><meta charset="utf-8">
-  <title>${escHtml(cl.title)}</title>
-  <style>
-    body{font-family:system-ui,sans-serif;max-width:700px;margin:40px auto;padding:0 24px;color:#0f172a}
-    h1{font-size:24px;font-weight:700;margin-bottom:4px}
-    .meta{font-size:13px;color:#64748b;margin-bottom:28px}
-    .progress{height:6px;background:#e2e8f0;border-radius:99px;overflow:hidden;margin-bottom:28px}
-    .progress-bar{height:100%;background:#6366f1;border-radius:99px}
-    .cat{margin-bottom:24px}
-    .cat-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#64748b;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e2e8f0}
-    .item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f1f5f9}
-    .cb{width:16px;height:16px;border:2px solid #cbd5e1;border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
-    .cb.checked{background:#6366f1;border-color:#6366f1}
-    .item-text{font-size:14px}
-    .item-text.done{text-decoration:line-through;color:#94a3b8}
-    @media print{body{margin:0}button{display:none}}
-  </style></head><body>
-  <h1>${escHtml(cl.icon||"📋")} ${escHtml(cl.title)}</h1>
-  <div class="meta">Exportiert am ${new Date().toLocaleDateString("de-CH")} · ${done(Object.values(itemsByCat).flat())} von ${total(Object.values(itemsByCat).flat())} erledigt</div>`;
-  const allItems=Object.values(itemsByCat).flat();
-  const pct=allItems.length?Math.round(done(allItems)/total(allItems)*100):0;
-  html+=`<div class="progress"><div class="progress-bar" style="width:${pct}%"></div></div>`;
-  cats.forEach(cat=>{
-    const items=itemsByCat[cat.id]||[];
-    html+=`<div class="cat"><div class="cat-title">${escHtml(cat.title)}</div>`;
-    items.forEach(it=>{
-      html+=`<div class="item"><div class="cb${it.is_checked?" checked":""}"></div><span class="item-text${it.is_checked?" done":""}">${escHtml(it.title)}</span></div>`;
-    });
-    html+=`</div>`;
-  });
-  html+=`</body></html>`;
-  const blob=new Blob([html],{type:"text/html;charset=utf-8"});
-  const url=URL.createObjectURL(blob);
-  const w=window.open(url,"_blank");
-  setTimeout(()=>{w?.print();URL.revokeObjectURL(url)},600);
-  toast("PDF-Druckdialog geöffnet");
-}
-
-/* ── Share ── */
-let _shareClId=null;
-
-function openShareModal(id){
-  _shareClId=id;
-  const overlay=$("shareOverlay"),box=$("shareBox");
-  // Build share URL — points to a public view page with the checklist ID
-  const url=`${location.origin}${location.pathname}?share=${id}`;
-  $("shareUrl").value=url;
-  overlay.style.opacity="1";overlay.style.pointerEvents="all";
-  box.style.transform="scale(1) translateY(0)";
-  $("shareUrl").select();
-}
-function closeShareModal(){
-  const overlay=$("shareOverlay"),box=$("shareBox");
-  overlay.style.opacity="0";overlay.style.pointerEvents="none";
-  box.style.transform="scale(.95) translateY(10px)";
-}
-function copyShareUrl(){
-  const inp=$("shareUrl");
-  inp.select();
-  navigator.clipboard?.writeText(inp.value).then(()=>toast("Link kopiert ✓")).catch(()=>{
-    document.execCommand("copy");toast("Link kopiert ✓");
-  });
-}
-
-/* ── Share view (read-only, no login needed) ── */
-async function checkShareMode(){
-  const params=new URLSearchParams(location.search);
-  const shareId=params.get("share");
-  if(!shareId)return false;
-  // Show read-only view
-  document.body.innerHTML=`<div style="font-family:system-ui,sans-serif;max-width:600px;margin:0 auto;padding:24px;color:#0f172a">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid #e2e8f0">
-      <svg width="28" height="28" viewBox="0 0 512 512" style="border-radius:7px;flex-shrink:0"><rect width="512" height="512" rx="112" fill="#1e1b4b"/><circle cx="358" cy="168" r="53" fill="#6366f1"/><polyline points="331,168 350,188 387,148" fill="none" stroke="white" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span style="font-weight:700;font-size:16px">Checklists by Bejhan</span>
-    </div>
-    <div id="shareContent" style="text-align:center;padding:40px"><div style="width:24px;height:24px;border:3px solid #e2e8f0;border-top-color:#6366f1;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px"></div>Lade…</div>
-    <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
-  </div>`;
-  const sb2=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-  const[clRes,catsRes]=await Promise.all([
-    sb2.from("checklists").select("*").eq("id",shareId).single(),
-    sb2.from("checklist_categories").select("*").eq("checklist_id",shareId).order("sort_order")
-  ]);
-  if(clRes.error){document.getElementById("shareContent").innerHTML=`<p style="color:#ef4444">Checkliste nicht gefunden oder kein Zugriff.</p>`;return true}
-  const cl=clRes.data;
-  const catIds=(catsRes.data||[]).map(c=>c.id);
-  const itemsRes=catIds.length?await sb2.from("checklist_items").select("*").in("category_id",catIds).order("sort_order"):{data:[]};
-  const itemsByCat={};(itemsRes.data||[]).forEach(it=>(itemsByCat[it.category_id]=itemsByCat[it.category_id]||[]).push(it));
-  const allItems=Object.values(itemsByCat).flat();
-  const done=allItems.filter(i=>i.is_checked).length,total=allItems.length;
-  const pct=total?Math.round(done/total*100):0;
-  let html=`<h1 style="font-size:22px;font-weight:700;margin-bottom:4px">${cl.icon||"📋"} ${escHtml(cl.title)}</h1>
-  <p style="font-size:13px;color:#64748b;margin-bottom:16px">${done} von ${total} erledigt · ${pct}%</p>
-  <div style="height:6px;background:#e2e8f0;border-radius:99px;overflow:hidden;margin-bottom:24px"><div style="height:100%;width:${pct}%;background:#6366f1;border-radius:99px"></div></div>`;
-  (catsRes.data||[]).forEach(cat=>{
-    html+=`<div style="margin-bottom:20px"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#64748b;margin-bottom:8px">${escHtml(cat.title)}</div>`;
-    (itemsByCat[cat.id]||[]).forEach(it=>{
-      html+=`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid #f1f5f9">
-        <div style="width:18px;height:18px;border:2px solid ${it.is_checked?"#6366f1":"#cbd5e1"};border-radius:4px;background:${it.is_checked?"#6366f1":"transparent"};flex-shrink:0;display:flex;align-items:center;justify-content:center">
-          ${it.is_checked?`<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg>`:""}
-        </div>
-        <span style="font-size:14px;${it.is_checked?"text-decoration:line-through;color:#94a3b8":""}">${escHtml(it.title)}</span>
-      </div>`;
-    });
-    html+=`</div>`;
-  });
-  document.getElementById("shareContent").innerHTML=html;
-  return true;
+  const p=await sb.from("profiles").upsert({id,email,display_name:name});
+  if(p.error){alert(p.error.message);loading(false);return}
+  const m=await sb.from("organization_members").insert({organization_id:orgId,user_id:id,role});
+  if(m.error){alert(m.error.message);loading(false);return}
+  loading(false);loadUsers();toast("Benutzer gespeichert");
 }
 
 async function seedStandardTemplates(){
   const templates=[["Camping","Packliste fürs Camping","🏕️","Schlafen\n- Zelt\n- Schlafsack\n- Isomatte\n\nKochen\n- Gaskocher\n- Geschirr\n- Besteck\n- Wasser"],["Wandern","Vorlage für Wanderausflüge","🎒","Ausrüstung\n- Wanderschuhe\n- Rucksack\n- Regenjacke\n\nVerpflegung\n- Wasser\n- Snacks\n- Sandwich"],["Flugreise","Vorlage für Reisen mit Flug","✈️","Dokumente\n- Pass/ID\n- Boardingpass\n- Versicherung\n\nHandgepäck\n- Kopfhörer\n- Ladegerät\n- Powerbank"],["Einkauf","Allgemeine Einkaufsliste","🛒","Lebensmittel\n- Brot\n- Milch\n- Früchte\n\nHaushalt\n- Küchenpapier\n- Müllsäcke"]];
-  loading(true,"Prüfe Vorlagen…");
-  // Fetch existing template titles to avoid duplicates
-  const{data:existing}=await sb.from("templates").select("title").is("deleted_at",null);
-  const existingTitles=new Set((existing||[]).map(t=>t.title));
-  const toCreate=templates.filter(t=>!existingTitles.has(t[0]));
-  if(!toCreate.length){loading(false);toast("Alle Standardvorlagen sind bereits vorhanden.");return}
-  for(const t of toCreate)await createTemplateFromSeed(t);
-  loading(false);await loadTemplates();
-  toast(`${toCreate.length} Vorlage${toCreate.length!==1?"n":""} hinzugefügt`);
+  loading(true,"Ergänze Vorlagen…");
+  for(const t of templates)await createTemplateFromSeed(t);
+  loading(false);await loadTemplates();toast("Standardvorlagen ergänzt");
 }
+
 async function createTemplateFromSeed(t){
   const r=await sb.from("templates").insert({organization_id:orgId,owner_id:owner(),created_by:user.id,updated_by:user.id,title:t[0],description:t[1],icon:t[2],is_global:isSuper}).select().single();
-  if(r.error)return;let cur=null,n=10,i=10;
+  if(r.error)return;
+  let cur=null,n=10,i=10;
   for(const line of t[3].split(/\n/).map(x=>x.trim()).filter(Boolean)){
     if(line.startsWith("-")){if(cur)await sb.from("template_items").insert({category_id:cur,title:line.replace(/^-\s*/,""),sort_order:i});i+=10}
     else{const c=await sb.from("template_categories").insert({template_id:r.data.id,title:line,sort_order:n}).select().single();cur=c.data.id;n+=10;i=10}
   }
 }
 
-/* ── Event wiring ── */
-// Safe onclick helper — skips if element not found
-function on(id,fn){const el=$(id);if(el)el.onclick=fn}
-function onkey(id,fn){const el=$(id);if(el)el.onkeydown=fn}
+/* ── XSS helpers ── */
+function escHtml(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function escAttr(s){return String(s).replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
 
+/* ── CSS for item delete button ── */
+const style=document.createElement("style");
+style.textContent=`.item-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:0 4px;line-height:1;opacity:0;transition:opacity .15s,color .15s;flex-shrink:0}.checkrow:hover .item-del{opacity:1}.item-del:hover{color:var(--danger)}`;
+document.head.appendChild(style);
+
+/* ── Event wiring ── */
 document.addEventListener("DOMContentLoaded",()=>{
   initClient();
-
-  // Normal app wiring
-  on("loginBtn",doLogin);
-  onkey("loginPw",e=>{if(e.key==="Enter")doLogin()});
-  on("logoutBtn",doLogout);
-  on("logoutBtnDesktop",doLogout);
-  on("darkToggle",toggleDark);
-  on("darkToggleDesktop",toggleDark);
-  on("editUserClose",()=>{$("editUserOverlay").style.opacity="0";$("editUserOverlay").style.pointerEvents="none";$("editUserPanel").style.transform="translateX(100%)"});
-  on("changePwBtn",()=>openChangePwModal());
-  on("changePwCancel",()=>closeChangePwModal());
-  on("changePwConfirm",()=>submitChangePw());
-  onkey("newPw1",e=>{if(e.key==="Enter")submitChangePw()});
-  onkey("newPw2",e=>{if(e.key==="Enter")submitChangePw()});
-  applyDark(false);
-  if(window.innerWidth<=768){const d=$("desktopActions");if(d)d.style.display="none"}
-  on("menuBtn",openSidebar);
-  on("sidebarBackdrop",closeSidebar);
-  on("stopActing",()=>setActing(null,""));
-  on("bCheck",()=>show("Check"));
-  on("bTpl",()=>show("Tpl"));
-  on("bAdmin",()=>show("Admin"));
-  on("bbCheck",()=>show("Check"));
-  on("bbTpl",()=>show("Tpl"));
-  on("bbAdmin",()=>show("Admin"));
-  on("refreshCheck",()=>{loading(true,"Aktualisiere…");loadChecklists().finally(()=>loading(false))});
-  on("newEmptyCl",()=>createEmptyChecklist());
-  on("newFromTplCl",()=>pickTemplateAndCreate());
-  on("newTpl",()=>openTemplateEditor(null));
-  on("adminClClose",()=>{$("adminClSection").style.display="none"});
-  on("seedMore",()=>seedStandardTemplates());
-  on("showArchivedTpl",()=>loadArchivedTemplates());
-  on("closeArchivedTpl",()=>{$("archivedTplSection").style.display="none"});
-  on("addUser",addUser);
-  on("detailClose",closeDetailPanel);
-  on("detailAddCat",()=>addChecklistCategory());
-  on("detailExport",()=>openExportModal(currentChecklistId));
-  on("detailShare",()=>openShareModal(currentChecklistId));
-  on("showArchivedCl",()=>loadArchivedChecklists());
-  on("closeArchivedCl",()=>{$("archivedClSection").style.display="none"});
-  on("exportClose",closeExportModal);
-  on("exportPdf",()=>exportChecklist("pdf"));
-  on("exportCsv",()=>exportChecklist("csv"));
-  on("shareClose",closeShareModal);
-  on("shareCopy",copyShareUrl);
+  $("loginBtn").onclick=doLogin;
+  $("loginPw").onkeydown=e=>{if(e.key==="Enter")doLogin()};
+  $("logoutBtn").onclick=doLogout;
+  $("menuBtn").onclick=openSidebar;
+  $("sidebarBackdrop").onclick=closeSidebar;
+  $("stopActing").onclick=()=>setActing(null,"");
+  $("bCheck").onclick=()=>show("Check");
+  $("bTpl").onclick=()=>show("Tpl");
+  $("bAdmin").onclick=()=>show("Admin");
+  $("bbCheck").onclick=()=>show("Check");
+  $("bbTpl").onclick=()=>show("Tpl");
+  $("bbAdmin").onclick=()=>show("Admin");
+  $("refreshCheck").onclick=()=>{loading(true,"Aktualisiere…");loadChecklists().finally(()=>loading(false))};
+  $("newTpl").onclick=()=>openTemplateEditor(null);
+  $("seedMore").onclick=()=>seedStandardTemplates();
+  $("addUser").onclick=addUser;
+  $("detailClose").onclick=closeDetailPanel;
+  $("detailAddCat").onclick=()=>addChecklistCategory();
   $("detailOverlay").onclick=e=>{if(e.target===$("detailOverlay"))closeDetailPanel()};
-  $("exportOverlay").onclick=e=>{if(e.target===$("exportOverlay"))closeExportModal()};
-  $("shareOverlay").onclick=e=>{if(e.target===$("shareOverlay"))closeShareModal()};
   checkSession();
 });
+
 if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js");
 </script>
 </body>
