@@ -363,6 +363,7 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
       </div>
       <div class="detail-hbtns">
         <button class="btn btn-ghost btn-sm" id="detailAddCat"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg><span class="btn-label">Kategorie</span></button>
+        <button class="btn btn-ghost btn-sm" id="detailShare" title="Teilen"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg><span class="btn-label">Teilen</span></button>
         <button class="btn btn-danger btn-sm" id="detailArchive"><span class="btn-label">Archivieren</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg></button>
       </div>
     </div>
@@ -574,18 +575,21 @@ async function loadApp(){
     const m=await sb.from("organization_members").select("organization_id,role").eq("user_id",user.id);
     orgId=m.data?.[0]?.organization_id;
     isSuper=(m.data||[]).some(x=>x.role==="super_admin");
-    [$("bAdmin"),$("bbAdmin")].forEach(el=>{if(el)el.classList.toggle("hidden",!isSuper)});
+    const isAdminOrSuper=(m.data||[]).some(x=>["admin","super_admin"].includes(x.role));
+    [$("bAdmin"),$("bbAdmin")].forEach(el=>{if(el)el.classList.toggle("hidden",!isAdminOrSuper)});
     await Promise.all([loadTemplates(),loadChecklists()]);
-    if(isSuper){
+    const isAdmin=(m.data||[]).some(x=>["admin","super_admin"].includes(x.role));
+    if(isAdmin){
       const filt=$("checkUserFilter"),sel=$("checkUserSelect");
       filt.style.display="";
       const us=await getUsers();
-      sel.innerHTML='<option value="">Alle Checklisten</option>'
-        +'<option value="'+user.id+'" selected>Meine Checklisten</option>'
+      sel.innerHTML='<option value="OWN" selected>Meine Checklisten</option>'
+        +'<option value="ALL">Alle Checklisten</option>'
         +us.filter(u=>u.id!==user.id).map(u=>'<option value="'+u.id+'">'+escH(u.display_name||u.email)+'</option>').join("");
       sel.onchange=()=>{
         const uid=sel.value;
-        if(!uid||uid===user.id){setActing(null,"");return}
+        if(uid==="OWN"){actingAs=null;loadChecklists();return}
+        if(uid==="ALL"){actingAs="ALL";loadChecklists();return}
         const u=us.find(u=>u.id===uid);
         setActing(uid,u?u.display_name||u.email:"");
       };
@@ -598,8 +602,23 @@ async function loadChecklists(){
   const box=$("checkList");
   box.innerHTML='<div style="display:flex;justify-content:center;padding:48px"><div class="spinner"></div></div>';
   let clQ=sb.from("checklists").select("*").is("deleted_at",null).order("created_at",{ascending:false});
-  if(actingAs)clQ=clQ.eq("owner_id",actingAs);
+  // viewingAs: null=own, string=specific user, "ALL"=all users (admin)
+  const viewAs=actingAs;
+  if(viewAs==="ALL"){}  // no filter — show all
+  else if(viewAs)clQ=clQ.eq("owner_id",viewAs);
+  else clQ=clQ.eq("owner_id",user.id);  // default: own checklists only
   const{data,error}=await clQ;
+  // Also load shared checklists (only when viewing own)
+  let sharedData=[];
+  if(!viewAs){
+    const{data:shares}=await sb.from("checklist_shares").select("checklist_id,permission").eq("shared_with",user.id);
+    if(shares&&shares.length){
+      const sharedIds=shares.map(s=>s.checklist_id);
+      const{data:sharedCls}=await sb.from("checklists").select("*").in("id",sharedIds).is("deleted_at",null);
+      const permMap={}; shares.forEach(s=>permMap[s.checklist_id]=s.permission);
+      sharedData=(sharedCls||[]).map(cl=>({...cl,_sharedPerm:permMap[cl.id]}));
+    }
+  }
   if(error){box.textContent=error.message;return}
   const n=data?data.length:0;
   $("checkSub").textContent=n?n+" Checklist"+(n!==1?"en":""):"";
@@ -634,6 +653,17 @@ async function loadChecklists(){
       loading(false);toast("Gelöscht");card.remove();};
     card.onclick=()=>openDetailPanel(cl.id);
     grid.appendChild(card);
+  });
+  // Shared checklists
+  (sharedData||[]).forEach(cl=>{
+    const{d,t}=prog[cl.id]||{d:0,t:0};
+    const pct=t?Math.round(d/t*100):0;
+    const isEdit=cl._sharedPerm==="edit";
+    const scard=q("div");scard.className="cl-card";
+    scard.style.borderStyle="dashed";
+    scard.innerHTML='<div class="cl-ring">'+ring(pct)+'</div><div class="cl-body"><div class="cl-title">'+escH((cl.icon||"📋")+" "+cl.title)+'</div><div class="cl-desc">'+escH(cl.description||"Geteilt mit mir")+'</div><div class="cl-meta"><span>'+d+"/"+t+' erledigt</span><span style="font-size:11px;color:var(--accent);font-weight:600;background:rgba(99,102,241,.1);padding:2px 7px;border-radius:99px">'+( isEdit?"✏️ Bearbeiten":"👁 Lesen")+'</span></div></div>';
+    scard.onclick=()=>openDetailPanel(cl.id);
+    grid.appendChild(scard);
   });
   box.innerHTML="";box.appendChild(grid);
 }
@@ -1298,6 +1328,79 @@ async function submitPw(){
   setTimeout(closePwModal,1200);toast("Passwort geändert");
 }
 
+/* ── Sharing ── */
+function openSharePanel(clId){
+  const ov=$("shareOverlay"),pn=$("sharePanel");
+  $("shareMsg").textContent="";
+  ov.style.opacity="1";ov.style.pointerEvents="all";pn.style.transform="translateX(0)";
+  loadSharePanel(clId);
+}
+function closeSharePanel(){
+  const ov=$("shareOverlay"),pn=$("sharePanel");
+  ov.style.opacity="0";ov.style.pointerEvents="none";pn.style.transform="translateX(100%)";
+}
+
+async function loadSharePanel(clId){
+  // Populate user dropdown (exclude owner and already-shared)
+  const us=await getUsers();
+  const{data:existing}=await sb.from("checklist_shares").select("shared_with").eq("checklist_id",clId);
+  const sharedIds=new Set((existing||[]).map(s=>s.shared_with));
+  const eligible=us.filter(u=>u.id!==user.id&&!sharedIds.has(u.id));
+  const sel=$("shareUserSel");
+  if(!eligible.length){
+    sel.innerHTML='<option>Alle Benutzer haben bereits Zugriff</option>';
+    $("shareAddBtn").disabled=true;
+  } else {
+    $("shareAddBtn").disabled=false;
+    sel.innerHTML=eligible.map(u=>'<option value="'+u.id+'">'+escH(u.display_name||u.email)+'</option>').join("");
+  }
+  // Load existing shares
+  await loadShareList(clId);
+  // Wire add button
+  $("shareAddBtn").onclick=async()=>{
+    const uid=sel.value,perm=$("sharePermSel").value;
+    if(!uid)return;
+    loading(true,"Speichere…");
+    const{error}=await sb.from("checklist_shares").insert({checklist_id:clId,shared_with:uid,permission:perm,created_by:user.id});
+    loading(false);
+    if(error){$("shareMsg").style.color="var(--danger)";$("shareMsg").textContent=error.message;return}
+    $("shareMsg").style.color="var(--success)";$("shareMsg").textContent="✓ Freigabe hinzugefügt";
+    await loadSharePanel(clId);
+  };
+}
+
+async function loadShareList(clId){
+  const box=$("shareList");
+  box.innerHTML='<div style="display:flex;justify-content:center;padding:16px"><div class="spinner"></div></div>';
+  const{data,error}=await sb.from("checklist_shares").select("*").eq("checklist_id",clId);
+  if(error||!data||!data.length){box.innerHTML='<p style="font-size:13px;color:var(--muted)">Noch keine Freigaben.</p>';return}
+  const us=await getUsers();
+  box.innerHTML="";
+  (data||[]).forEach(s=>{
+    const u=us.find(u=>u.id===s.shared_with);
+    const row=q("div");row.style.cssText="display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--border)";
+    const av=q("div");av.className="user-avatar";av.style.cssText="width:30px;height:30px;font-size:11px;flex-shrink:0";
+    av.textContent=(u?.display_name||u?.email||"?")[0].toUpperCase();
+    const inf=q("div");inf.style.flex="1";
+    inf.innerHTML='<div style="font-size:14px;font-weight:600">'+escH(u?.display_name||u?.email||s.shared_with)+'</div>'
+      +'<div style="font-size:12px;color:var(--muted)">'+(s.permission==="edit"?"Bearbeiten":"Lesen")+'</div>';
+    // Permission toggle
+    const tog=q("button");tog.className="btn btn-ghost btn-sm";
+    tog.textContent=s.permission==="edit"?"→ Lesen":"→ Bearbeiten";
+    tog.onclick=async()=>{
+      const newPerm=s.permission==="edit"?"read":"edit";
+      loading(true,"...");await sb.from("checklist_shares").update({permission:newPerm}).eq("id",s.id);
+      loading(false);await loadShareList(clId);
+    };
+    const del=q("button");del.className="btn btn-danger btn-sm";del.textContent="×";del.title="Freigabe entfernen";
+    del.onclick=async()=>{
+      loading(true,"...");await sb.from("checklist_shares").delete().eq("id",s.id);
+      loading(false);toast("Freigabe entfernt");await loadSharePanel(clId);
+    };
+    row.append(av,inf,tog,del);box.appendChild(row);
+  });
+}
+
 /* Wiring */
 document.addEventListener("DOMContentLoaded",()=>{
   initClient();
@@ -1316,6 +1419,9 @@ document.addEventListener("DOMContentLoaded",()=>{
   on("adminClClose",()=>{$("adminClSection").style.display="none"});
   on("addUser",addUser);
   on("detailClose",closeDetailPanel);on("detailAddCat",addChecklistCat);on("detailArchive",()=>archiveCl(currentChecklistId,true));
+  on("detailShare",()=>openSharePanel(currentChecklistId));
+  on("sharePanelClose",closeSharePanel);
+  $("shareOverlay").onclick=e=>{if(e.target===$("shareOverlay"))closeSharePanel()};
   $("detailOverlay").onclick=e=>{if(e.target===$("detailOverlay"))closeDetailPanel()};
   on("changePwBtn",openPwModal);on("changePwCancel",closePwModal);on("changePwConfirm",submitPw);
   onkey("newPw1",e=>{if(e.key==="Enter")submitPw()});onkey("newPw2",e=>{if(e.key==="Enter")submitPw()});
@@ -1325,5 +1431,30 @@ document.addEventListener("DOMContentLoaded",()=>{
 });
 if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js");
 </script>
+<!-- Share Panel -->
+<div id="shareOverlay" style="position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:150;opacity:0;pointer-events:none;transition:opacity .22s ease">
+  <div id="sharePanel" style="position:fixed;top:0;right:0;bottom:0;width:min(400px,100vw);background:var(--surface);border-left:1px solid var(--border);box-shadow:var(--shadow-lg);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .26s cubic-bezier(.4,0,.2,1);z-index:151;overflow-y:auto;padding:24px">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+      <button id="sharePanelClose" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:6px;border-radius:8px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      <h2 style="font-size:18px;font-weight:700;flex:1">Checkliste teilen</h2>
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Wähle einen Benutzer und die Berechtigung.</p>
+    <div class="form-group">
+      <label>Benutzer</label>
+      <select id="shareUserSel" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none"></select>
+    </div>
+    <div class="form-group">
+      <label>Berechtigung</label>
+      <select id="sharePermSel" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none">
+        <option value="read">Lesen (nur ansehen)</option>
+        <option value="edit">Bearbeiten (Einträge abhaken & hinzufügen)</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" id="shareAddBtn" style="width:100%;margin-bottom:20px">Freigabe hinzufügen</button>
+    <div id="shareMsg" style="font-size:13px;margin-bottom:12px;min-height:18px"></div>
+    <h3 style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px">Aktive Freigaben</h3>
+    <div id="shareList"></div>
+  </div>
+</div>
 </body>
 </html>
