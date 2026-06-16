@@ -789,8 +789,6 @@ async function doLogin(){
 }
 async function doLogout(){await sb.auth.signOut();$("shell").style.display="none";$("loginScreen").classList.add("show");toast("Abgemeldet")}
 async function checkSession(){
-  // Handle public share links — no login needed
-  if(await checkShareMode())return;
   const{data}=await sb.auth.getSession();
   if(data.session)await loadApp();
   else $("loginScreen").classList.add("show");
@@ -1923,7 +1921,10 @@ async function createTemplateFromSeed(t){
 }
 
 /* ── Event wiring ── */
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener("DOMContentLoaded",async()=>{
+  // Share links work without login — check first
+  const shareId=new URLSearchParams(location.search).get("share");
+  if(shareId){initClient();await checkShareMode();return}
   initClient();
   $("loginBtn").onclick=doLogin;
   $("loginPw").onkeydown=e=>{if(e.key==="Enter")doLogin()};
