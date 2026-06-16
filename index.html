@@ -99,6 +99,9 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 .drag-handle,.cat-drag-handle{display:flex;align-items:center;cursor:grab;color:var(--muted);padding:0;flex-shrink:0;touch-action:none;min-width:32px;min-height:32px;justify-content:center;user-select:none;-webkit-user-select:none}
 .drag-handle:hover,.cat-drag-handle:hover{color:var(--accent)}
 .dragging{opacity:.35}
+.cl-tab{background:none;border:none;border-bottom:2px solid transparent;padding:8px 14px;font-size:14px;font-weight:500;color:var(--muted);cursor:pointer;font-family:inherit;transition:color .15s,border-color .15s;margin-bottom:-1px}
+.cl-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.cl-tab:hover:not(.active){color:var(--text)}
 .drag-over-top{box-shadow:0 -2px 0 var(--accent)!important}
 .drag-over-bottom{box-shadow:0 2px 0 var(--accent)!important}
 .inline-add{display:flex;gap:8px;align-items:center;padding:10px 14px;border-top:1px solid var(--border)}
@@ -277,7 +280,12 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
             <button class="icon-btn btn-sm" id="refreshCheck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/></svg></button>
           </div>
         </div>
-        <div id="checkUserFilter" style="display:none;margin-top:14px;padding:0 24px">
+        <!-- Tab navigation -->
+        <div id="clTabBar" style="display:flex;gap:4px;margin-top:16px;padding:0 24px;border-bottom:1px solid var(--border)">
+          <button class="cl-tab active" id="tabMine" onclick="setClTab('mine')">Meine Listen</button>
+          <button class="cl-tab" id="tabShared" onclick="setClTab('shared')">Geteilt mit mir</button>
+        </div>
+        <div id="checkUserFilter" style="display:none;margin-top:12px;padding:0 24px">
           <div style="display:flex;align-items:center;gap:10px">
             <label style="font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap">Benutzer:</label>
             <select id="checkUserSelect" style="flex:1;min-width:180px;padding:8px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none"></select>
@@ -601,24 +609,52 @@ async function loadApp(){
 async function loadChecklists(){
   const box=$("checkList");
   box.innerHTML='<div style="display:flex;justify-content:center;padding:48px"><div class="spinner"></div></div>';
-  let clQ=sb.from("checklists").select("*").is("deleted_at",null).order("created_at",{ascending:false});
-  // viewingAs: null=own, string=specific user, "ALL"=all users (admin)
-  const viewAs=actingAs;
-  if(viewAs==="ALL"){}  // no filter — show all
-  else if(viewAs)clQ=clQ.eq("owner_id",viewAs);
-  else clQ=clQ.eq("owner_id",user.id);  // default: own checklists only
-  const{data,error}=await clQ;
-  // Also load shared checklists (only when viewing own)
-  let sharedData=[];
-  if(!viewAs){
+  // Tab: "shared" shows checklists shared with current user
+  if(clTab==="shared"){
     const{data:shares}=await sb.from("checklist_shares").select("checklist_id,permission").eq("shared_with",user.id);
+    const sharedData=[];
     if(shares&&shares.length){
       const sharedIds=shares.map(s=>s.checklist_id);
       const{data:sharedCls}=await sb.from("checklists").select("*").in("id",sharedIds).is("deleted_at",null);
-      const permMap={}; shares.forEach(s=>permMap[s.checklist_id]=s.permission);
-      sharedData=(sharedCls||[]).map(cl=>({...cl,_sharedPerm:permMap[cl.id]}));
+      const permMap={};shares.forEach(s=>permMap[s.checklist_id]=s.permission);
+      sharedData.push(...(sharedCls||[]).map(cl=>({...cl,_sharedPerm:permMap[cl.id]})));
     }
+    // Render shared checklists
+    const n=sharedData.length;
+    $("checkSub").textContent=n?n+" geteilt mit mir":"";
+    if(!n){
+      box.innerHTML='<div class="empty-state"><div class="empty-icon">🤝</div><div class="empty-title">Keine geteilten Listen</div><div class="empty-sub">Noch hat niemand eine Checkliste mit dir geteilt.</div></div>';
+      return;
+    }
+    const ids=sharedData.map(c=>c.id);
+    const cats=await sb.from("checklist_categories").select("id,checklist_id").in("checklist_id",ids);
+    const cids=(cats.data||[]).map(c=>c.id);
+    const items=cids.length?await sb.from("checklist_items").select("category_id,is_checked").in("category_id",cids):{data:[]};
+    const c2cl={};(cats.data||[]).forEach(c=>c2cl[c.id]=c.checklist_id);
+    const prog={};ids.forEach(id=>prog[id]={d:0,t:0});
+    (items.data||[]).forEach(it=>{const cl=c2cl[it.category_id];if(!cl)return;prog[cl].t++;if(it.is_checked)prog[cl].d++});
+    const grid=q("div");grid.className="cl-grid";
+    sharedData.forEach(cl=>{
+      const{d,t}=prog[cl.id]||{d:0,t:0};
+      const pct=t?Math.round(d/t*100):0;
+      const isEdit=cl._sharedPerm==="edit";
+      const card=q("div");card.className="cl-card";card.style.borderStyle="dashed";
+      const permBadge='<span style="font-size:11px;color:var(--accent);font-weight:600;background:rgba(99,102,241,.1);padding:2px 7px;border-radius:99px">'+(isEdit?"✏️ Bearbeiten":"👁 Lesen")+'</span>';
+      card.innerHTML='<div class="cl-ring">'+ring(pct)+'</div><div class="cl-body"><div class="cl-title">'+escH((cl.icon||"📋")+" "+cl.title)+'</div><div class="cl-desc">'+escH(cl.description||"")+'</div><div class="cl-meta"><span>'+d+"/"+t+' erledigt</span>'+permBadge+'</div></div>';
+      card.onclick=()=>openDetailPanel(cl.id);
+      grid.appendChild(card);
+    });
+    box.innerHTML="";box.appendChild(grid);
+    return;
   }
+  // "mine" tab: owned checklists
+  let clQ=sb.from("checklists").select("*").is("deleted_at",null).order("created_at",{ascending:false});
+  const viewAs=actingAs;
+  if(viewAs==="ALL"){}
+  else if(viewAs)clQ=clQ.eq("owner_id",viewAs);
+  else clQ=clQ.eq("owner_id",user.id);
+  const{data,error}=await clQ;
+  const sharedData=[];
   if(error){box.textContent=error.message;return}
   const n=data?data.length:0;
   $("checkSub").textContent=n?n+" Checklist"+(n!==1?"en":""):"";
@@ -653,17 +689,6 @@ async function loadChecklists(){
       loading(false);toast("Gelöscht");card.remove();};
     card.onclick=()=>openDetailPanel(cl.id);
     grid.appendChild(card);
-  });
-  // Shared checklists
-  (sharedData||[]).forEach(cl=>{
-    const{d,t}=prog[cl.id]||{d:0,t:0};
-    const pct=t?Math.round(d/t*100):0;
-    const isEdit=cl._sharedPerm==="edit";
-    const scard=q("div");scard.className="cl-card";
-    scard.style.borderStyle="dashed";
-    scard.innerHTML='<div class="cl-ring">'+ring(pct)+'</div><div class="cl-body"><div class="cl-title">'+escH((cl.icon||"📋")+" "+cl.title)+'</div><div class="cl-desc">'+escH(cl.description||"Geteilt mit mir")+'</div><div class="cl-meta"><span>'+d+"/"+t+' erledigt</span><span style="font-size:11px;color:var(--accent);font-weight:600;background:rgba(99,102,241,.1);padding:2px 7px;border-radius:99px">'+( isEdit?"✏️ Bearbeiten":"👁 Lesen")+'</span></div></div>';
-    scard.onclick=()=>openDetailPanel(cl.id);
-    grid.appendChild(scard);
   });
   box.innerHTML="";box.appendChild(grid);
 }
@@ -1328,6 +1353,19 @@ async function submitPw(){
   setTimeout(closePwModal,1200);toast("Passwort geändert");
 }
 
+/* ── Checklist tabs ── */
+let clTab="mine"; // "mine" or "shared"
+function setClTab(tab){
+  clTab=tab;
+  $("tabMine").classList.toggle("active",tab==="mine");
+  $("tabShared").classList.toggle("active",tab==="shared");
+  // Hide admin filter on shared tab
+  if($("checkUserFilter").style.display!=="none"){
+    $("checkUserFilter").style.display=tab==="shared"?"none":"";
+  }
+  loadChecklists();
+}
+
 /* ── Sharing ── */
 function openSharePanel(clId){
   const ov=$("shareOverlay"),pn=$("sharePanel");
@@ -1347,13 +1385,10 @@ async function loadSharePanel(clId){
   const sharedIds=new Set((existing||[]).map(s=>s.shared_with));
   const eligible=us.filter(u=>u.id!==user.id&&!sharedIds.has(u.id));
   const sel=$("shareUserSel");
-  if(!eligible.length){
-    sel.innerHTML='<option>Alle Benutzer haben bereits Zugriff</option>';
-    $("shareAddBtn").disabled=true;
-  } else {
-    $("shareAddBtn").disabled=false;
-    sel.innerHTML=eligible.map(u=>'<option value="'+u.id+'">'+escH(u.display_name||u.email)+'</option>').join("");
-  }
+  $("shareAddBtn").disabled=!eligible.length;
+  sel.innerHTML=eligible.length
+    ? eligible.map(u=>'<option value="'+u.id+'">'+escH(u.display_name||u.email)+'</option>').join("")
+    : '<option value="">— Kein weiterer Benutzer verfügbar —</option>';
   // Load existing shares
   await loadShareList(clId);
   // Wire add button
