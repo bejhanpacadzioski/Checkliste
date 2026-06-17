@@ -1332,7 +1332,24 @@ async function toggleUserActive(u,isActive){
     sub:isActive?"Der User wird als deaktiviert markiert.":"Der User wird wieder aktiviert.",
     confirmLabel:isActive?"Deaktivieren":"Aktivieren",danger:isActive});
   if(!ok)return;loading(true,"...");
-  await sb.from("profiles").update({is_disabled:isActive}).eq("id",u.id);
+  // Use set-user-password edge function with ban parameter
+  try{
+    const sess=await sb.auth.getSession();
+    const tok=sess.data?.session?.access_token;
+    // Ban via edge function (uses auth.admin.updateUserById with ban_duration)
+    const res=await fetch(SB_URL+"/functions/v1/set-user-password",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":"Bearer "+tok},
+      body:JSON.stringify({user_id:u.id,ban:isActive})
+    });
+    const json=await res.json().catch(()=>({}));
+    if(!res.ok||json.error){
+      // Fallback: just update profile flag
+      await sb.from("profiles").update({is_disabled:isActive}).eq("id",u.id);
+    }
+  }catch(e){
+    await sb.from("profiles").update({is_disabled:isActive}).eq("id",u.id);
+  }
   loading(false);_users=null;loadUsers();toast(isActive?"User deaktiviert":"User aktiviert");
 }
 
@@ -1342,28 +1359,15 @@ async function deleteUser(u){
     confirmLabel:"Löschen",danger:true});
   if(!ok)return;loading(true,"Lösche…");
   try{
-    // Delete all user data in order
-    const cls=await sb.from("checklists").select("id").eq("owner_id",u.id);
-    const clIds=(cls.data||[]).map(c=>c.id);
-    if(clIds.length){
-      const cats=await sb.from("checklist_categories").select("id").in("checklist_id",clIds);
-      const catIds=(cats.data||[]).map(c=>c.id);
-      if(catIds.length)await sb.from("checklist_items").delete().in("category_id",catIds);
-      await sb.from("checklist_categories").delete().in("checklist_id",clIds);
-      await sb.from("checklists").delete().in("id",clIds);
-    }
-    const tpls=await sb.from("templates").select("id").eq("owner_id",u.id);
-    const tplIds=(tpls.data||[]).map(t=>t.id);
-    if(tplIds.length){
-      const tc=await sb.from("template_categories").select("id").in("template_id",tplIds);
-      const tcIds=(tc.data||[]).map(c=>c.id);
-      if(tcIds.length)await sb.from("template_items").delete().in("category_id",tcIds);
-      await sb.from("template_categories").delete().in("template_id",tplIds);
-      await sb.from("templates").delete().in("id",tplIds);
-    }
-    await sb.from("checklist_shares").delete().eq("shared_with",u.id);
-    await sb.from("organization_members").delete().eq("user_id",u.id);
-    await sb.from("profiles").delete().eq("id",u.id);
+    const sess=await sb.auth.getSession();
+    const tok=sess.data?.session?.access_token;
+    const res=await fetch(SB_URL+"/functions/v1/delete-user",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":"Bearer "+tok},
+      body:JSON.stringify({user_id:u.id,organization_id:orgId})
+    });
+    const json=await res.json().catch(()=>({}));
+    if(!res.ok||json.error){toast("Fehler: "+(json.error||res.status));loading(false);return}
     loading(false);_users=null;loadUsers();toast("User gelöscht");
   }catch(e){loading(false);toast("Fehler: "+e.message)}
 }
