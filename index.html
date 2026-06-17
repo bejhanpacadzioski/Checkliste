@@ -1579,6 +1579,45 @@ async function loadShareList(clId){
 /* back button removed */
 
 
+/* ── URL Import ── */
+async function importFromUrl(url){
+  const msg=document.getElementById("fImportMsg");
+  try{
+    const sess=await sb.auth.getSession();
+    const tok=sess.data?.session?.access_token;
+    const res=await fetch(SB_URL+"/functions/v1/scrape-url",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":"Bearer "+tok},
+      body:JSON.stringify({url})
+    });
+    const json=await res.json();
+    if(!res.ok||json.error){
+      if(msg){msg.style.color="var(--danger)";msg.textContent="Fehler: "+(json.error||"Seite nicht lesbar");}
+      return;
+    }
+    const d=json.data||{};
+    // Fill in fields
+    const set=(id,val)=>{const el=document.getElementById(id);if(el&&val)el.value=val};
+    set("fName",d.name);
+    set("fProv",d.provider);
+    set("fPrice",d.price);
+    set("fDFrom",d.date_from);
+    set("fDTo",d.date_to);
+    set("fUrl",d.url||url);
+    set("fNotes",d.notes);
+    if(d.category){const sel=document.getElementById("fCat");if(sel)sel.value=d.category}
+    const filled=["name","provider","price","date_from"].filter(k=>d[k]).length;
+    if(msg){
+      msg.style.color="var(--success)";
+      msg.textContent=filled>0
+        ?`✓ ${filled} Felder automatisch ausgefüllt — bitte prüfen und ergänzen.`
+        :"Seite geladen, aber keine strukturierten Daten gefunden. Bitte manuell ausfüllen.";
+    }
+  }catch(e){
+    if(msg){msg.style.color="var(--danger)";msg.textContent="Netzwerkfehler: "+e.message}
+  }
+}
+
 /* ══════════════════════════════════════════
    REISEN / TRIPS
 ══════════════════════════════════════════ */
@@ -1782,6 +1821,14 @@ function openItemForm(tripId,defaultCat,item){
   const isNew=!item;
   const catOpts=Object.entries(CAT_META).map(([v,{icon,label}])=>`<option value="${v}"${(item?.category||defaultCat||"accommodation")===v?" selected":""}>${icon} ${label}</option>`).join("");
   showFormModal(isNew?"Neues Angebot":"Angebot bearbeiten",`
+    ${isNew?`<div style="display:flex;gap:8px;margin-bottom:14px">
+      <input id="fImportUrl" type="url" placeholder="Link einfügen zum automatischen Ausfüllen…" style="flex:1;padding:9px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none">
+      <button type="button" id="fImportBtn" class="btn btn-primary btn-sm" style="white-space:nowrap;flex-shrink:0">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Importieren
+      </button>
+    </div>
+    <div id="fImportMsg" style="font-size:13px;min-height:16px;margin-bottom:8px;color:var(--muted)"></div>`:""}
     <div class="form-group"><label>Kategorie</label><select id="fCat">${catOpts}</select></div>
     <div class="form-group"><label>Name*</label><input id="fName" value="${escA(item?.name||"")}"></div>
     <div class="form-group"><label>Anbieter</label><input id="fProv" value="${escA(item?.provider||"")}"></div>
@@ -1886,6 +1933,22 @@ document.addEventListener("DOMContentLoaded",()=>{
   on("editUserClose",()=>$("editUserOverlay").classList.remove("open"));
   applyDark(false);
   // Trips: use delegation since vTrips content gets replaced dynamically
+  // Import URL button in modal
+  document.addEventListener("click",e=>{
+    if(!e.target.closest("#fImportBtn"))return;
+    const urlInp=document.getElementById("fImportUrl");
+    const msg=document.getElementById("fImportMsg");
+    if(!urlInp||!msg)return;
+    const url=urlInp.value.trim();
+    if(!url){msg.style.color="var(--danger)";msg.textContent="Bitte URL eingeben.";return}
+    msg.style.color="var(--muted)";msg.textContent="⏳ Wird geladen…";
+    e.target.closest("#fImportBtn").disabled=true;
+    importFromUrl(url).finally(()=>{
+      const b=document.getElementById("fImportBtn");
+      if(b)b.disabled=false;
+    });
+  });
+
   $("content").addEventListener("click",e=>{
     if(e.target.closest("#newTrip"))openTripForm(null);
     if(e.target.closest("#backToTrips")){history.back();restoreTripsView()}
