@@ -619,7 +619,14 @@ async function loadChecklists(){
       const{data:sharedCls,error:clsErr}=await sb.from("checklists").select("*").in("id",sharedIds).is("deleted_at",null);
       if(clsErr){box.innerHTML='<div style="padding:20px;color:var(--danger);font-size:13px">Fehler beim Laden der Checklisten: '+escH(clsErr.message)+'</div>';return}
       const permMap={};shares.forEach(s=>permMap[s.checklist_id]=s.permission);
-      sharedData.push(...(sharedCls||[]).map(cl=>({...cl,_sharedPerm:permMap[cl.id]})));
+      // Fetch owner profiles for shared checklists
+      const sOwnerIds=[...new Set((sharedCls||[]).map(c=>c.owner_id).filter(Boolean))];
+      const sOwnerMap={};
+      if(sOwnerIds.length){
+        const{data:sProfs}=await sb.from("profiles").select("id,display_name,email").in("id",sOwnerIds);
+        (sProfs||[]).forEach(p=>sOwnerMap[p.id]=p.display_name||p.email||"");
+      }
+      sharedData.push(...(sharedCls||[]).map(cl=>({...cl,_sharedPerm:permMap[cl.id],_ownerName:sOwnerMap[cl.owner_id]||""})));
     }
     // Render shared checklists
     const n=sharedData.length;
@@ -642,7 +649,9 @@ async function loadChecklists(){
       const isEdit=cl._sharedPerm==="edit";
       const card=q("div");card.className="cl-card";card.style.borderStyle="dashed";
       const permBadge='<span style="font-size:11px;color:var(--accent);font-weight:600;background:rgba(99,102,241,.1);padding:2px 7px;border-radius:99px">'+(isEdit?"✏️ Bearbeiten":"👁 Lesen")+'</span>';
-      card.innerHTML='<div class="cl-ring">'+ring(pct)+'</div><div class="cl-body"><div class="cl-title">'+escH((cl.icon||"📋")+" "+cl.title)+'</div><div class="cl-desc">'+escH(cl.description||"")+'</div><div class="cl-meta"><span>'+d+"/"+t+' erledigt</span>'+permBadge+'</div></div>';
+      // Fetch owner name for shared cards (use cached profiles if possible)
+      const sharedOwnerBadge='<span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;color:var(--muted)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>'+escH(cl._ownerName||"")+'</span>';
+      card.innerHTML='<div class="cl-ring">'+ring(pct)+'</div><div class="cl-body"><div class="cl-title">'+escH((cl.icon||"📋")+" "+cl.title)+'</div><div class="cl-desc">'+escH(cl.description||"")+'</div><div class="cl-meta"><span>'+d+"/"+t+' erledigt</span>'+permBadge+(cl._ownerName?sharedOwnerBadge:"")+'</div></div>';
       card.onclick=()=>openDetailPanel(cl.id);
       grid.appendChild(card);
     });
@@ -660,12 +669,18 @@ async function loadChecklists(){
   if(error){box.textContent=error.message;return}
   const n=data?data.length:0;
   $("checkSub").textContent=n?n+" Checklist"+(n!==1?"en":""):"";
-  // Fetch which checklists are shared (to show icon)
+  // Fetch owner profiles + shared info in parallel
   const sharedByMe={};
+  const ownerMap={};
   if(data&&data.length){
     const clIds=data.map(c=>c.id);
-    const{data:sharesOut}=await sb.from("checklist_shares").select("checklist_id").in("checklist_id",clIds);
-    (sharesOut||[]).forEach(s=>sharedByMe[s.checklist_id]=true);
+    const ownerIds=[...new Set(data.map(c=>c.owner_id).filter(Boolean))];
+    const[sharesRes,profilesRes]=await Promise.all([
+      sb.from("checklist_shares").select("checklist_id").in("checklist_id",clIds),
+      ownerIds.length?sb.from("profiles").select("id,display_name,email").in("id",ownerIds):{data:[]}
+    ]);
+    (sharesRes.data||[]).forEach(s=>sharedByMe[s.checklist_id]=true);
+    (profilesRes.data||[]).forEach(p=>ownerMap[p.id]=p.display_name||p.email||"");
   }
   if(!n){
     box.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Noch keine Checklisten</div><div class="empty-sub">Erstelle eine Checkliste.</div><button class="btn btn-primary" id="goTpl">Zu den Vorlagen</button></div>';
@@ -685,7 +700,10 @@ async function loadChecklists(){
     const card=q("div");card.className="cl-card"+(done?" done-card":"");
     const badge=done?'<span class="cl-done-badge"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg>Fertig</span>':"";
     const shareBadge=sharedByMe[cl.id]?'<span title="Geteilt" style="display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;color:#6366f1;background:rgba(99,102,241,.1);padding:2px 7px;border-radius:99px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Geteilt</span>':"";
-    card.innerHTML='<div class="cl-ring">'+ring(pct)+'</div><div class="cl-body"><div class="cl-title">'+escH((cl.icon||"📋")+" "+cl.title)+'</div><div class="cl-desc">'+escH(cl.description||"Keine Beschreibung")+'</div><div class="cl-meta"><span>'+d+"/"+t+' erledigt</span>'+badge+shareBadge+'<span class="cl-date">'+fmtD(cl.created_at)+'</span></div><div class="cl-actions"><button class="btn-dup">Duplizieren</button><button class="btn-arch">Archivieren</button><button class="btn-del">Löschen</button></div></div>';
+    const ownerName=ownerMap[cl.owner_id]||"";
+    const isOwn=cl.owner_id===user.id;
+    const ownerBadge=ownerName?'<span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;color:var(--muted)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>'+escH(isOwn?"Ich":ownerName)+'</span>':"";
+    card.innerHTML='<div class="cl-ring">'+ring(pct)+'</div><div class="cl-body"><div class="cl-title">'+escH((cl.icon||"📋")+" "+cl.title)+'</div><div class="cl-desc">'+escH(cl.description||"Keine Beschreibung")+'</div><div class="cl-meta"><span>'+d+"/"+t+' erledigt</span>'+badge+shareBadge+ownerBadge+'<span class="cl-date">'+fmtD(cl.created_at)+'</span></div><div class="cl-actions"><button class="btn-dup">Duplizieren</button><button class="btn-arch">Archivieren</button><button class="btn-del">Löschen</button></div></div>';
     card.querySelector(".btn-dup").onclick=e=>{e.stopPropagation();duplicateCl(cl.id)};
     card.querySelector(".btn-arch").onclick=e=>{e.stopPropagation();archiveCl(cl.id)};
     card.querySelector(".btn-del").onclick=async e=>{e.stopPropagation();
