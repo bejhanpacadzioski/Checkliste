@@ -505,7 +505,12 @@ function applyDark(v){document.documentElement.classList.toggle("dark",!!v);[$("
 async function toggleDark(){const d=document.documentElement.classList.contains("dark");applyDark(!d);await sb.from("profiles").update({dark_mode:!d}).eq("id",user.id)}
 
 /* Nav */
-function show(v){
+let _currentView="Check";
+function show(v,skipHistory=false){
+  if(!skipHistory&&v!==_currentView){
+    history.pushState({view:_currentView},"","#"+_currentView.toLowerCase());
+  }
+  _currentView=v;
   ["Check","Tpl","Admin"].forEach(x=>{
     $("v"+x).style.display=x===v?"":"none";
     $("b"+x)?.classList.toggle("active",x===v);
@@ -514,20 +519,31 @@ function show(v){
   closeSidebar();
   if(v==="Admin")loadUsers();
 }
-function openSidebar(){$("sidebar").classList.add("open");$("sidebarBackdrop").classList.add("show");_pushPanel("sidebar")}
-function closeSidebar(){if(_panelStack[_panelStack.length-1]==="sidebar")_popPanel();$("sidebar").classList.remove("open");$("sidebarBackdrop").classList.remove("show")}
+window.addEventListener("popstate",e=>{
+  // If a panel is open, close it
+  if($("detailOverlay").classList.contains("open")){
+    $("detailOverlay").classList.remove("open");
+    document.body.style.overflow="";
+    if(panelDirty)loadChecklists();
+    panelDirty=false;
+    return;
+  }
+  // Otherwise navigate back to previous tab
+  const prev=e.state?.view||"Check";
+  show(prev,true);
+});
+function openSidebar(){$("sidebar").classList.add("open");$("sidebarBackdrop").classList.add("show")}
+function closeSidebar(){$("sidebar").classList.remove("open");$("sidebarBackdrop").classList.remove("show")}
 
 /* Detail panel */
 function openDetailPanel(id){
   currentChecklistId=id;panelDirty=false;
   $("detailOverlay").classList.add("open");document.body.style.overflow="hidden";
   $("detailTitle").classList.remove("editing");$("detailTitleEdit").classList.remove("active");
-  _pushPanel("detail");loadDetailPanel(id);
+  history.pushState({view:_currentView,panel:"detail"},"","#detail");
+  loadDetailPanel(id);
 }
 function closeDetailPanel(){
-  if(_panelStack[_panelStack.length-1]==="detail"){
-    _popPanel();history.back();return;
-  }
   $("detailOverlay").classList.remove("open");document.body.style.overflow="";
   if(panelDirty)loadChecklists();panelDirty=false;
 }
@@ -1280,7 +1296,7 @@ function openEditUser(u,currentRole){
     +'<div class="form-group"><label>Bestätigen</label><input id="euPw2" type="password" placeholder="Wiederholen"></div></div>'
     +'<div id="euMsg" style="font-size:13px;min-height:18px;margin-bottom:10px;color:var(--danger)"></div>'
     +'<div style="display:flex;gap:8px"><button class="btn btn-primary" id="euSave" style="flex:1">Speichern</button><button class="btn btn-ghost" id="euCancel">Abbrechen</button></div>';
-  const close=()=>{if(_panelStack[_panelStack.length-1]==="edituser"){_popPanel();history.back();return}ov.classList.remove("open")};
+  const close=()=>{ov.classList.remove("open")};
   on("euCancel",close);on("editUserClose",close);
   ov.onclick=e=>{if(e.target===ov)close()};
   on("euSave",async()=>{
@@ -1307,43 +1323,48 @@ function openEditUser(u,currentRole){
     loading(false);msg.style.color="var(--success)";msg.textContent="✓ Gespeichert";
     setTimeout(close,800);_users=null;loadUsers();toast("Benutzer aktualisiert");
   });
-  ov.classList.add("open");_pushPanel("edituser");setTimeout(()=>$("euName")&&$("euName").focus(),100);
+  ov.classList.add("open");setTimeout(()=>$("euName")&&$("euName").focus(),100);
 }
 
 async function toggleUserActive(u,isActive){
   const action=isActive?"deaktivieren":"aktivieren";
   const ok=await showModal({title:escH(u.display_name||u.email)+" "+action+"?",
-    sub:isActive?"Der User kann sich nicht mehr einloggen.":"Der User kann sich wieder einloggen.",
+    sub:isActive?"Der User wird als deaktiviert markiert.":"Der User wird wieder aktiviert.",
     confirmLabel:isActive?"Deaktivieren":"Aktivieren",danger:isActive});
   if(!ok)return;loading(true,"...");
-  try{
-    const sess=await sb.auth.getSession();
-    const tok=sess.data?.session?.access_token;
-    await fetch(SB_URL+"/functions/v1/set-user-password",{method:"POST",
-      headers:{"Content-Type":"application/json","Authorization":"Bearer "+tok},
-      body:JSON.stringify({user_id:u.id,ban:isActive})});
-  }catch(e){}
-  // Update profile with disabled flag
   await sb.from("profiles").update({is_disabled:isActive}).eq("id",u.id);
   loading(false);_users=null;loadUsers();toast(isActive?"User deaktiviert":"User aktiviert");
 }
 
 async function deleteUser(u){
-  const ok=await showModal({title:escH(u.display_name||u.email)+" entfernen?",sub:"Der User wird aus der Organisation entfernt.",confirmLabel:"Entfernen",danger:true});
-  if(!ok)return;loading(true,"Entferne…");
+  const ok=await showModal({title:escH(u.display_name||u.email)+" löschen?",
+    sub:"Alle Daten des Users werden gelöscht. Nicht rückgängig machbar.",
+    confirmLabel:"Löschen",danger:true});
+  if(!ok)return;loading(true,"Lösche…");
   try{
-    const sess=await sb.auth.getSession();
-    const tok=sess.data&&sess.data.session?sess.data.session.access_token:null;
-    const res=await fetch(SB_URL+"/functions/v1/delete-user",{method:"POST",
-      headers:{"Content-Type":"application/json","Authorization":"Bearer "+tok},
-      body:JSON.stringify({user_id:u.id,organization_id:orgId})});
-    let json={};try{json=await res.json()}catch(_){}
-    if(!res.ok||json.error){
-      // Fallback: try direct delete
-      await sb.from("organization_members").delete().eq("user_id",u.id).eq("organization_id",orgId);
-      await sb.from("profiles").delete().eq("id",u.id);
+    // Delete all user data in order
+    const cls=await sb.from("checklists").select("id").eq("owner_id",u.id);
+    const clIds=(cls.data||[]).map(c=>c.id);
+    if(clIds.length){
+      const cats=await sb.from("checklist_categories").select("id").in("checklist_id",clIds);
+      const catIds=(cats.data||[]).map(c=>c.id);
+      if(catIds.length)await sb.from("checklist_items").delete().in("category_id",catIds);
+      await sb.from("checklist_categories").delete().in("checklist_id",clIds);
+      await sb.from("checklists").delete().in("id",clIds);
     }
-    loading(false);_users=null;loadUsers();toast("Benutzer entfernt");
+    const tpls=await sb.from("templates").select("id").eq("owner_id",u.id);
+    const tplIds=(tpls.data||[]).map(t=>t.id);
+    if(tplIds.length){
+      const tc=await sb.from("template_categories").select("id").in("template_id",tplIds);
+      const tcIds=(tc.data||[]).map(c=>c.id);
+      if(tcIds.length)await sb.from("template_items").delete().in("category_id",tcIds);
+      await sb.from("template_categories").delete().in("template_id",tplIds);
+      await sb.from("templates").delete().in("id",tplIds);
+    }
+    await sb.from("checklist_shares").delete().eq("shared_with",u.id);
+    await sb.from("organization_members").delete().eq("user_id",u.id);
+    await sb.from("profiles").delete().eq("id",u.id);
+    loading(false);_users=null;loadUsers();toast("User gelöscht");
   }catch(e){loading(false);toast("Fehler: "+e.message)}
 }
 
@@ -1369,9 +1390,9 @@ async function addUser(){
 /* Own PW */
 function openPwModal(){
   $("newPw1").value="";$("newPw2").value="";$("changePwMsg").textContent="";
-  _pushPanel("changepw");$("changePwOverlay").classList.add("open");closeSidebar();setTimeout(()=>$("newPw1").focus(),80);
+  $("changePwOverlay").classList.add("open");closeSidebar();setTimeout(()=>$("newPw1").focus(),80);
 }
-function closePwModal(){if(_panelStack[_panelStack.length-1]==="changepw"){_popPanel();history.back();return}$("changePwOverlay").classList.remove("open")}
+function closePwModal(){$("changePwOverlay").classList.remove("open")}
 async function submitPw(){
   const pw=$("newPw1").value,pw2=$("newPw2").value,msg=$("changePwMsg");
   msg.style.color="var(--danger)";msg.textContent="";
@@ -1402,11 +1423,9 @@ function openSharePanel(clId){
   const ov=$("shareOverlay"),pn=$("sharePanel");
   $("shareMsg").textContent="";
   ov.style.opacity="1";ov.style.pointerEvents="all";pn.style.transform="translateX(0)";
-  _pushPanel("share");
   loadSharePanel(clId);
 }
 function closeSharePanel(){
-  if(_panelStack[_panelStack.length-1]==="share"){_popPanel();history.back();return}
   const ov=$("shareOverlay"),pn=$("sharePanel");
   if(ov){ov.style.opacity="0";ov.style.pointerEvents="none"}
   if(pn)pn.style.transform="translateX(100%)";
@@ -1470,35 +1489,7 @@ async function loadShareList(clId){
   });
 }
 
-/* ── Back button handler ── */
-// Simple stack-based approach: track open panels
-const _panelStack=[];
-function _pushPanel(name){_panelStack.push(name);history.pushState({panel:name},"","#"+name)}
-function _popPanel(){_panelStack.pop()}
-
-window.addEventListener("popstate",()=>{
-  const name=_panelStack[_panelStack.length-1];
-  if(!name)return;
-  _popPanel();
-  if(name==="detail"){
-    $("detailOverlay").classList.remove("open");
-    document.body.style.overflow="";
-    if(panelDirty)loadChecklists();
-    panelDirty=false;
-  } else if(name==="share"){
-    const ov=$("shareOverlay"),pn=$("sharePanel");
-    if(ov){ov.style.opacity="0";ov.style.pointerEvents="none"}
-    if(pn)pn.style.transform="translateX(100%)";
-  } else if(name==="edituser"){
-    $("editUserOverlay").classList.remove("open");
-  } else if(name==="changepw"){
-    const ov=$("changePwOverlay"),bx=$("changePwBox");
-    if(ov){ov.style.opacity="0";ov.style.pointerEvents="none"}
-    if(bx)bx.style.transform="scale(.95) translateY(10px)";
-  } else if(name==="sidebar"){
-    closeSidebar();
-  }
-});
+/* back button removed */
 
 /* Wiring */
 document.addEventListener("DOMContentLoaded",()=>{
