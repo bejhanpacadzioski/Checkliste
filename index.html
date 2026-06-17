@@ -213,6 +213,32 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
   .detail-hbtns .btn-sm{padding:7px;border-radius:9px}
   @media(hover:none){.item-del{opacity:.4}}
 }
+.trip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:18px 20px;cursor:pointer;transition:box-shadow .18s,transform .18s,border-color .18s;margin-bottom:14px}
+.trip-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px);border-color:var(--accent)}
+.trip-title{font-size:17px;font-weight:700;margin-bottom:4px}
+.trip-meta{font-size:13px;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.trip-cats{display:flex;gap:6px;flex-wrap:wrap}
+.trip-cat-badge{font-size:11px;font-weight:600;padding:3px 8px;border-radius:99px;background:rgba(99,102,241,.1);color:var(--accent)}
+.item-card{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.item-card-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+.item-cat-icon{font-size:22px;flex-shrink:0;line-height:1.2}
+.item-name{font-weight:600;font-size:15px;flex:1}
+.item-status{font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;flex-shrink:0}
+.item-status.open{background:rgba(100,116,139,.1);color:var(--muted)}
+.item-status.favorite{background:rgba(245,158,11,.12);color:#d97706}
+.item-status.booked{background:rgba(34,197,94,.12);color:#16a34a}
+.item-status.rejected{background:rgba(239,68,68,.1);color:var(--danger);text-decoration:line-through}
+.item-fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px;margin-bottom:10px}
+.item-field{font-size:12px;color:var(--muted)}
+.item-field strong{color:var(--text);font-weight:600;display:block;font-size:13px}
+.ratings-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+.rating-chip{display:flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:4px 8px;font-size:12px}
+.rating-stars{color:#f59e0b;font-weight:700}
+.my-rating-btn{background:none;border:1px dashed var(--border);border-radius:8px;padding:4px 10px;font-size:12px;cursor:pointer;color:var(--muted);font-family:inherit;transition:border-color .15s,color .15s}
+.my-rating-btn:hover{border-color:var(--accent);color:var(--accent)}
+.star-select{display:flex;gap:4px;margin:8px 0}
+.star-select button{background:none;border:none;cursor:pointer;font-size:28px;padding:2px;transition:transform .1s;line-height:1}
+.star-select button:hover{transform:scale(1.2)}
 </style>
 </head>
 <body>
@@ -248,6 +274,7 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
     <nav class="snav">
       <button class="nav-item active" id="bCheck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M9 12l2 2 4-4"/></svg>Checklisten</button>
       <button class="nav-item" id="bTpl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Vorlagen</button>
+      <button class="nav-item" id="bTrips"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.25h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.82a16 16 0 0 0 6.29 6.29l1.61-1.73a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Reisen</button>
       <button class="nav-item hidden" id="bAdmin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 11l1.5 1.5L21 9"/></svg>Admin</button>
     </nav>
     <div class="suser">
@@ -326,6 +353,14 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
       </div>
 
       <!-- Admin -->
+      <!-- Reisen view -->
+      <div id="vTrips" style="display:none">
+        <div class="page-header">
+          <div><h1 class="page-title">Reisen</h1><p class="page-sub" id="tripsSub"></p></div>
+          <button class="btn btn-primary btn-sm" id="newTrip"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Neue Reise</button>
+        </div>
+        <div id="tripsList" style="margin-top:18px"></div>
+      </div>
       <div id="vAdmin" style="display:none">
         <div class="page-header"><div><h1 class="page-title">Admin</h1><p class="page-sub">Benutzer &amp; Inhalte verwalten</p></div></div>
         <div style="margin-top:18px;display:flex;flex-direction:column;gap:16px">
@@ -357,6 +392,9 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
   <nav id="bottomNav">
     <button class="bnav-item active" id="bbCheck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M9 12l2 2 4-4"/></svg>Checklisten</button>
     <button class="bnav-item" id="bbTpl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Vorlagen</button>
+    <button class="bnav-item" id="bbTrips">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.25h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.82a16 16 0 0 0 6.29 6.29l1.61-1.73a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Reisen
+    </button>
     <button class="bnav-item hidden" id="bbAdmin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 11l1.5 1.5L21 9"/></svg>Admin</button>
   </nav>
 </div>
@@ -479,6 +517,7 @@ function showSelectModal(title,cur,vals,labels){
 document.addEventListener("keydown",e=>{
   if(e.key!=="Escape")return;
   if($("modalOverlay").classList.contains("open")){$("modalOverlay").classList.remove("open");return}
+  if(location.hash==="#trip"){restoreTripsView();return}
   if($("detailOverlay").classList.contains("open")){closeDetailPanel()}
 });
 
@@ -512,13 +551,14 @@ function show(v,skipHistory=false){
     history.pushState({view:_currentView},"","#"+_currentView.toLowerCase());
   }
   _currentView=v;
-  ["Check","Tpl","Admin"].forEach(x=>{
+  ["Check","Tpl","Trips","Admin"].forEach(x=>{
     $("v"+x).style.display=x===v?"":"none";
     $("b"+x)?.classList.toggle("active",x===v);
     $("bb"+x)?.classList.toggle("active",x===v);
   });
   closeSidebar();
   if(v==="Admin")loadUsers();
+  if(v==="Trips")loadTrips();
 }
 window.addEventListener("popstate",e=>{
   // If a panel is open, close it
@@ -1512,7 +1552,288 @@ async function loadShareList(clId){
   });
 }
 
+
+
 /* back button removed */
+
+
+/* ══════════════════════════════════════════
+   REISEN / TRIPS
+══════════════════════════════════════════ */
+const CAT_META={
+  accommodation:{icon:"🏨",label:"Unterkunft"},
+  flight_out:{icon:"✈️",label:"Hinflug"},
+  flight_return:{icon:"🔙",label:"Rückflug"},
+  flight_combined:{icon:"↔️",label:"Hin+Rückflug"}
+};
+const STATUS_LABEL={open:"Offen",favorite:"Favorit",booked:"Gebucht",rejected:"Abgelehnt"};
+
+let currentTripId=null;
+
+async function loadTrips(){
+  const box=$("tripsList");
+  box.innerHTML='<div style="display:flex;justify-content:center;padding:48px"><div class="spinner"></div></div>';
+  const{data,error}=await sb.from("trips").select("*").is("deleted_at",null).order("created_at",{ascending:false});
+  if(error){box.textContent=error.message;return}
+  $("tripsSub").textContent=(data&&data.length)?data.length+" Reis"+(data.length===1?"e":"en"):"";
+  if(!data||!data.length){
+    box.innerHTML='<div class="empty-state"><div class="empty-icon">✈️</div><div class="empty-title">Noch keine Reisen</div><div class="empty-sub">Erstelle eine neue Reise und erfasse Angebote.</div></div>';
+    return;
+  }
+  box.innerHTML="";
+  // Fetch item counts per trip
+  const tripIds=data.map(t=>t.id);
+  const{data:items}=await sb.from("trip_items").select("trip_id,category").in("trip_id",tripIds);
+  const itemsByTrip={};
+  (items||[]).forEach(it=>{(itemsByTrip[it.trip_id]=itemsByTrip[it.trip_id]||[]).push(it.category)});
+
+  data.forEach(trip=>{
+    const cats=[...new Set((itemsByTrip[trip.id]||[]))];
+    const card=q("div");card.className="trip-card";
+    const dateRange=trip.travel_date_from?fmtD(trip.travel_date_from)+(trip.travel_date_to?" – "+fmtD(trip.travel_date_to):""):"";
+    const catBadges=cats.map(c=>`<span class="trip-cat-badge">${CAT_META[c]?.icon||""} ${CAT_META[c]?.label||c}</span>`).join("");
+    card.innerHTML=`<div class="trip-title">${escH(trip.title)}</div>
+      <div class="trip-meta">
+        ${trip.destination?`<span>📍 ${escH(trip.destination)}</span>`:""}
+        ${dateRange?`<span>📅 ${dateRange}</span>`:""}
+        <span>${(itemsByTrip[trip.id]||[]).length} Angebote</span>
+      </div>
+      ${catBadges?`<div class="trip-cats">${catBadges}</div>`:""}`;
+    card.onclick=()=>openTripDetail(trip);
+    box.appendChild(card);
+  });
+}
+
+async function openTripDetail(trip){
+  currentTripId=trip.id;
+  history.pushState({panel:"tripDetail"},"","#trip");
+  // Replace main content with trip detail
+  $("vTrips").innerHTML=`
+    <div class="page-header" style="margin-bottom:0">
+      <div>
+        <button class="btn btn-ghost btn-sm" id="backToTrips" style="margin-bottom:8px">← Alle Reisen</button>
+        <h1 class="page-title">${escH(trip.title)}</h1>
+        ${trip.destination?`<p class="page-sub">📍 ${escH(trip.destination)}</p>`:""}
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost btn-sm" id="editTrip">Bearbeiten</button>
+        <button class="btn btn-primary btn-sm" id="addItemBtn">+ Angebot</button>
+      </div>
+    </div>
+    <div id="tripItemsList" style="padding:16px 24px 32px"></div>`;
+  on("backToTrips",()=>{history.back();restoreTripsView()});
+  on("addItemBtn",()=>openItemForm(trip.id));
+  on("editTrip",()=>openTripForm(trip));
+  loadTripItems(trip.id);
+}
+
+function restoreTripsView(){
+  $("vTrips").innerHTML=`
+    <div class="page-header">
+      <div><h1 class="page-title">Reisen</h1><p class="page-sub" id="tripsSub"></p></div>
+      <button class="btn btn-primary btn-sm" id="newTrip"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Neue Reise</button>
+    </div>
+    <div id="tripsList" style="margin-top:18px"></div>`;
+  on("newTrip",()=>openTripForm(null));
+  loadTrips();
+}
+
+async function loadTripItems(tripId){
+  const box=$("tripItemsList");
+  box.innerHTML='<div style="display:flex;justify-content:center;padding:32px"><div class="spinner"></div></div>';
+  const{data:items,error}=await sb.from("trip_items").select("*").eq("trip_id",tripId).order("sort_order").order("created_at");
+  if(error){box.textContent=error.message;return}
+  if(!items||!items.length){
+    box.innerHTML='<div class="empty-state" style="padding:40px 0"><div class="empty-icon">🗂️</div><div class="empty-title">Noch keine Angebote</div><div class="empty-sub">Füge Unterkünfte, Flüge und mehr hinzu.</div></div>';
+    return;
+  }
+  // Fetch all ratings
+  const itemIds=items.map(i=>i.id);
+  const{data:ratings}=await sb.from("trip_item_ratings").select("*").in("item_id",itemIds);
+  const ratingsByItem={};
+  (ratings||[]).forEach(r=>{(ratingsByItem[r.item_id]=ratingsByItem[r.item_id]||[]).push(r)});
+  // Fetch user names
+  const userIds=[...new Set((ratings||[]).map(r=>r.user_id))];
+  const{data:profs}=userIds.length?await sb.from("profiles").select("id,display_name,email").in("id",userIds):{data:[]};
+  const profMap={};(profs||[]).forEach(p=>profMap[p.id]=p.display_name||p.email||"?");
+
+  // Group by category
+  const cats=["accommodation","flight_out","flight_return","flight_combined"];
+  box.innerHTML="";
+  cats.forEach(cat=>{
+    const catItems=items.filter(i=>i.category===cat);
+    if(!catItems.length)return;
+    const section=q("div");section.style.marginBottom="24px";
+    const{icon,label}=CAT_META[cat];
+    section.innerHTML=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <span style="font-size:20px">${icon}</span>
+      <h3 style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);flex:1">${label}</h3>
+      <button class="btn btn-ghost btn-sm" onclick="openItemForm('${tripId}','${cat}')">+ Hinzufügen</button>
+    </div>`;
+    catItems.forEach(item=>{
+      const iRatings=ratingsByItem[item.id]||[];
+      const myRating=iRatings.find(r=>r.user_id===user.id);
+      const avgRating=iRatings.length?Math.round(iRatings.reduce((s,r)=>s+r.rating,0)/iRatings.length*10)/10:null;
+      const card=q("div");card.className="item-card";
+      const fields=[];
+      if(item.provider)fields.push(`<div class="item-field"><span style="font-size:10px;text-transform:uppercase;letter-spacing:.4px">Anbieter</span><strong>${escH(item.provider)}</strong></div>`);
+      if(item.price!=null)fields.push(`<div class="item-field"><span style="font-size:10px;text-transform:uppercase;letter-spacing:.4px">Preis</span><strong>${item.price} ${item.currency||"CHF"}</strong></div>`);
+      if(item.date_from)fields.push(`<div class="item-field"><span style="font-size:10px;text-transform:uppercase;letter-spacing:.4px">Datum</span><strong>${fmtD(item.date_from)}${item.date_to?" – "+fmtD(item.date_to):""}</strong></div>`);
+      if(item.persons)fields.push(`<div class="item-field"><span style="font-size:10px;text-transform:uppercase;letter-spacing:.4px">Personen</span><strong>${item.persons}</strong></div>`);
+      if(item.booking_deadline)fields.push(`<div class="item-field"><span style="font-size:10px;text-transform:uppercase;letter-spacing:.4px">Buchungsfrist</span><strong style="${new Date(item.booking_deadline)<new Date()?'color:var(--danger)':''}">${fmtD(item.booking_deadline)}</strong></div>`);
+      const statusLbl=STATUS_LABEL[item.status]||item.status;
+      card.innerHTML=`
+        <div class="item-card-head">
+          <div class="item-name">${escH(item.name)}${item.url?` <a href="${escH(item.url)}" target="_blank" style="font-size:12px;color:var(--accent);margin-left:6px">🔗 Link</a>`:""}</div>
+          <span class="item-status ${item.status}">${statusLbl}</span>
+        </div>
+        ${fields.length?`<div class="item-fields">${fields.join("")}</div>`:""}
+        ${item.notes?`<div style="font-size:13px;color:var(--muted);margin-bottom:8px;font-style:italic">${escH(item.notes)}</div>`:""}
+        <div class="ratings-row" id="ratings-${item.id}"></div>`;
+
+      // Ratings area
+      const ratingsRow=card.querySelector(".ratings-row");
+      iRatings.forEach(r=>{
+        const chip=q("div");chip.className="rating-chip";
+        const stars="★".repeat(r.rating)+"☆".repeat(6-r.rating);
+        chip.innerHTML=`<span class="rating-stars" style="font-size:14px">${stars}</span><span style="font-weight:600">${r.rating}/6</span><span style="color:var(--muted)">${escH(profMap[r.user_id]||"?")}</span>${r.comment?`<span style="color:var(--muted)">· ${escH(r.comment)}</span>`:""}`;
+        if(r.user_id===user.id){
+          chip.style.borderColor="var(--accent)";chip.style.cursor="pointer";
+          chip.title="Klicken zum Bearbeiten";
+          chip.onclick=()=>openRatingForm(item.id,tripId,myRating);
+        }
+        ratingsRow.appendChild(chip);
+      });
+      if(!myRating){
+        const btn=q("button");btn.className="my-rating-btn";btn.textContent="+ Bewerten";
+        btn.onclick=()=>openRatingForm(item.id,tripId,null);
+        ratingsRow.appendChild(btn);
+      }
+      // Edit/delete item actions
+      const actRow=q("div");actRow.style.cssText="display:flex;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)";
+      const statusOpts=["open","favorite","booked","rejected"];
+      const statusSel=q("select");statusSel.style.cssText="flex:1;padding:5px 8px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:12px;font-family:inherit;outline:none";
+      statusOpts.forEach(s=>{const o=q("option");o.value=s;o.textContent=STATUS_LABEL[s];if(s===item.status)o.selected=true;statusSel.appendChild(o)});
+      statusSel.onchange=async()=>{
+        await sb.from("trip_items").update({status:statusSel.value}).eq("id",item.id);
+        toast("Status aktualisiert");card.querySelector(".item-status").className="item-status "+statusSel.value;card.querySelector(".item-status").textContent=STATUS_LABEL[statusSel.value];
+      };
+      const editBtn=q("button");editBtn.className="btn btn-ghost btn-sm";editBtn.textContent="Bearbeiten";editBtn.onclick=()=>openItemForm(tripId,cat,item);
+      const delBtn=q("button");delBtn.className="btn btn-danger btn-sm";delBtn.textContent="Löschen";
+      delBtn.onclick=async()=>{
+        const ok=await showModal({title:"Angebot löschen?",sub:escH(item.name),confirmLabel:"Löschen",danger:true});
+        if(!ok)return;loading(true,"...");await sb.from("trip_items").delete().eq("id",item.id);loading(false);toast("Gelöscht");loadTripItems(tripId);
+      };
+      actRow.append(statusSel,editBtn,delBtn);card.appendChild(actRow);
+      section.appendChild(card);
+    });
+    box.appendChild(section);
+  });
+}
+
+/* ── Trip form ── */
+function openTripForm(trip){
+  const isNew=!trip;
+  showFormModal(isNew?"Neue Reise":"Reise bearbeiten",`
+    <div class="form-group"><label>Titel*</label><input id="fTitle" value="${escA(trip?.title||"")}"></div>
+    <div class="form-group"><label>Reiseziel</label><input id="fDest" value="${escA(trip?.destination||"")}"></div>
+    <div class="form-group"><label>Beschreibung</label><input id="fDesc" value="${escA(trip?.description||"")}"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="form-group"><label>Von</label><input id="fDateFrom" type="date" value="${trip?.travel_date_from||""}"></div>
+      <div class="form-group"><label>Bis</label><input id="fDateTo" type="date" value="${trip?.travel_date_to||""}"></div>
+    </div>`,
+    async()=>{
+      const title=($("fTitle").value||"").trim();
+      if(!title){toast("Titel erforderlich");return false}
+      const d={organization_id:orgId,owner_id:owner(),created_by:user.id,title,destination:$("fDest").value.trim(),description:$("fDesc").value.trim(),travel_date_from:$("fDateFrom").value||null,travel_date_to:$("fDateTo").value||null};
+      loading(true,"Speichere…");
+      if(trip){await sb.from("trips").update(d).eq("id",trip.id)}
+      else{const r=await sb.from("trips").insert(d).select().single();if(r.error){toast("Fehler: "+r.error.message);loading(false);return false};trip=r.data}
+      loading(false);toast(isNew?"Reise erstellt":"Reise gespeichert");
+      if(isNew)openTripDetail(trip);else{const t=trip;openTripDetail(t)}
+      return true;
+    });
+}
+
+/* ── Item form ── */
+function openItemForm(tripId,defaultCat,item){
+  const isNew=!item;
+  const catOpts=Object.entries(CAT_META).map(([v,{icon,label}])=>`<option value="${v}"${(item?.category||defaultCat||"accommodation")===v?" selected":""}>${icon} ${label}</option>`).join("");
+  showFormModal(isNew?"Neues Angebot":"Angebot bearbeiten",`
+    <div class="form-group"><label>Kategorie</label><select id="fCat">${catOpts}</select></div>
+    <div class="form-group"><label>Name*</label><input id="fName" value="${escA(item?.name||"")}"></div>
+    <div class="form-group"><label>Anbieter</label><input id="fProv" value="${escA(item?.provider||"")}"></div>
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:10px">
+      <div class="form-group"><label>Preis</label><input id="fPrice" type="number" min="0" step="0.01" value="${item?.price||""}"></div>
+      <div class="form-group"><label>Währung</label><input id="fCurr" value="${escA(item?.currency||"CHF")}" style="max-width:70px"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="form-group"><label>Datum von</label><input id="fDFrom" type="date" value="${item?.date_from?item.date_from.slice(0,10):""}"></div>
+      <div class="form-group"><label>Datum bis</label><input id="fDTo" type="date" value="${item?.date_to?item.date_to.slice(0,10):""}"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="form-group"><label>Personen</label><input id="fPersons" type="number" min="1" value="${item?.persons||""}"></div>
+      <div class="form-group"><label>Buchungsfrist</label><input id="fDeadline" type="date" value="${item?.booking_deadline||""}"></div>
+    </div>
+    <div class="form-group"><label>Link zum Angebot</label><input id="fUrl" type="url" placeholder="https://…" value="${escA(item?.url||"")}"></div>
+    <div class="form-group"><label>Notizen</label><input id="fNotes" value="${escA(item?.notes||"")}"></div>`,
+    async()=>{
+      const name=($("fName").value||"").trim();
+      if(!name){toast("Name erforderlich");return false}
+      const d={trip_id:tripId,category:$("fCat").value,name,provider:$("fProv").value.trim()||null,price:$("fPrice").value?parseFloat($("fPrice").value):null,currency:$("fCurr").value.trim()||"CHF",date_from:$("fDFrom").value||null,date_to:$("fDTo").value||null,persons:$("fPersons").value?parseInt($("fPersons").value):null,booking_deadline:$("fDeadline").value||null,url:$("fUrl").value.trim()||null,notes:$("fNotes").value.trim()||null,created_by:user.id};
+      loading(true,"Speichere…");
+      if(item){await sb.from("trip_items").update(d).eq("id",item.id)}
+      else{await sb.from("trip_items").insert(d)}
+      loading(false);toast(isNew?"Angebot hinzugefügt":"Angebot gespeichert");loadTripItems(tripId);return true;
+    });
+}
+
+/* ── Rating form ── */
+function openRatingForm(itemId,tripId,existing){
+  const cur=existing?.rating||0;
+  showFormModal(existing?"Bewertung bearbeiten":"Angebot bewerten",`
+    <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Note 1 = Schlecht, Note 6 = Sehr gut</p>
+    <div class="star-select" id="starSel">
+      ${[1,2,3,4,5,6].map(n=>`<button type="button" data-n="${n}" style="color:${n<=cur?"#f59e0b":"#e2e8f0"}" onclick="setRatingStar(${n})">${n<=cur?"★":"☆"}</button>`).join("")}
+    </div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:8px" id="ratingLabel">${cur?`Note ${cur}/6`:""}</div>
+    <div class="form-group"><label>Kommentar (optional)</label><input id="fRatingComment" value="${escA(existing?.comment||"")}"></div>`,
+    async()=>{
+      const rating=parseInt(document.getElementById("starSel")?.dataset.selected||cur);
+      if(!rating){toast("Bitte Note auswählen");return false}
+      const comment=($("fRatingComment").value||"").trim()||null;
+      loading(true,"Speichere…");
+      await sb.from("trip_item_ratings").upsert({item_id:itemId,user_id:user.id,rating,comment,updated_at:new Date().toISOString()},{onConflict:"item_id,user_id"});
+      loading(false);toast("Bewertung gespeichert");loadTripItems(tripId);return true;
+    });
+}
+window.setRatingStar=function(n){
+  const sel=document.getElementById("starSel");if(!sel)return;
+  sel.dataset.selected=n;
+  sel.querySelectorAll("button").forEach((b,i)=>{b.textContent=i<n?"★":"☆";b.style.color=i<n?"#f59e0b":"#e2e8f0"});
+  const lbl=document.getElementById("ratingLabel");if(lbl)lbl.textContent="Note "+n+"/6";
+};
+
+/* ── Generic form modal ── */
+function showFormModal(title,bodyHtml,onSave){
+  $("modalTitle").textContent=title;$("modalSub").innerHTML="";
+  const wrap=$("modalInputWrap");wrap.style.display="";
+  $("modalInputLabel").textContent="";
+  $("modalInput").style.display="none";
+  // Inject custom body
+  let custom=document.getElementById("modalCustomBody");
+  if(!custom){custom=q("div");custom.id="modalCustomBody";wrap.appendChild(custom)}
+  custom.innerHTML=bodyHtml;
+  $("modalConfirm").textContent="Speichern";$("modalConfirm").className="btn btn-sm btn-primary";
+  $("modalOverlay").classList.add("open");
+  const close=(saved)=>{
+    $("modalOverlay").classList.remove("open");
+    $("modalInput").style.display="";custom.innerHTML="";
+    $("modalConfirm").onclick=null;$("modalCancel").onclick=null;
+  };
+  $("modalConfirm").onclick=async()=>{const ok=await onSave();if(ok!==false)close(true)};
+  $("modalCancel").onclick=()=>close(false);
+}
 
 /* Wiring */
 document.addEventListener("DOMContentLoaded",()=>{
@@ -1522,8 +1843,8 @@ document.addEventListener("DOMContentLoaded",()=>{
   on("darkToggle",toggleDark);on("darkToggleDesktop",toggleDark);
   on("menuBtn",openSidebar);on("sidebarBackdrop",closeSidebar);
   on("stopActing",()=>setActing(null,""));
-  on("bCheck",()=>show("Check"));on("bTpl",()=>show("Tpl"));on("bAdmin",()=>show("Admin"));
-  on("bbCheck",()=>show("Check"));on("bbTpl",()=>show("Tpl"));on("bbAdmin",()=>show("Admin"));
+  on("bCheck",()=>show("Check"));on("bTpl",()=>show("Tpl"));on("bTrips",()=>show("Trips"));on("bAdmin",()=>show("Admin"));
+  on("bbCheck",()=>show("Check"));on("bbTpl",()=>show("Tpl"));on("bbTrips",()=>show("Trips"));on("bbAdmin",()=>show("Admin"));
   on("refreshCheck",()=>{loading(true,"Aktualisiere…");loadChecklists().finally(()=>loading(false))});
   on("newEmptyCl",createEmptyCl);on("newFromTplCl",pickTplAndCreate);
   on("showArchivedCl",loadArchivedCls);on("closeArchivedCl",()=>{$("archivedClSection").style.display="none"});
