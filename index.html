@@ -522,11 +522,13 @@ function openDetailPanel(id){
   currentChecklistId=id;panelDirty=false;
   $("detailOverlay").classList.add("open");document.body.style.overflow="hidden";
   $("detailTitle").classList.remove("editing");$("detailTitleEdit").classList.remove("active");
-  loadDetailPanel(id);
+  history.pushState({panel:"detail",id},"","#detail");loadDetailPanel(id);
 }
-function closeDetailPanel(){
+function closeDetailPanel(fromHistory=false){
   $("detailOverlay").classList.remove("open");document.body.style.overflow="";
   if(panelDirty)loadChecklists();panelDirty=false;
+  // Remove history entry if closed via button (not back button)
+  if(!fromHistory&&location.hash==="#detail")history.back();
 }
 
 function initTitleEdit(id,cur){
@@ -1277,7 +1279,7 @@ function openEditUser(u,currentRole){
     +'<div class="form-group"><label>Bestätigen</label><input id="euPw2" type="password" placeholder="Wiederholen"></div></div>'
     +'<div id="euMsg" style="font-size:13px;min-height:18px;margin-bottom:10px;color:var(--danger)"></div>'
     +'<div style="display:flex;gap:8px"><button class="btn btn-primary" id="euSave" style="flex:1">Speichern</button><button class="btn btn-ghost" id="euCancel">Abbrechen</button></div>';
-  const close=()=>{ov.classList.remove("open")};
+  const close=(fromHistory=false)=>{ov.classList.remove("open");if(!fromHistory&&location.hash==="#edituser")history.back()};
   on("euCancel",close);on("editUserClose",close);
   ov.onclick=e=>{if(e.target===ov)close()};
   on("euSave",async()=>{
@@ -1304,7 +1306,7 @@ function openEditUser(u,currentRole){
     loading(false);msg.style.color="var(--success)";msg.textContent="✓ Gespeichert";
     setTimeout(close,800);_users=null;loadUsers();toast("Benutzer aktualisiert");
   });
-  ov.classList.add("open");setTimeout(()=>$("euName")&&$("euName").focus(),100);
+  ov.classList.add("open");history.pushState({panel:"editUser"},"","#edituser");setTimeout(()=>$("euName")&&$("euName").focus(),100);
 }
 
 async function toggleUserActive(u,isActive){
@@ -1399,11 +1401,13 @@ function openSharePanel(clId){
   const ov=$("shareOverlay"),pn=$("sharePanel");
   $("shareMsg").textContent="";
   ov.style.opacity="1";ov.style.pointerEvents="all";pn.style.transform="translateX(0)";
+  history.pushState({panel:"share"},"","#share");
   loadSharePanel(clId);
 }
-function closeSharePanel(){
+function closeSharePanel(fromHistory=false){
   const ov=$("shareOverlay"),pn=$("sharePanel");
   ov.style.opacity="0";ov.style.pointerEvents="none";pn.style.transform="translateX(100%)";
+  if(!fromHistory&&location.hash==="#share")history.back();
 }
 
 async function loadSharePanel(clId){
@@ -1463,6 +1467,30 @@ async function loadShareList(clId){
     row.append(av,inf,tog,del);box.appendChild(row);
   });
 }
+
+/* ── Back button handler ── */
+window.addEventListener("popstate",e=>{
+  const state=e.state;
+  // Close whichever panel is open
+  if($("detailOverlay").classList.contains("open")){closeDetailPanel(true);return}
+  if($("shareOverlay")&&$("shareOverlay").style.opacity==="1"){closeSharePanel(true);return}
+  if($("editUserOverlay")&&$("editUserOverlay").classList.contains("open")){
+    $("editUserOverlay").style.opacity="0";$("editUserOverlay").style.pointerEvents="none";
+    $("editUserPanel").style.transform="translateX(100%)";return
+  }
+  if($("changePwOverlay")&&$("changePwOverlay").style.opacity==="1"){closeChangePwModal();return}
+  // If hash is gone and we're on root, make sure no panel is open
+  if(!location.hash){
+    [$("detailOverlay"),$("shareOverlay"),$("editUserOverlay")].forEach(el=>{
+      if(el){el.style.opacity="0";el.style.pointerEvents="none"}
+    });
+    const dp=$("detailPanel");if(dp)dp.style.transform="translateX(100%)";
+    document.body.style.overflow="";
+  }
+});
+
+// Clear hash on initial load to avoid stale state
+if(location.hash)history.replaceState({},"",""+location.pathname);
 
 /* Wiring */
 document.addEventListener("DOMContentLoaded",()=>{
