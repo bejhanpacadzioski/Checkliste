@@ -99,6 +99,7 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 .drag-handle,.cat-drag-handle{display:flex;align-items:center;cursor:grab;color:var(--muted);padding:0;flex-shrink:0;touch-action:none;min-width:32px;min-height:32px;justify-content:center;user-select:none;-webkit-user-select:none}
 .drag-handle:hover,.cat-drag-handle:hover{color:var(--accent)}
 .dragging{opacity:.35}
+.nav-group-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);padding:4px 12px 2px;opacity:.6}
 .cl-tab{background:none;border:none;border-bottom:2px solid transparent;padding:8px 14px;font-size:14px;font-weight:500;color:var(--muted);cursor:pointer;font-family:inherit;transition:color .15s,border-color .15s;margin-bottom:-1px}
 .cl-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
 .cl-tab:hover:not(.active){color:var(--text)}
@@ -272,10 +273,12 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
       <span id="actingName">—</span><button id="stopActing">✕</button>
     </div>
     <nav class="snav">
+      <div class="nav-group-label">Checklisten</div>
       <button class="nav-item active" id="bCheck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M9 12l2 2 4-4"/></svg>Checklisten</button>
       <button class="nav-item" id="bTpl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Vorlagen</button>
+      <div class="nav-group-label" style="margin-top:10px">Reisen</div>
       <button class="nav-item" id="bTrips"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.25h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.82a16 16 0 0 0 6.29 6.29l1.61-1.73a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Reisen</button>
-      <button class="nav-item hidden" id="bAdmin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 11l1.5 1.5L21 9"/></svg>Admin</button>
+      <button class="nav-item hidden" id="bAdmin" style="margin-top:10px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 11l1.5 1.5L21 9"/></svg>Admin</button>
     </nav>
     <div class="suser">
       <span class="uname" id="sUserName">—</span>
@@ -1605,7 +1608,7 @@ async function loadTrips(){
 }
 
 async function openTripDetail(trip){
-  currentTripId=trip.id;
+  currentTripId=trip.id;window._currentTripId=trip.id;window._currentTrip=trip;
   history.pushState({panel:"tripDetail"},"","#trip");
   // Replace main content with trip detail
   $("vTrips").innerHTML=`
@@ -1621,9 +1624,9 @@ async function openTripDetail(trip){
       </div>
     </div>
     <div id="tripItemsList" style="padding:16px 24px 32px"></div>`;
-  on("backToTrips",()=>{history.back();restoreTripsView()});
-  on("addItemBtn",()=>openItemForm(trip.id));
-  on("editTrip",()=>openTripForm(trip));
+  // backToTrips handled by delegation
+  // addItemBtn handled by delegation
+  // editTrip handled by delegation
   loadTripItems(trip.id);
 }
 
@@ -1861,6 +1864,13 @@ document.addEventListener("DOMContentLoaded",()=>{
   onkey("newPw1",e=>{if(e.key==="Enter")submitPw()});onkey("newPw2",e=>{if(e.key==="Enter")submitPw()});
   on("editUserClose",()=>$("editUserOverlay").classList.remove("open"));
   applyDark(false);
+  // Trips: use delegation since vTrips content gets replaced dynamically
+  $("content").addEventListener("click",e=>{
+    if(e.target.closest("#newTrip"))openTripForm(null);
+    if(e.target.closest("#backToTrips")){history.back();restoreTripsView()}
+    if(e.target.closest("#editTrip")&&window._currentTrip)openTripForm(window._currentTrip);
+    if(e.target.closest("#addItemBtn")&&window._currentTripId)openItemForm(window._currentTripId,null,null);
+  });
   checkSession();
 });
 if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js");
