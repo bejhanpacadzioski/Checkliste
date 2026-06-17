@@ -611,11 +611,13 @@ async function loadChecklists(){
   box.innerHTML='<div style="display:flex;justify-content:center;padding:48px"><div class="spinner"></div></div>';
   // Tab: "shared" shows checklists shared with current user
   if(clTab==="shared"){
-    const{data:shares}=await sb.from("checklist_shares").select("checklist_id,permission").eq("shared_with",user.id);
+    const{data:shares,error:sharesErr}=await sb.from("checklist_shares").select("checklist_id,permission").eq("shared_with",user.id);
+    if(sharesErr){box.innerHTML='<div style="padding:20px;color:var(--danger);font-size:13px">Fehler beim Laden der Freigaben: '+escH(sharesErr.message)+'<br><small>Bitte SQL-Migration ausführen.</small></div>';return}
     const sharedData=[];
     if(shares&&shares.length){
       const sharedIds=shares.map(s=>s.checklist_id);
-      const{data:sharedCls}=await sb.from("checklists").select("*").in("id",sharedIds).is("deleted_at",null);
+      const{data:sharedCls,error:clsErr}=await sb.from("checklists").select("*").in("id",sharedIds).is("deleted_at",null);
+      if(clsErr){box.innerHTML='<div style="padding:20px;color:var(--danger);font-size:13px">Fehler beim Laden der Checklisten: '+escH(clsErr.message)+'</div>';return}
       const permMap={};shares.forEach(s=>permMap[s.checklist_id]=s.permission);
       sharedData.push(...(sharedCls||[]).map(cl=>({...cl,_sharedPerm:permMap[cl.id]})));
     }
