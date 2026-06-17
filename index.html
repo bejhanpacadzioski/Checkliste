@@ -277,7 +277,7 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
       <button class="nav-item active" id="bCheck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M9 12l2 2 4-4"/></svg>Checklisten</button>
       <button class="nav-item" id="bTpl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Vorlagen</button>
       <div class="nav-group-label" style="margin-top:10px">Reisen</div>
-      <button class="nav-item" id="bTrips"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.25h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.82a16 16 0 0 0 6.29 6.29l1.61-1.73a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Reisen</button>
+      <button class="nav-item" id="bTrips"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>Reisen</button>
       <button class="nav-item hidden" id="bAdmin" style="margin-top:10px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 11l1.5 1.5L21 9"/></svg>Admin</button>
     </nav>
     <div class="suser">
@@ -393,12 +393,19 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
   </div>
 
   <nav id="bottomNav">
-    <button class="bnav-item active" id="bbCheck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M9 12l2 2 4-4"/></svg>Checklisten</button>
-    <button class="bnav-item" id="bbTpl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Vorlagen</button>
-    <button class="bnav-item" id="bbTrips">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.25h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.82a16 16 0 0 0 6.29 6.29l1.61-1.73a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Reisen
-    </button>
-    <button class="bnav-item hidden" id="bbAdmin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 11l1.5 1.5L21 9"/></svg>Admin</button>
+    <!-- Context: Checklisten group active -->
+    <div id="bnavCheck" style="display:contents">
+      <button class="bnav-item active" id="bbCheck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M9 12l2 2 4-4"/></svg>Checklisten</button>
+      <button class="bnav-item" id="bbTpl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Vorlagen</button>
+      <button class="bnav-item" id="bbTrips2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>Reisen</button>
+      <button class="bnav-item hidden" id="bbAdmin2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 11l1.5 1.5L21 9"/></svg>Admin</button>
+    </div>
+    <!-- Context: Reisen active -->
+    <div id="bnavTrips" style="display:none;contents">
+      <button class="bnav-item" id="bbCheck2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M9 12l2 2 4-4"/></svg>Checklisten</button>
+      <button class="bnav-item active" id="bbTrips"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>Reisen</button>
+      <button class="bnav-item hidden" id="bbAdmin3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 11l1.5 1.5L21 9"/></svg>Admin</button>
+    </div>
   </nav>
 </div>
 
@@ -557,8 +564,20 @@ function show(v,skipHistory=false){
   ["Check","Tpl","Trips","Admin"].forEach(x=>{
     $("v"+x).style.display=x===v?"":"none";
     $("b"+x)?.classList.toggle("active",x===v);
-    $("bb"+x)?.classList.toggle("active",x===v);
   });
+  // Context-sensitive bottom nav
+  const inTrips=v==="Trips";
+  const bnavCheck=$("bnavCheck"),bnavTrips=$("bnavTrips");
+  if(bnavCheck)bnavCheck.style.display=inTrips?"none":"contents";
+  if(bnavTrips)bnavTrips.style.display=inTrips?"contents":"none";
+  // Update active states in current visible nav
+  if(inTrips){
+    $("bbTrips")?.classList.add("active");
+    $("bbCheck2")?.classList.remove("active");
+  } else {
+    [$("bbCheck"),$("bbTpl")].forEach(el=>el?.classList.toggle("active",
+      (el.id==="bbCheck"&&v==="Check")||(el.id==="bbTpl"&&v==="Tpl")));
+  }
   closeSidebar();
   if(v==="Admin")loadUsers();
   if(v==="Trips")loadTrips();
@@ -647,7 +666,7 @@ async function loadApp(){
     orgId=m.data?.[0]?.organization_id;
     isSuper=(m.data||[]).some(x=>x.role==="super_admin");
     const isAdminOrSuper=(m.data||[]).some(x=>["admin","super_admin"].includes(x.role));
-    [$("bAdmin"),$("bbAdmin")].forEach(el=>{if(el)el.classList.toggle("hidden",!isAdminOrSuper)});
+    [$("bAdmin"),$("bbAdmin"),$("bbAdmin2"),$("bbAdmin3")].forEach(el=>{if(el)el.classList.toggle("hidden",!isAdminOrSuper)});
     await Promise.all([loadTemplates(),loadChecklists()]);
     const isAdmin=(m.data||[]).some(x=>["admin","super_admin"].includes(x.role));
     if(isAdmin){
@@ -1687,7 +1706,7 @@ async function loadTripItems(tripId){
       const statusLbl=STATUS_LABEL[item.status]||item.status;
       card.innerHTML=`
         <div class="item-card-head">
-          <div class="item-name">${escH(item.name)}${item.url?` <a href="${escH(item.url)}" target="_blank" style="font-size:12px;color:var(--accent);margin-left:6px">🔗 Link</a>`:""}</div>
+          <div class="item-name">${escH(item.name)}${item.url?` <button onclick="window.open(${JSON.stringify(item.url)},'_blank')" style="background:none;border:none;cursor:pointer;font-size:12px;color:var(--accent);margin-left:6px;font-family:inherit;padding:0">🔗 Link öffnen</button>`:""}</div>
           <span class="item-status ${item.status}">${statusLbl}</span>
         </div>
         ${fields.length?`<div class="item-fields">${fields.join("")}</div>`:""}
@@ -1848,6 +1867,8 @@ document.addEventListener("DOMContentLoaded",()=>{
   on("stopActing",()=>setActing(null,""));
   on("bCheck",()=>show("Check"));on("bTpl",()=>show("Tpl"));on("bTrips",()=>show("Trips"));on("bAdmin",()=>show("Admin"));
   on("bbCheck",()=>show("Check"));on("bbTpl",()=>show("Tpl"));on("bbTrips",()=>show("Trips"));on("bbAdmin",()=>show("Admin"));
+  on("bbCheck2",()=>show("Check"));on("bbTrips2",()=>show("Trips"));
+  on("bbAdmin2",()=>show("Admin"));on("bbAdmin3",()=>show("Admin"));
   on("refreshCheck",()=>{loading(true,"Aktualisiere…");loadChecklists().finally(()=>loading(false))});
   on("newEmptyCl",createEmptyCl);on("newFromTplCl",pickTplAndCreate);
   on("showArchivedCl",loadArchivedCls);on("closeArchivedCl",()=>{$("archivedClSection").style.display="none"});
