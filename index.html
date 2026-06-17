@@ -1234,9 +1234,13 @@ async function loadUsers(){
   (pR.data||[]).forEach(u=>{
     const role=rMap[u.id]||"user",isSelf=u.id===user.id;
     const row=q("div");row.className="user-row";
-    const av=q("div");av.className="user-avatar";av.textContent=(u.display_name||u.email||"?")[0].toUpperCase();
+    const isDisabled=!!u.is_disabled;
+    const av=q("div");av.className="user-avatar";
+    av.textContent=(u.display_name||u.email||"?")[0].toUpperCase();
+    if(isDisabled)av.style.cssText="opacity:.4;filter:grayscale(1)";
     const inf=q("div");inf.className="user-info";
-    inf.innerHTML='<div class="uname-u">'+escH(u.display_name||"—")+(isSelf?' <span style="font-size:11px;color:var(--accent)">(Du)</span>':"")+'</div><div class="uemail-u">'+escH(u.email||"—")+'</div><div style="font-size:11px;color:var(--muted);margin-top:2px">'+(rLbl[role]||role)+'</div>';
+    const disabledBadge=isDisabled?'<span style="font-size:11px;font-weight:600;color:#ef4444;background:rgba(239,68,68,.1);padding:1px 6px;border-radius:99px;margin-left:4px">Deaktiviert</span>':"";
+    inf.innerHTML='<div class="uname-u" style="'+(isDisabled?"opacity:.5":"")+'">'+escH(u.display_name||"—")+(isSelf?' <span style="font-size:11px;color:var(--accent)">(Du)</span>':"")+disabledBadge+'</div><div class="uemail-u">'+escH(u.email||"—")+'</div><div style="font-size:11px;color:var(--muted);margin-top:2px">'+(rLbl[role]||role)+'</div>';
     const acts=q("div");acts.style.cssText="display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0";
     const bCl=q("button");bCl.className="btn btn-ghost btn-sm";bCl.title="Checklisten";
     bCl.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M9 12l2 2 4-4"/></svg>';
@@ -1248,7 +1252,7 @@ async function loadUsers(){
     bEd.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
     bEd.onclick=()=>openEditUser(u,role);
     const bDis=q("button");bDis.className="btn btn-ghost btn-sm";
-    const isActive=!u.is_disabled;
+    const isActive=!isDisabled;
     bDis.title=isActive?"Deaktivieren":"Aktivieren";
     bDis.innerHTML=isActive
       ?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>'
@@ -1336,21 +1340,19 @@ async function toggleUserActive(u,isActive){
   try{
     const sess=await sb.auth.getSession();
     const tok=sess.data?.session?.access_token;
-    // Ban via edge function (uses auth.admin.updateUserById with ban_duration)
-    const res=await fetch(SB_URL+"/functions/v1/set-user-password",{
-      method:"POST",
-      headers:{"Content-Type":"application/json","Authorization":"Bearer "+tok},
-      body:JSON.stringify({user_id:u.id,ban:isActive})
-    });
-    const json=await res.json().catch(()=>({}));
+    if(!tok){loading(false);toast("Fehler: Kein Token");return}
+    let res,json={};
+    try{
+      res=await fetch(SB_URL+"/functions/v1/set-user-password",{method:"POST",
+        headers:{"Content-Type":"application/json","Authorization":"Bearer "+tok},
+        body:JSON.stringify({user_id:u.id,ban:isActive})});
+      json=await res.json().catch(()=>({}));
+    }catch(fetchErr){loading(false);toast("Netzwerkfehler: "+fetchErr.message);return}
     if(!res.ok||json.error){
-      // Fallback: just update profile flag
-      await sb.from("profiles").update({is_disabled:isActive}).eq("id",u.id);
+      loading(false);toast("Fehler "+res.status+": "+(json.error||"Unbekannt"));return;
     }
-  }catch(e){
-    await sb.from("profiles").update({is_disabled:isActive}).eq("id",u.id);
-  }
-  loading(false);_users=null;loadUsers();toast(isActive?"User deaktiviert":"User aktiviert");
+    loading(false);_users=null;loadUsers();toast(isActive?"User deaktiviert":"User aktiviert");
+  }catch(e){loading(false);toast("Fehler: "+e.message)}
 }
 
 async function deleteUser(u){
@@ -1361,13 +1363,22 @@ async function deleteUser(u){
   try{
     const sess=await sb.auth.getSession();
     const tok=sess.data?.session?.access_token;
-    const res=await fetch(SB_URL+"/functions/v1/delete-user",{
-      method:"POST",
-      headers:{"Content-Type":"application/json","Authorization":"Bearer "+tok},
-      body:JSON.stringify({user_id:u.id,organization_id:orgId})
-    });
-    const json=await res.json().catch(()=>({}));
-    if(!res.ok||json.error){toast("Fehler: "+(json.error||res.status));loading(false);return}
+    if(!tok){loading(false);toast("Fehler: Kein Token — bitte neu einloggen");return}
+    const url=SB_URL+"/functions/v1/delete-user";
+    let res,json={};
+    try{
+      res=await fetch(url,{method:"POST",
+        headers:{"Content-Type":"application/json","Authorization":"Bearer "+tok},
+        body:JSON.stringify({user_id:u.id,organization_id:orgId})});
+      json=await res.json().catch(()=>({}));
+    }catch(fetchErr){
+      loading(false);toast("Netzwerkfehler: "+fetchErr.message);return;
+    }
+    if(!res.ok||json.error){
+      loading(false);
+      toast("Fehler "+res.status+": "+(json.error||"Unbekannt"));
+      return;
+    }
     loading(false);_users=null;loadUsers();toast("User gelöscht");
   }catch(e){loading(false);toast("Fehler: "+e.message)}
 }
