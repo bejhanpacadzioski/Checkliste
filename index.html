@@ -514,21 +514,22 @@ function show(v){
   closeSidebar();
   if(v==="Admin")loadUsers();
 }
-function openSidebar(){$("sidebar").classList.add("open");$("sidebarBackdrop").classList.add("show")}
-function closeSidebar(){$("sidebar").classList.remove("open");$("sidebarBackdrop").classList.remove("show")}
+function openSidebar(){$("sidebar").classList.add("open");$("sidebarBackdrop").classList.add("show");_pushPanel("sidebar")}
+function closeSidebar(){if(_panelStack[_panelStack.length-1]==="sidebar")_popPanel();$("sidebar").classList.remove("open");$("sidebarBackdrop").classList.remove("show")}
 
 /* Detail panel */
 function openDetailPanel(id){
   currentChecklistId=id;panelDirty=false;
   $("detailOverlay").classList.add("open");document.body.style.overflow="hidden";
   $("detailTitle").classList.remove("editing");$("detailTitleEdit").classList.remove("active");
-  history.pushState({panel:"detail",id},"","#detail");loadDetailPanel(id);
+  _pushPanel("detail");loadDetailPanel(id);
 }
-function closeDetailPanel(fromHistory=false){
+function closeDetailPanel(){
+  if(_panelStack[_panelStack.length-1]==="detail"){
+    _popPanel();history.back();return;
+  }
   $("detailOverlay").classList.remove("open");document.body.style.overflow="";
   if(panelDirty)loadChecklists();panelDirty=false;
-  // Remove history entry if closed via button (not back button)
-  if(!fromHistory&&location.hash==="#detail")history.back();
 }
 
 function initTitleEdit(id,cur){
@@ -1279,7 +1280,7 @@ function openEditUser(u,currentRole){
     +'<div class="form-group"><label>Bestätigen</label><input id="euPw2" type="password" placeholder="Wiederholen"></div></div>'
     +'<div id="euMsg" style="font-size:13px;min-height:18px;margin-bottom:10px;color:var(--danger)"></div>'
     +'<div style="display:flex;gap:8px"><button class="btn btn-primary" id="euSave" style="flex:1">Speichern</button><button class="btn btn-ghost" id="euCancel">Abbrechen</button></div>';
-  const close=(fromHistory=false)=>{ov.classList.remove("open");if(!fromHistory&&location.hash==="#edituser")history.back()};
+  const close=()=>{if(_panelStack[_panelStack.length-1]==="edituser"){_popPanel();history.back();return}ov.classList.remove("open")};
   on("euCancel",close);on("editUserClose",close);
   ov.onclick=e=>{if(e.target===ov)close()};
   on("euSave",async()=>{
@@ -1306,7 +1307,7 @@ function openEditUser(u,currentRole){
     loading(false);msg.style.color="var(--success)";msg.textContent="✓ Gespeichert";
     setTimeout(close,800);_users=null;loadUsers();toast("Benutzer aktualisiert");
   });
-  ov.classList.add("open");history.pushState({panel:"editUser"},"","#edituser");setTimeout(()=>$("euName")&&$("euName").focus(),100);
+  ov.classList.add("open");_pushPanel("edituser");setTimeout(()=>$("euName")&&$("euName").focus(),100);
 }
 
 async function toggleUserActive(u,isActive){
@@ -1368,9 +1369,9 @@ async function addUser(){
 /* Own PW */
 function openPwModal(){
   $("newPw1").value="";$("newPw2").value="";$("changePwMsg").textContent="";
-  $("changePwOverlay").classList.add("open");closeSidebar();setTimeout(()=>$("newPw1").focus(),80);
+  _pushPanel("changepw");$("changePwOverlay").classList.add("open");closeSidebar();setTimeout(()=>$("newPw1").focus(),80);
 }
-function closePwModal(){$("changePwOverlay").classList.remove("open")}
+function closePwModal(){if(_panelStack[_panelStack.length-1]==="changepw"){_popPanel();history.back();return}$("changePwOverlay").classList.remove("open")}
 async function submitPw(){
   const pw=$("newPw1").value,pw2=$("newPw2").value,msg=$("changePwMsg");
   msg.style.color="var(--danger)";msg.textContent="";
@@ -1401,13 +1402,14 @@ function openSharePanel(clId){
   const ov=$("shareOverlay"),pn=$("sharePanel");
   $("shareMsg").textContent="";
   ov.style.opacity="1";ov.style.pointerEvents="all";pn.style.transform="translateX(0)";
-  history.pushState({panel:"share"},"","#share");
+  _pushPanel("share");
   loadSharePanel(clId);
 }
-function closeSharePanel(fromHistory=false){
+function closeSharePanel(){
+  if(_panelStack[_panelStack.length-1]==="share"){_popPanel();history.back();return}
   const ov=$("shareOverlay"),pn=$("sharePanel");
-  ov.style.opacity="0";ov.style.pointerEvents="none";pn.style.transform="translateX(100%)";
-  if(!fromHistory&&location.hash==="#share")history.back();
+  if(ov){ov.style.opacity="0";ov.style.pointerEvents="none"}
+  if(pn)pn.style.transform="translateX(100%)";
 }
 
 async function loadSharePanel(clId){
@@ -1469,28 +1471,34 @@ async function loadShareList(clId){
 }
 
 /* ── Back button handler ── */
-window.addEventListener("popstate",e=>{
-  const state=e.state;
-  // Close whichever panel is open
-  if($("detailOverlay").classList.contains("open")){closeDetailPanel(true);return}
-  if($("shareOverlay")&&$("shareOverlay").style.opacity==="1"){closeSharePanel(true);return}
-  if($("editUserOverlay")&&$("editUserOverlay").classList.contains("open")){
-    $("editUserOverlay").style.opacity="0";$("editUserOverlay").style.pointerEvents="none";
-    $("editUserPanel").style.transform="translateX(100%)";return
-  }
-  if($("changePwOverlay")&&$("changePwOverlay").style.opacity==="1"){closeChangePwModal();return}
-  // If hash is gone and we're on root, make sure no panel is open
-  if(!location.hash){
-    [$("detailOverlay"),$("shareOverlay"),$("editUserOverlay")].forEach(el=>{
-      if(el){el.style.opacity="0";el.style.pointerEvents="none"}
-    });
-    const dp=$("detailPanel");if(dp)dp.style.transform="translateX(100%)";
+// Simple stack-based approach: track open panels
+const _panelStack=[];
+function _pushPanel(name){_panelStack.push(name);history.pushState({panel:name},"","#"+name)}
+function _popPanel(){_panelStack.pop()}
+
+window.addEventListener("popstate",()=>{
+  const name=_panelStack[_panelStack.length-1];
+  if(!name)return;
+  _popPanel();
+  if(name==="detail"){
+    $("detailOverlay").classList.remove("open");
     document.body.style.overflow="";
+    if(panelDirty)loadChecklists();
+    panelDirty=false;
+  } else if(name==="share"){
+    const ov=$("shareOverlay"),pn=$("sharePanel");
+    if(ov){ov.style.opacity="0";ov.style.pointerEvents="none"}
+    if(pn)pn.style.transform="translateX(100%)";
+  } else if(name==="edituser"){
+    $("editUserOverlay").classList.remove("open");
+  } else if(name==="changepw"){
+    const ov=$("changePwOverlay"),bx=$("changePwBox");
+    if(ov){ov.style.opacity="0";ov.style.pointerEvents="none"}
+    if(bx)bx.style.transform="scale(.95) translateY(10px)";
+  } else if(name==="sidebar"){
+    closeSidebar();
   }
 });
-
-// Clear hash on initial load to avoid stale state
-if(location.hash)history.replaceState({},"",""+location.pathname);
 
 /* Wiring */
 document.addEventListener("DOMContentLoaded",()=>{
