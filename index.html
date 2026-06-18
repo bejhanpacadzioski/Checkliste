@@ -155,7 +155,7 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 .form-group input:focus,.form-group select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.12)}
 #modalOverlay{position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s ease}
 #modalOverlay.open{opacity:1;pointer-events:all}
-.modal-box{background:var(--surface);border-radius:20px;box-shadow:var(--shadow-lg);padding:24px;width:100%;max-width:400px;transform:scale(.95) translateY(10px);transition:transform .22s ease}
+.modal-box{background:var(--surface);border-radius:16px;box-shadow:var(--shadow-lg);padding:16px;width:100%;max-width:480px;max-height:82dvh;overflow-y:auto;transform:scale(.95) translateY(10px);transition:transform .22s ease}
 #modalOverlay.open .modal-box{transform:scale(1) translateY(0)}
 .modal-title{font-size:17px;font-weight:700;margin-bottom:4px}
 .modal-sub{font-size:14px;color:var(--muted);margin-bottom:4px}
@@ -273,6 +273,7 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
       <span id="actingName">—</span><button id="stopActing">✕</button>
     </div>
     <nav class="snav">
+      <button class="nav-item" id="bHome" style="margin-bottom:6px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Dashboard</button>
       <div class="nav-group-label">Checklisten</div>
       <button class="nav-item active" id="bCheck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M9 12l2 2 4-4"/></svg>Checklisten</button>
       <button class="nav-item" id="bTpl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Vorlagen</button>
@@ -300,6 +301,11 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
     </header>
 
     <div id="content">
+      <!-- Dashboard -->
+      <div id="vHome" style="display:none">
+        <div id="dashContent" style="padding:20px 24px 32px"></div>
+      </div>
+
       <!-- Checklisten -->
       <div id="vCheck">
         <div class="page-header">
@@ -395,7 +401,8 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
   <nav id="bottomNav">
     <!-- Context: Checklisten group active -->
     <div id="bnavCheck" style="display:contents">
-      <button class="bnav-item active" id="bbCheck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M9 12l2 2 4-4"/></svg>Checklisten</button>
+      <button class="bnav-item" id="bbHome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</button>
+      <button class="bnav-item" id="bbCheck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M9 12l2 2 4-4"/></svg>Checklisten</button>
       <button class="bnav-item" id="bbTpl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Vorlagen</button>
       <button class="bnav-item" id="bbTrips2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>Reisen</button>
       <button class="bnav-item hidden" id="bbAdmin2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 11l1.5 1.5L21 9"/></svg>Admin</button>
@@ -555,13 +562,13 @@ function applyDark(v){document.documentElement.classList.toggle("dark",!!v);[$("
 async function toggleDark(){const d=document.documentElement.classList.contains("dark");applyDark(!d);await sb.from("profiles").update({dark_mode:!d}).eq("id",user.id)}
 
 /* Nav */
-let _currentView="Check";
+let _currentView=localStorage.getItem("lastView")||"Home";
 function show(v,skipHistory=false){
   if(!skipHistory&&v!==_currentView){
     history.pushState({view:_currentView},"","#"+_currentView.toLowerCase());
   }
-  _currentView=v;
-  ["Check","Tpl","Trips","Admin"].forEach(x=>{
+  _currentView=v;try{localStorage.setItem("lastView",v)}catch(_){}
+  ["Home","Check","Tpl","Trips","Admin"].forEach(x=>{
     $("v"+x).style.display=x===v?"":"none";
     $("b"+x)?.classList.toggle("active",x===v);
   });
@@ -570,15 +577,17 @@ function show(v,skipHistory=false){
   const bnavCheck=$("bnavCheck"),bnavTrips=$("bnavTrips");
   if(bnavCheck)bnavCheck.style.display=inTrips?"none":"contents";
   if(bnavTrips)bnavTrips.style.display=inTrips?"contents":"none";
-  // Update active states in current visible nav
+  // Update active states
   if(inTrips){
-    $("bbTrips")?.classList.add("active");
-    $("bbCheck2")?.classList.remove("active");
+    $("bbTrips")?.classList.add("active");$("bbCheck2")?.classList.remove("active");
   } else {
-    [$("bbCheck"),$("bbTpl")].forEach(el=>el?.classList.toggle("active",
-      (el.id==="bbCheck"&&v==="Check")||(el.id==="bbTpl"&&v==="Tpl")));
+    ["bbHome","bbCheck","bbTpl"].forEach(id=>{
+      const el=$(id);if(el)el.classList.toggle("active",
+        (id==="bbHome"&&v==="Home")||(id==="bbCheck"&&v==="Check")||(id==="bbTpl"&&v==="Tpl"));
+    });
   }
   closeSidebar();
+  if(v==="Home")loadDashboard();
   if(v==="Admin")loadUsers();
   if(v==="Trips")loadTrips();
 }
@@ -642,7 +651,7 @@ async function doLogin(){
   $("loginMsg").textContent="";await loadApp();
 }
 async function doLogout(){await sb.auth.signOut();$("shell").style.display="none";$("loginScreen").classList.add("show");toast("Abgemeldet")}
-async function checkSession(){const{data}=await sb.auth.getSession();if(data.session)await loadApp();else $("loginScreen").classList.add("show")}
+async function checkSession(){const{data}=await sb.auth.getSession();if(data.session){await loadApp();show(_currentView,true);}else $("loginScreen").classList.add("show")}
 
 /* User cache */
 let _users=null;
@@ -668,6 +677,10 @@ async function loadApp(){
     const isAdminOrSuper=(m.data||[]).some(x=>["admin","super_admin"].includes(x.role));
     [$("bAdmin"),$("bbAdmin"),$("bbAdmin2"),$("bbAdmin3")].forEach(el=>{if(el)el.classList.toggle("hidden",!isAdminOrSuper)});
     await Promise.all([loadTemplates(),loadChecklists()]);
+    // Restore last view
+    const lastView=localStorage.getItem("lastView")||"Home";
+    const validViews=["Home","Check","Tpl","Trips",...(isAdminOrSuper?["Admin"]:[])];
+    show(validViews.includes(lastView)?lastView:"Home",true);
     const isAdmin=(m.data||[]).some(x=>["admin","super_admin"].includes(x.role));
     if(isAdmin){
       const filt=$("checkUserFilter"),sel=$("checkUserSelect");
@@ -1579,6 +1592,172 @@ async function loadShareList(clId){
 /* back button removed */
 
 
+
+/* ── Dashboard ── */
+async function loadDashboard(){
+  const box=$("dashContent");
+  box.innerHTML='<div style="display:flex;justify-content:center;padding:40px"><div class="spinner"></div></div>';
+
+  const[clRes,tplRes,tripRes,sharedRes]=await Promise.all([
+    sb.from("checklists").select("id,title,icon,created_at,updated_at").is("deleted_at",null).eq("owner_id",user.id).order("created_at",{ascending:false}).limit(50),
+    sb.from("templates").select("id").is("deleted_at",null),
+    sb.from("trips").select("id,title,destination,travel_date_from,travel_date_to").is("deleted_at",null).order("travel_date_from",{ascending:true}),
+    sb.from("checklist_shares").select("checklist_id").eq("shared_with",user.id)
+  ]);
+
+  const cls=clRes.data||[];
+  const trips=tripRes.data||[];
+  const sharedCount=(sharedRes.data||[]).length;
+
+  // Progress
+  const clIds=cls.map(c=>c.id);
+  let prog={};
+  if(clIds.length){
+    const cats=await sb.from("checklist_categories").select("id,checklist_id").in("checklist_id",clIds);
+    const catIds=(cats.data||[]).map(c=>c.id);
+    if(catIds.length){
+      const items=await sb.from("checklist_items").select("category_id,is_checked").in("category_id",catIds);
+      const c2cl={};(cats.data||[]).forEach(c=>c2cl[c.id]=c.checklist_id);
+      clIds.forEach(id=>prog[id]={d:0,t:0});
+      (items.data||[]).forEach(it=>{const cl=c2cl[it.category_id];if(!cl)return;prog[cl].t++;if(it.is_checked)prog[cl].d++});
+    }
+  }
+
+  const total=cls.length;
+  const doneCount=cls.filter(cl=>{const p=prog[cl.id]||{d:0,t:0};return p.t>0&&p.d===p.t}).length;
+  const inProg=cls.filter(cl=>{const p=prog[cl.id]||{d:0,t:0};return p.t>0&&p.d>0&&p.d<p.t}).length;
+  const tplCount=(tplRes.data||[]).length;
+  const today=new Date().toISOString().slice(0,10);
+  const upcoming=trips.filter(t=>t.travel_date_from&&t.travel_date_from>=today);
+  const nextTrip=upcoming[0];
+  const recent=cls.slice(0,4);
+
+  const h=new Date().getHours();
+  const greeting=h<12?"Guten Morgen":h<17?"Guten Tag":"Guten Abend";
+  const firstName=($("sUserName").textContent||"").split(" ")[0];
+  const dateStr=new Date().toLocaleDateString("de-CH",{weekday:"long",day:"numeric",month:"long"});
+
+  // Overall progress percentage across all lists
+  const totalItems=Object.values(prog).reduce((s,p)=>s+p.t,0);
+  const doneItems=Object.values(prog).reduce((s,p)=>s+p.d,0);
+  const overallPct=totalItems?Math.round(doneItems/totalItems*100):0;
+
+  box.innerHTML=`
+  <!-- Header -->
+  <div style="margin-bottom:20px">
+    <p style="font-size:13px;color:var(--muted);margin-bottom:2px">${dateStr}</p>
+    <h1 style="font-size:22px;font-weight:800">${greeting}, ${escH(firstName)} 👋</h1>
+  </div>
+
+  <!-- Overall progress card -->
+  <div style="background:linear-gradient(135deg,#6366f1,#818cf8);border-radius:16px;padding:18px 20px;margin-bottom:16px;color:#fff;position:relative;overflow:hidden">
+    <div style="position:absolute;right:-20px;top:-20px;width:100px;height:100px;background:rgba(255,255,255,.08);border-radius:50%"></div>
+    <div style="position:absolute;right:20px;bottom:-30px;width:70px;height:70px;background:rgba(255,255,255,.06);border-radius:50%"></div>
+    <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;opacity:.8;margin-bottom:4px">Gesamtfortschritt</div>
+    <div style="font-size:36px;font-weight:800;margin-bottom:8px">${overallPct}%</div>
+    <div style="height:6px;background:rgba(255,255,255,.25);border-radius:99px;overflow:hidden">
+      <div style="height:100%;width:${overallPct}%;background:#fff;border-radius:99px;transition:width .6s ease"></div>
+    </div>
+    <div style="font-size:12px;opacity:.8;margin-top:6px">${doneItems} von ${totalItems} Einträgen erledigt</div>
+  </div>
+
+  <!-- Stats grid -->
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px">
+    <div onclick="show('Check')" style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div style="width:32px;height:32px;background:rgba(99,102,241,.12);border-radius:8px;display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M9 12l2 2 4-4"/></svg></div>
+        <span style="font-size:22px;font-weight:800;color:var(--accent)">${total}</span>
+      </div>
+      <div style="font-size:13px;font-weight:600">Checklisten</div>
+      <div style="font-size:11px;color:var(--muted)">${doneCount} abgeschlossen · ${inProg} aktiv</div>
+    </div>
+    <div onclick="show('Trips')" style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='#6366f1'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div style="width:32px;height:32px;background:rgba(99,102,241,.12);border-radius:8px;display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="1.8"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg></div>
+        <span style="font-size:22px;font-weight:800;color:var(--accent)">${trips.length}</span>
+      </div>
+      <div style="font-size:13px;font-weight:600">Reisen</div>
+      <div style="font-size:11px;color:var(--muted)">${upcoming.length} bevorstehend${sharedCount?` · ${sharedCount} geteilt`:""}</div>
+    </div>
+    ${sharedCount?`
+    <div onclick="show('Check');setTimeout(()=>{setClTab('shared')},100)" style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='#6366f1'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div style="width:32px;height:32px;background:rgba(99,102,241,.12);border-radius:8px;display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>
+        <span style="font-size:22px;font-weight:800;color:var(--accent)">${sharedCount}</span>
+      </div>
+      <div style="font-size:13px;font-weight:600">Geteilt mit mir</div>
+      <div style="font-size:11px;color:var(--muted)">Checklisten anderer</div>
+    </div>`:""}
+    <div onclick="show('Tpl')" style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='#f59e0b'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div style="width:32px;height:32px;background:rgba(245,158,11,.12);border-radius:8px;display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></div>
+        <span style="font-size:22px;font-weight:800;color:#f59e0b">${tplCount}</span>
+      </div>
+      <div style="font-size:13px;font-weight:600">Vorlagen</div>
+      <div style="font-size:11px;color:var(--muted)">Wiederverwendbar</div>
+    </div>
+  </div>
+
+  ${nextTrip?`
+  <!-- Next trip banner -->
+  <div onclick="show('Trips')" style="background:linear-gradient(135deg,rgba(99,102,241,.1),rgba(129,140,248,.06));border:1px solid rgba(99,102,241,.2);border-radius:14px;padding:14px 16px;margin-bottom:16px;cursor:pointer;display:flex;align-items:center;gap:12px">
+    <div style="font-size:26px;flex-shrink:0">✈️</div>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--accent);margin-bottom:2px">Nächste Reise</div>
+      <div style="font-weight:700;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escH(nextTrip.title)}</div>
+      ${nextTrip.destination?`<div style="font-size:12px;color:var(--muted)">📍 ${escH(nextTrip.destination)}${nextTrip.travel_date_from?" · "+fmtD(nextTrip.travel_date_from):""}</div>`:""}
+    </div>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--muted);flex-shrink:0"><path d="M9 18l6-6-6-6"/></svg>
+  </div>`:""}
+
+  ${recent.length?`
+  <!-- Recent checklists -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <span style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">Zuletzt erstellt</span>
+      <button class="btn btn-ghost btn-sm" onclick="show('Check')">Alle →</button>
+    </div>
+    ${recent.map(cl=>{
+      const p=prog[cl.id]||{d:0,t:0};
+      const pct=p.t?Math.round(p.d/p.t*100):0;
+      const isDone=p.t>0&&pct===100;
+      return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--border);cursor:pointer" onclick="show('Check');setTimeout(()=>openDetailPanel('${cl.id}'),100)">
+        <div style="width:36px;height:36px;border-radius:10px;background:rgba(99,102,241,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${cl.icon||"📋"}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escH(cl.title)}</div>
+          <div style="font-size:11px;color:var(--muted)">${p.t?p.d+"/"+p.t+" erledigt":"Leer"}</div>
+        </div>
+        <div style="flex-shrink:0">${isDone?'<span style="color:#22c55e;font-size:16px">✓</span>':p.t?ring(pct).replace('width="52" height="52"','width="32" height="32"'):""}  </div>
+      </div>`;
+    }).join("")}
+  </div>`:""}
+
+  <!-- Quick actions -->
+  <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:10px">Schnellaktionen</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+    <button onclick="show('Check');setTimeout(createEmptyCl,100)" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 12px;cursor:pointer;font-family:inherit;text-align:left;transition:all .15s" onmouseover="this.style.borderColor='var(--accent)';this.style.background='rgba(99,102,241,.04)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--surface)'">
+      <div style="font-size:22px;margin-bottom:6px">✅</div>
+      <div style="font-size:13px;font-weight:700">Neue Checkliste</div>
+      <div style="font-size:11px;color:var(--muted)">Leere Liste erstellen</div>
+    </button>
+    <button onclick="show('Trips');setTimeout(()=>openTripForm(null),100)" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 12px;cursor:pointer;font-family:inherit;text-align:left;transition:all .15s" onmouseover="this.style.borderColor='var(--accent)';this.style.background='rgba(99,102,241,.04)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--surface)'">
+      <div style="font-size:22px;margin-bottom:6px">✈️</div>
+      <div style="font-size:13px;font-weight:700">Neue Reise</div>
+      <div style="font-size:11px;color:var(--muted)">Reise planen</div>
+    </button>
+    <button onclick="show('Tpl')" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 12px;cursor:pointer;font-family:inherit;text-align:left;transition:all .15s" onmouseover="this.style.borderColor='#f59e0b';this.style.background='rgba(245,158,11,.04)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--surface)'">
+      <div style="font-size:22px;margin-bottom:6px">📋</div>
+      <div style="font-size:13px;font-weight:700">Vorlagen</div>
+      <div style="font-size:11px;color:var(--muted)">Aus Vorlage erstellen</div>
+    </button>
+    <button onclick="show('Check');setTimeout(()=>loadArchivedCls(),100)" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 12px;cursor:pointer;font-family:inherit;text-align:left;transition:all .15s" onmouseover="this.style.borderColor='var(--muted)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--surface)'">
+      <div style="font-size:22px;margin-bottom:6px">🗂️</div>
+      <div style="font-size:13px;font-weight:700">Archiv</div>
+      <div style="font-size:11px;color:var(--muted)">Archivierte Listen</div>
+    </button>
+  </div>`;
+}
+
 /* ── URL Import ── */
 function applyImportData(d){
   const set=(id,val)=>{const el=document.getElementById(id);if(el&&val!==undefined&&val!=="")el.value=val};
@@ -1855,7 +2034,7 @@ function openItemForm(tripId,defaultCat,item){
         <label style="display:flex;align-items:center;gap:6px;cursor:pointer;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-size:13px;font-weight:500;color:var(--text);flex:1;justify-content:center">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
           Screenshot hochladen
-          <input id="fScreenshot" type="file" accept="image/*" capture="environment" style="display:none">
+          <input id="fScreenshot" type="file" accept="image/*, image/jpeg, image/png, image/webp" style="display:none">
         </label>
       </div>
       <div id="fImportMsg" style="font-size:12px;min-height:16px;margin-top:8px;color:var(--muted)"></div>
@@ -1944,6 +2123,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   on("menuBtn",openSidebar);on("sidebarBackdrop",closeSidebar);
   on("stopActing",()=>setActing(null,""));
   on("bCheck",()=>show("Check"));on("bTpl",()=>show("Tpl"));on("bTrips",()=>show("Trips"));on("bAdmin",()=>show("Admin"));
+  on("bbHome",()=>show("Home"));on("bHome",()=>show("Home"));
   on("bbCheck",()=>show("Check"));on("bbTpl",()=>show("Tpl"));on("bbTrips",()=>show("Trips"));on("bbAdmin",()=>show("Admin"));
   on("bbCheck2",()=>show("Check"));on("bbTrips2",()=>show("Trips"));
   on("bbAdmin2",()=>show("Admin"));on("bbAdmin3",()=>show("Admin"));
