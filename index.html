@@ -91,7 +91,7 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 .checkrow{display:flex;align-items:center;gap:10px;padding:11px 14px;border-top:1px solid var(--border);user-select:none;-webkit-user-select:none}
 .checkrow:first-child{border-top:none}
 .checkrow input[type=checkbox]{width:20px;height:20px;flex-shrink:0;cursor:pointer;accent-color:var(--accent)}
-.checkrow label{cursor:pointer;flex:1;font-size:14px;transition:color .15s;word-break:break-word}
+.checkrow label{cursor:pointer;flex:1;font-size:14px;transition:color .15s;word-break:break-word}.checkrow label:hover{opacity:.85}
 .checkrow label.done{text-decoration:line-through;color:var(--muted)}
 .item-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:2px 4px;line-height:1;border-radius:5px;transition:color .15s;flex-shrink:0;opacity:0}
 .checkrow:hover .item-del{opacity:1}
@@ -860,7 +860,24 @@ async function loadDetailPanel(id){
     const hd=q("div");hd.className="cat-header";
     const hnd=q("div");hnd.className="cat-drag-handle";hnd.title="Ziehen zum Sortieren";
     hnd.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>';
-    const ht=q("h3");ht.textContent=cat.title;
+    const ht=q("h3");ht.textContent=cat.title;ht.title="Doppelklick zum Umbenennen";
+    ht.style.cursor="pointer";
+    ht.ondblclick=()=>{
+      const inp=q("input");
+      inp.value=cat.title;
+      inp.style.cssText="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);border:none;border-bottom:2px solid var(--accent);background:transparent;outline:none;width:100%;font-family:inherit";
+      ht.replaceWith(inp);inp.focus();inp.select();
+      const save=async()=>{
+        const val=inp.value.trim();
+        if(val&&val!==cat.title){
+          await sb.from("checklist_categories").update({title:val}).eq("id",cat.id);
+          cat.title=val;panelDirty=true;
+        }
+        const h=q("h3");h.textContent=cat.title;h.title="Doppelklick zum Umbenennen";h.style.cursor="pointer";
+        h.ondblclick=ht.ondblclick;inp.replaceWith(h);
+      };
+      inp.onblur=save;inp.onkeydown=e=>{if(e.key==="Enter")inp.blur();if(e.key==="Escape"){inp.value=cat.title;inp.blur()}};
+    };
     const hd2=q("button");hd2.className="cat-del-btn";hd2.textContent="×";hd2.title="Löschen";
     hd2.onclick=async()=>{
       const ok=await showModal({title:"Kategorie löschen?",sub:'"'+cat.title+'" und alle Einträge werden gelöscht.',confirmLabel:"Löschen",danger:true});
@@ -896,6 +913,23 @@ function makeRow(it,container,refreshProg){
   hnd.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>';
   const cb=q("input");cb.type="checkbox";cb.checked=it.is_checked;cb.id="cb-"+it.id;
   const lb=q("label");lb.htmlFor="cb-"+it.id;lb.textContent=it.title;if(it.is_checked)lb.classList.add("done");
+  lb.title="Doppelklick zum Umbenennen";
+  lb.ondblclick=e=>{
+    e.preventDefault();e.stopPropagation();
+    const inp=q("input");
+    inp.value=it.title;
+    inp.style.cssText="flex:1;font-size:14px;border:none;border-bottom:2px solid var(--accent);background:transparent;outline:none;font-family:inherit;color:var(--text);width:100%";
+    lb.style.display="none";row.insertBefore(inp,lb.nextSibling);inp.focus();inp.select();
+    const save=async()=>{
+      const val=inp.value.trim();
+      if(val&&val!==it.title){
+        await sb.from("checklist_items").update({title:val}).eq("id",it.id);
+        it.title=val;lb.textContent=val;panelDirty=true;
+      }
+      inp.remove();lb.style.display="";
+    };
+    inp.onblur=save;inp.onkeydown=e=>{if(e.key==="Enter")inp.blur();if(e.key==="Escape"){inp.value=it.title;inp.blur()}};
+  };
   const del=q("button");del.className="item-del";del.innerHTML="×";del.title="Löschen";
   del.onclick=async e=>{
     e.stopPropagation();
