@@ -91,7 +91,10 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 .checkrow{display:flex;align-items:center;gap:10px;padding:11px 14px;border-top:1px solid var(--border);user-select:none;-webkit-user-select:none}
 .checkrow:first-child{border-top:none}
 .checkrow input[type=checkbox]{width:20px;height:20px;flex-shrink:0;cursor:pointer;accent-color:var(--accent)}
-.checkrow label{cursor:pointer;flex:1;font-size:14px;transition:color .15s;word-break:break-word}.checkrow label:hover{opacity:.85}
+.checkrow label{cursor:pointer;flex:1;font-size:14px;transition:color .15s;word-break:break-word}
+.edit-inline-btn{background:none;border:none;cursor:pointer;color:var(--muted);opacity:.45;padding:4px 6px;display:flex;align-items:center;flex-shrink:0;transition:opacity .15s,color .15s;border-radius:6px}
+.edit-inline-btn:hover{opacity:1;color:var(--accent)}
+@media(hover:none){.edit-inline-btn{opacity:.55}}
 .checkrow label.done{text-decoration:line-through;color:var(--muted)}
 .item-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:2px 4px;line-height:1;border-radius:5px;transition:color .15s;flex-shrink:0;opacity:0}
 .checkrow:hover .item-del{opacity:1}
@@ -287,6 +290,7 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
       <button id="changePwBtn" style="width:100%;margin-top:10px;background:none;border:1px solid var(--border);border-radius:8px;padding:7px;font-size:13px;color:var(--muted);cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Passwort ändern
       </button>
+      <div style="text-align:center;margin-top:12px;font-size:11px;color:var(--muted);opacity:.6">Checklists v4.0 · Stand 05.07.2026</div>
     </div>
   </aside>
 
@@ -860,21 +864,23 @@ async function loadDetailPanel(id){
     const hd=q("div");hd.className="cat-header";
     const hnd=q("div");hnd.className="cat-drag-handle";hnd.title="Ziehen zum Sortieren";
     hnd.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>';
-    const ht=q("h3");ht.textContent=cat.title;ht.title="Doppelklick zum Umbenennen";
-    ht.style.cursor="pointer";
-    ht.ondblclick=()=>{
+    const ht=q("h3");ht.textContent=cat.title;
+    const editCatBtn=q("button");
+    editCatBtn.className="edit-inline-btn";editCatBtn.title="Umbenennen";
+    editCatBtn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+    editCatBtn.onclick=()=>{
       const inp=q("input");
       inp.value=cat.title;
-      inp.style.cssText="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);border:none;border-bottom:2px solid var(--accent);background:transparent;outline:none;width:100%;font-family:inherit";
-      ht.replaceWith(inp);inp.focus();inp.select();
+      inp.style.cssText="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text);border:none;border-bottom:2px solid var(--accent);background:transparent;outline:none;flex:1;font-family:inherit;min-width:0";
+      ht.style.display="none";editCatBtn.style.display="none";
+      hd.insertBefore(inp,ht.nextSibling);inp.focus();inp.select();
       const save=async()=>{
         const val=inp.value.trim();
         if(val&&val!==cat.title){
           await sb.from("checklist_categories").update({title:val}).eq("id",cat.id);
-          cat.title=val;panelDirty=true;
+          cat.title=val;ht.textContent=val;panelDirty=true;toast("Umbenannt");
         }
-        const h=q("h3");h.textContent=cat.title;h.title="Doppelklick zum Umbenennen";h.style.cursor="pointer";
-        h.ondblclick=ht.ondblclick;inp.replaceWith(h);
+        inp.remove();ht.style.display="";editCatBtn.style.display="";
       };
       inp.onblur=save;inp.onkeydown=e=>{if(e.key==="Enter")inp.blur();if(e.key==="Escape"){inp.value=cat.title;inp.blur()}};
     };
@@ -886,7 +892,7 @@ async function loadDetailPanel(id){
       await sb.from("checklist_categories").delete().eq("id",cat.id);
       loading(false);toast("Gelöscht");panelDirty=true;loadDetailPanel(id);
     };
-    hd.append(hnd,ht,hd2);blk.appendChild(hd);
+    hd.append(hnd,ht,editCatBtn,hd2);blk.appendChild(hd);
     const inn=q("div");inn.className="cat-inner";
     (bycat[cat.id]||[]).forEach(it=>inn.appendChild(makeRow(it,inn,refreshProg)));
     const ar=q("div");ar.className="inline-add";
@@ -913,20 +919,23 @@ function makeRow(it,container,refreshProg){
   hnd.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>';
   const cb=q("input");cb.type="checkbox";cb.checked=it.is_checked;cb.id="cb-"+it.id;
   const lb=q("label");lb.htmlFor="cb-"+it.id;lb.textContent=it.title;if(it.is_checked)lb.classList.add("done");
-  lb.title="Doppelklick zum Umbenennen";
-  lb.ondblclick=e=>{
+  const editBtn=q("button");
+  editBtn.className="edit-inline-btn";editBtn.title="Umbenennen";
+  editBtn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+  editBtn.onclick=e=>{
     e.preventDefault();e.stopPropagation();
     const inp=q("input");
     inp.value=it.title;
-    inp.style.cssText="flex:1;font-size:14px;border:none;border-bottom:2px solid var(--accent);background:transparent;outline:none;font-family:inherit;color:var(--text);width:100%";
-    lb.style.display="none";row.insertBefore(inp,lb.nextSibling);inp.focus();inp.select();
+    inp.style.cssText="flex:1;font-size:14px;border:none;border-bottom:2px solid var(--accent);background:transparent;outline:none;font-family:inherit;color:var(--text);min-width:0";
+    lb.style.display="none";editBtn.style.display="none";
+    row.insertBefore(inp,lb.nextSibling);inp.focus();inp.select();
     const save=async()=>{
       const val=inp.value.trim();
       if(val&&val!==it.title){
         await sb.from("checklist_items").update({title:val}).eq("id",it.id);
-        it.title=val;lb.textContent=val;panelDirty=true;
+        it.title=val;lb.textContent=val;panelDirty=true;toast("Umbenannt");
       }
-      inp.remove();lb.style.display="";
+      inp.remove();lb.style.display="";editBtn.style.display="";
     };
     inp.onblur=save;inp.onkeydown=e=>{if(e.key==="Enter")inp.blur();if(e.key==="Escape"){inp.value=it.title;inp.blur()}};
   };
@@ -942,7 +951,7 @@ function makeRow(it,container,refreshProg){
     await sb.from("checklist_items").update({is_checked:cb.checked,checked_at:cb.checked?new Date().toISOString():null,checked_by:cb.checked?user.id:null}).eq("id",it.id);
     panelDirty=true;refreshProg();
   };
-  row.append(hnd,cb,lb,del);
+  row.append(hnd,cb,lb,editBtn,del);
   ptrDrag(hnd,row,container,".checkrow",saveItemOrd);
   return row;
 }
