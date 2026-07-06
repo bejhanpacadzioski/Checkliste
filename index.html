@@ -205,7 +205,9 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
   #main{padding-bottom:72px}
   .page-header{padding:16px 16px 0}
   #content{padding:14px}
-  #bottomNav{display:grid;grid-template-columns:repeat(3,1fr);position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--border);padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:40}
+  #bottomNav{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--border);padding:4px 8px calc(8px + env(safe-area-inset-bottom));z-index:40}
+  .bnav-sub-pill{background:none;border:1px solid var(--border);border-radius:99px;padding:6px 16px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;font-family:inherit;transition:all .15s}
+  .bnav-sub-pill.active{background:rgba(99,102,241,.12);border-color:var(--accent);color:var(--accent)}
   .bnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px;border:none;background:none;cursor:pointer;font-size:11px;font-weight:500;color:var(--muted);font-family:inherit;border-radius:10px}
   .bnav-item svg{width:22px;height:22px}
   .bnav-item.active{color:var(--accent)}
@@ -290,7 +292,7 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
       <button id="changePwBtn" style="width:100%;margin-top:10px;background:none;border:1px solid var(--border);border-radius:8px;padding:7px;font-size:13px;color:var(--muted);cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Passwort ändern
       </button>
-      <div style="text-align:center;margin-top:12px;font-size:11px;color:var(--muted);opacity:.6">Checklists v4.0 · Stand 05.07.2026</div>
+      <div style="text-align:center;margin-top:12px;font-size:11px;color:var(--muted);opacity:.6">Checklists v4.1 · Stand 06.07.2026</div>
     </div>
   </aside>
 
@@ -403,20 +405,14 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
   </div>
 
   <nav id="bottomNav">
-    <!-- Context: Checklisten group active -->
-    <div id="bnavCheck" style="display:contents">
-      <button class="bnav-item" id="bbHome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</button>
-      <button class="bnav-item" id="bbCheck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M9 12l2 2 4-4"/></svg>Checklisten</button>
-      <button class="bnav-item" id="bbTpl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Vorlagen</button>
-      <button class="bnav-item" id="bbTrips2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>Reisen</button>
-      <button class="bnav-item hidden" id="bbAdmin2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 11l1.5 1.5L21 9"/></svg>Admin</button>
+    <!-- Subnav: shows subcategories of active section -->
+    <div id="bnavSub" style="display:none;grid-column:1/-1;padding:6px 8px 8px;border-bottom:1px solid var(--border);margin-bottom:6px">
+      <div style="display:flex;gap:6px;justify-content:center" id="bnavSubInner"></div>
     </div>
-    <!-- Context: Reisen active -->
-    <div id="bnavTrips" style="display:none;contents">
-      <button class="bnav-item" id="bbCheck2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M9 12l2 2 4-4"/></svg>Checklisten</button>
-      <button class="bnav-item active" id="bbTrips"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>Reisen</button>
-      <button class="bnav-item hidden" id="bbAdmin3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 11l1.5 1.5L21 9"/></svg>Admin</button>
-    </div>
+    <button class="bnav-item" id="bbHome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</button>
+    <button class="bnav-item" id="bbCheckGrp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M9 12l2 2 4-4"/></svg>Checklisten</button>
+    <button class="bnav-item" id="bbTripsGrp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>Reisen</button>
+    <button class="bnav-item hidden" id="bbAdminGrp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 11l1.5 1.5L21 9"/></svg>Admin</button>
   </nav>
 </div>
 
@@ -576,19 +572,24 @@ function show(v,skipHistory=false){
     $("v"+x).style.display=x===v?"":"none";
     $("b"+x)?.classList.toggle("active",x===v);
   });
-  // Context-sensitive bottom nav
-  const inTrips=v==="Trips";
-  const bnavCheck=$("bnavCheck"),bnavTrips=$("bnavTrips");
-  if(bnavCheck)bnavCheck.style.display=inTrips?"none":"contents";
-  if(bnavTrips)bnavTrips.style.display=inTrips?"contents":"none";
-  // Update active states
-  if(inTrips){
-    $("bbTrips")?.classList.add("active");$("bbCheck2")?.classList.remove("active");
-  } else {
-    ["bbHome","bbCheck","bbTpl"].forEach(id=>{
-      const el=$(id);if(el)el.classList.toggle("active",
-        (id==="bbHome"&&v==="Home")||(id==="bbCheck"&&v==="Check")||(id==="bbTpl"&&v==="Tpl"));
-    });
+  // Bottom nav: main groups + subnav
+  const grpOf={Home:"Home",Check:"Checklisten",Tpl:"Checklisten",Trips:"Reisen",Admin:"Admin"};
+  const grp=grpOf[v]||"Home";
+  $("bbHome")?.classList.toggle("active",grp==="Home");
+  $("bbCheckGrp")?.classList.toggle("active",grp==="Checklisten");
+  $("bbTripsGrp")?.classList.toggle("active",grp==="Reisen");
+  $("bbAdminGrp")?.classList.toggle("active",grp==="Admin");
+  // Subnav for groups with subcategories
+  const sub=$("bnavSub"),subInner=$("bnavSubInner");
+  if(sub&&subInner){
+    if(grp==="Checklisten"){
+      sub.style.display="";
+      subInner.innerHTML=
+        '<button class="bnav-sub-pill'+(v==="Check"?" active":"")+'" onclick="show(\'Check\')">Checklisten</button>'
+        +'<button class="bnav-sub-pill'+(v==="Tpl"?" active":"")+'" onclick="show(\'Tpl\')">Vorlagen</button>';
+    } else {
+      sub.style.display="none";subInner.innerHTML="";
+    }
   }
   closeSidebar();
   if(v==="Home")loadDashboard();
@@ -679,7 +680,7 @@ async function loadApp(){
     orgId=m.data?.[0]?.organization_id;
     isSuper=(m.data||[]).some(x=>x.role==="super_admin");
     const isAdminOrSuper=(m.data||[]).some(x=>["admin","super_admin"].includes(x.role));
-    [$("bAdmin"),$("bbAdmin"),$("bbAdmin2"),$("bbAdmin3")].forEach(el=>{if(el)el.classList.toggle("hidden",!isAdminOrSuper)});
+    [$("bAdmin"),$("bbAdminGrp")].forEach(el=>{if(el)el.classList.toggle("hidden",!isAdminOrSuper)});
     await Promise.all([loadTemplates(),loadChecklists()]);
     // Restore last view
     const lastView=localStorage.getItem("lastView")||"Home";
@@ -750,7 +751,7 @@ async function loadChecklists(){
       const permBadge='<span style="font-size:11px;color:var(--accent);font-weight:600;background:rgba(99,102,241,.1);padding:2px 7px;border-radius:99px">'+(isEdit?"✏️ Bearbeiten":"👁 Lesen")+'</span>';
       // Fetch owner name for shared cards (use cached profiles if possible)
       const sharedOwnerBadge='<span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;color:var(--muted)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>'+escH(cl._ownerName||"")+'</span>';
-      card.innerHTML='<div class="cl-ring">'+ring(pct)+'</div><div class="cl-body"><div class="cl-title">'+escH((cl.icon||"📋")+" "+cl.title)+'</div><div class="cl-desc">'+escH(cl.description||"")+'</div><div class="cl-meta"><span>'+d+"/"+t+' erledigt</span>'+permBadge+(cl._ownerName?sharedOwnerBadge:"")+'</div></div>';
+      card.innerHTML='<div class="cl-ring">'+ring(pct)+'</div><div class="cl-body"><div class="cl-title">'+escH(cl.title)+'</div><div class="cl-desc">'+escH(cl.description||"")+'</div><div class="cl-meta"><span>'+d+"/"+t+' erledigt</span>'+permBadge+(cl._ownerName?sharedOwnerBadge:"")+'</div></div>';
       card.onclick=()=>openDetailPanel(cl.id);
       grid.appendChild(card);
     });
@@ -802,7 +803,7 @@ async function loadChecklists(){
     const ownerName=ownerMap[cl.owner_id]||"";
     const isOwn=cl.owner_id===user.id;
     const ownerBadge=ownerName?'<span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;color:var(--muted)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>'+escH(isOwn?"Ich":ownerName)+'</span>':"";
-    card.innerHTML='<div class="cl-ring">'+ring(pct)+'</div><div class="cl-body"><div class="cl-title">'+escH((cl.icon||"📋")+" "+cl.title)+'</div><div class="cl-desc">'+escH(cl.description||"Keine Beschreibung")+'</div><div class="cl-meta"><span>'+d+"/"+t+' erledigt</span>'+badge+shareBadge+ownerBadge+'<span class="cl-date">'+fmtD(cl.created_at)+'</span></div><div class="cl-actions"><button class="btn-dup">Duplizieren</button><button class="btn-arch">Archivieren</button><button class="btn-del">Löschen</button></div></div>';
+    card.innerHTML='<div class="cl-ring">'+ring(pct)+'</div><div class="cl-body"><div class="cl-title">'+escH(cl.title)+'</div><div class="cl-desc">'+escH(cl.description||"Keine Beschreibung")+'</div><div class="cl-meta"><span>'+d+"/"+t+' erledigt</span>'+badge+shareBadge+ownerBadge+'<span class="cl-date">'+fmtD(cl.created_at)+'</span></div><div class="cl-actions"><button class="btn-dup">Duplizieren</button><button class="btn-arch">Archivieren</button><button class="btn-del">Löschen</button></div></div>';
     card.querySelector(".btn-dup").onclick=e=>{e.stopPropagation();duplicateCl(cl.id)};
     card.querySelector(".btn-arch").onclick=e=>{e.stopPropagation();archiveCl(cl.id)};
     card.querySelector(".btn-del").onclick=async e=>{e.stopPropagation();
@@ -828,7 +829,7 @@ async function loadDetailPanel(id){
     sb.from("checklist_categories").select("*").eq("checklist_id",id).order("sort_order")
   ]);
   const cl=clR.data;
-  $("detailTitle").textContent=(cl.icon||"📋")+" "+cl.title;
+  $("detailTitle").textContent=cl.title;
   $("detailArchive").onclick=()=>archiveCl(id,true);
   initTitleEdit(id,cl.title);
   const cids=(catR.data||[]).map(c=>c.id);
@@ -1052,7 +1053,7 @@ async function loadArchivedCls(){
   (data||[]).forEach(cl=>{
     const own="";
     const card=q("div");card.className="cl-card";card.style.opacity=".7";
-    card.innerHTML='<div class="cl-ring">'+ring(0)+'</div><div class="cl-body"><div class="cl-title">'+escH((cl.icon||"📋")+" "+cl.title)+'</div><div class="cl-desc">'+(isSuper&&own?escH(own):"Archiviert")+'</div><div class="cl-meta"><span class="cl-date">'+fmtD(cl.deleted_at)+'</span></div><div class="cl-actions"></div></div>';
+    card.innerHTML='<div class="cl-ring">'+ring(0)+'</div><div class="cl-body"><div class="cl-title">'+escH(cl.title)+'</div><div class="cl-desc">'+(isSuper&&own?escH(own):"Archiviert")+'</div><div class="cl-meta"><span class="cl-date">'+fmtD(cl.deleted_at)+'</span></div><div class="cl-actions"></div></div>';
     const act=card.querySelector(".cl-actions");
     const r=q("button");r.textContent="Wiederherstellen";
     r.onclick=async e=>{e.stopPropagation();loading(true,"...");await sb.from("checklists").update({archived:false,deleted_at:null,deleted_by:null}).eq("id",cl.id);loading(false);toast("Wiederhergestellt");card.remove();loadChecklists()};
@@ -1765,7 +1766,7 @@ async function loadDashboard(){
       const pct=p.t?Math.round(p.d/p.t*100):0;
       const isDone=p.t>0&&pct===100;
       return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--border);cursor:pointer" onclick="show('Check');setTimeout(()=>openDetailPanel('${cl.id}'),100)">
-        <div style="width:36px;height:36px;border-radius:10px;background:rgba(99,102,241,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${cl.icon||"📋"}</div>
+        <div style="width:36px;height:36px;border-radius:10px;background:rgba(99,102,241,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M9 12l2 2 4-4"/></svg></div>
         <div style="flex:1;min-width:0">
           <div style="font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escH(cl.title)}</div>
           <div style="font-size:11px;color:var(--muted)">${p.t?p.d+"/"+p.t+" erledigt":"Leer"}</div>
@@ -2165,11 +2166,11 @@ document.addEventListener("DOMContentLoaded",()=>{
   on("darkToggle",toggleDark);on("darkToggleDesktop",toggleDark);
   on("menuBtn",openSidebar);on("sidebarBackdrop",closeSidebar);
   on("stopActing",()=>setActing(null,""));
-  on("bCheck",()=>show("Check"));on("bTpl",()=>show("Tpl"));on("bTrips",()=>show("Trips"));on("bAdmin",()=>show("Admin"));
-  on("bbHome",()=>show("Home"));on("bHome",()=>show("Home"));
-  on("bbCheck",()=>show("Check"));on("bbTpl",()=>show("Tpl"));on("bbTrips",()=>show("Trips"));on("bbAdmin",()=>show("Admin"));
-  on("bbCheck2",()=>show("Check"));on("bbTrips2",()=>show("Trips"));
-  on("bbAdmin2",()=>show("Admin"));on("bbAdmin3",()=>show("Admin"));
+  on("bCheck",()=>show("Check"));on("bTpl",()=>show("Tpl"));on("bTrips",()=>show("Trips"));on("bAdmin",()=>show("Admin"));on("bHome",()=>show("Home"));
+  on("bbHome",()=>show("Home"));
+  on("bbCheckGrp",()=>show("Check"));
+  on("bbTripsGrp",()=>show("Trips"));
+  on("bbAdminGrp",()=>show("Admin"));
   on("refreshCheck",()=>{loading(true,"Aktualisiere…");loadChecklists().finally(()=>loading(false))});
   on("newEmptyCl",createEmptyCl);on("newFromTplCl",pickTplAndCreate);
   on("showArchivedCl",loadArchivedCls);on("closeArchivedCl",()=>{$("archivedClSection").style.display="none"});
