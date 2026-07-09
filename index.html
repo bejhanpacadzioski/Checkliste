@@ -807,8 +807,9 @@ async function loadChecklists(){
     const ownerName=ownerMap[cl.owner_id]||"";
     const isOwn=cl.owner_id===user.id;
     const ownerBadge=ownerName?'<span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;color:var(--muted)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>'+escH(isOwn?"Ich":ownerName)+'</span>':"";
-    card.innerHTML='<div class="cl-ring">'+ring(pct)+'</div><div class="cl-body"><div class="cl-title">'+escH(cl.title)+'</div><div class="cl-desc">'+escH(cl.description||"Keine Beschreibung")+'</div><div class="cl-meta"><span>'+d+"/"+t+' erledigt</span>'+badge+shareBadge+ownerBadge+'<span class="cl-date">'+fmtD(cl.created_at)+'</span></div><div class="cl-actions"><button class="btn-dup">Duplizieren</button><button class="btn-arch">Archivieren</button><button class="btn-del">Löschen</button></div></div>';
+    card.innerHTML='<div class="cl-ring">'+ring(pct)+'</div><div class="cl-body"><div class="cl-title">'+escH(cl.title)+'</div><div class="cl-desc">'+escH(cl.description||"Keine Beschreibung")+'</div><div class="cl-meta"><span>'+d+"/"+t+' erledigt</span>'+badge+shareBadge+ownerBadge+'<span class="cl-date">'+fmtD(cl.created_at)+'</span></div><div class="cl-actions"><button class="btn-dup">Duplizieren</button><button class="btn-tpl">Als Vorlage</button><button class="btn-arch">Archivieren</button><button class="btn-del">Löschen</button></div></div>';
     card.querySelector(".btn-dup").onclick=e=>{e.stopPropagation();duplicateCl(cl.id)};
+    card.querySelector(".btn-tpl").onclick=e=>{e.stopPropagation();saveChecklistAsTemplate(cl.id)};
     card.querySelector(".btn-arch").onclick=e=>{e.stopPropagation();archiveCl(cl.id)};
     card.querySelector(".btn-del").onclick=async e=>{e.stopPropagation();
       const ok=await showModal({title:"Checkliste löschen?",sub:'"'+cl.title+'" wird endgültig gelöscht.',confirmLabel:"Löschen",danger:true});
