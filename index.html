@@ -294,7 +294,7 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
       <button id="changePwBtn" style="width:100%;margin-top:10px;background:none;border:1px solid var(--border);border-radius:8px;padding:7px;font-size:13px;color:var(--muted);cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Passwort ändern
       </button>
-      <div style="text-align:center;margin-top:12px;font-size:11px;color:var(--muted);opacity:.6">Checklists v4.1 · Stand 06.07.2026</div>
+      <div style="text-align:center;margin-top:12px;font-size:11px;color:var(--muted);opacity:.6">Checklists v4.2 · Stand 09.07.2026</div>
     </div>
   </aside>
 
@@ -430,6 +430,7 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
       </div>
       <div class="detail-hbtns">
         <button class="btn btn-ghost btn-sm" id="detailAddCat"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg><span class="btn-label">Kategorie</span></button>
+        <button class="btn btn-ghost btn-sm" id="detailSaveTpl" title="Als Vorlage speichern"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 8h6M9 12h6M9 16h4"/></svg><span class="btn-label">Vorlage</span></button>
         <button class="btn btn-ghost btn-sm" id="detailShare" title="Teilen"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg><span class="btn-label">Teilen</span></button>
         <button class="btn btn-danger btn-sm" id="detailArchive"><span class="btn-label">Archivieren</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg></button>
       </div>
@@ -869,6 +870,8 @@ async function loadDetailPanel(id){
     const hnd=q("div");hnd.className="cat-drag-handle";hnd.title="Ziehen zum Sortieren";
     hnd.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>';
     const ht=q("h3");ht.textContent=cat.title;
+    ht.style.cursor="pointer";ht.title="Tippen zum Umbenennen";
+    ht.onclick=()=>editCatBtn.onclick();
     const editCatBtn=q("button");
     editCatBtn.className="edit-inline-btn";editCatBtn.title="Umbenennen";
     editCatBtn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
@@ -922,7 +925,9 @@ function makeRow(it,container,refreshProg){
   const hnd=q("div");hnd.className="drag-handle";hnd.title="Ziehen";
   hnd.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>';
   const cb=q("input");cb.type="checkbox";cb.checked=it.is_checked;cb.id="cb-"+it.id;
-  const lb=q("label");lb.htmlFor="cb-"+it.id;lb.textContent=it.title;if(it.is_checked)lb.classList.add("done");
+  const lb=q("label");lb.textContent=it.title;if(it.is_checked)lb.classList.add("done");
+  lb.title="Tippen zum Umbenennen";
+  lb.onclick=e=>{e.preventDefault();editBtn.onclick(e)};
   const editBtn=q("button");
   editBtn.className="edit-inline-btn";editBtn.title="Umbenennen";
   editBtn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
@@ -2161,6 +2166,28 @@ function showFormModal(title,bodyHtml,onSave){
   $("modalCancel").onclick=()=>close(false);
 }
 
+
+/* ── Checkliste als Vorlage speichern ── */
+async function saveChecklistAsTemplate(clId){
+  if(!clId)return;
+  const c=await sb.from("checklists").select("*").eq("id",clId).single();
+  if(c.error){toast("Fehler: "+c.error.message);return}
+  const title=await showModal({title:"Als Vorlage speichern",sub:"Die Checkliste wird als wiederverwendbare Vorlage kopiert.",input:{label:"Name der Vorlage",value:c.data.title}});
+  if(!title)return;
+  loading(true,"Erstelle Vorlage…");
+  const tr=await sb.from("templates").insert({organization_id:orgId,owner_id:user.id,created_by:user.id,updated_by:user.id,title,description:c.data.description||"",icon:c.data.icon||"📂"}).select().single();
+  if(tr.error){loading(false);toast("Fehler: "+tr.error.message);return}
+  const cats=await sb.from("checklist_categories").select("*").eq("checklist_id",clId).order("sort_order");
+  for(const cat of cats.data||[]){
+    const nc=await sb.from("template_categories").insert({template_id:tr.data.id,title:cat.title,sort_order:cat.sort_order}).select().single();
+    if(nc.error)continue;
+    const items=await sb.from("checklist_items").select("*").eq("category_id",cat.id).order("sort_order");
+    if(items.data&&items.data.length)
+      await sb.from("template_items").insert(items.data.map(i=>({category_id:nc.data.id,title:i.title,sort_order:i.sort_order})));
+  }
+  loading(false);toast("✓ Vorlage erstellt");loadTemplates();
+}
+
 /* Wiring */
 document.addEventListener("DOMContentLoaded",()=>{
   initClient();
@@ -2183,6 +2210,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   on("addUser",addUser);
   on("detailClose",closeDetailPanel);on("detailAddCat",addChecklistCat);on("detailArchive",()=>archiveCl(currentChecklistId,true));
   on("detailShare",()=>openSharePanel(currentChecklistId));
+  on("detailSaveTpl",()=>saveChecklistAsTemplate(currentChecklistId));
   on("sharePanelClose",closeSharePanel);
   $("shareOverlay").onclick=e=>{if(e.target===$("shareOverlay"))closeSharePanel()};
   $("detailOverlay").onclick=e=>{if(e.target===$("detailOverlay"))closeDetailPanel()};
