@@ -73,7 +73,9 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 .detail-title-edit{font-size:16px;font-weight:700;border:none;outline:none;background:var(--bg);border-radius:6px;padding:2px 4px;width:100%;font-family:inherit;color:var(--text);display:none}
 .detail-title-edit.active{display:block}
 .detail-title.editing{display:none}
-.detail-hbtns{display:flex;gap:6px;flex-shrink:0}
+.detail-hbtns{display:flex;gap:6px;flex-shrink:0;padding:8px 16px 10px;border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch}
+.detail-hbtns::-webkit-scrollbar{display:none}
+.detail-hbtns .btn-sm{white-space:nowrap;flex-shrink:0}
 .detail-body{flex:1;overflow-y:auto;padding:20px;-webkit-overflow-scrolling:touch}
 .progress-wrap{margin-bottom:20px}
 .detail-progress-bar{height:6px;background:var(--border);border-radius:99px;overflow:hidden;margin:8px 0 5px}
@@ -217,8 +219,7 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
   .cl-grid,.tpl-grid{grid-template-columns:1fr}
   #detailPanel{width:100vw;border-left:none;border-radius:20px 20px 0 0;top:auto;height:94dvh;transform:translateY(100%)}
   #detailOverlay.open #detailPanel{transform:translateY(0)}
-  .detail-hbtns .btn-label{display:none}
-  .detail-hbtns .btn-sm{padding:7px;border-radius:9px}
+  .detail-hbtns .btn-sm{padding:7px 10px;border-radius:9px;font-size:12px}
   @media(hover:none){.item-del{opacity:.4}}
 }
 .trip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:18px 20px;cursor:pointer;transition:box-shadow .18s,transform .18s,border-color .18s;margin-bottom:14px}
@@ -294,7 +295,7 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
       <button id="changePwBtn" style="width:100%;margin-top:10px;background:none;border:1px solid var(--border);border-radius:8px;padding:7px;font-size:13px;color:var(--muted);cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Passwort ändern
       </button>
-      <div style="text-align:center;margin-top:12px;font-size:11px;color:var(--muted);opacity:.6">Checklists v4.2 · Stand 09.07.2026</div>
+      <div style="text-align:center;margin-top:12px;font-size:11px;color:var(--muted);opacity:.6">Checklists v4.3 · Stand 06.08.2026</div>
     </div>
   </aside>
 
@@ -322,6 +323,7 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
             <button class="btn btn-ghost btn-sm" id="newEmptyCl"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>Leere Checkliste</button>
             <button class="btn btn-primary btn-sm" id="newFromTplCl"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Aus Vorlage</button>
             <button class="btn btn-ghost btn-sm" id="showArchivedCl"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg>Archiviert</button>
+            <button class="btn btn-ghost btn-sm" id="openClImport"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Importieren</button>
             <button class="icon-btn btn-sm" id="refreshCheck"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4-4.64 4.36A9 9 0 0 1 3.51 15"/></svg></button>
           </div>
         </div>
@@ -428,12 +430,12 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
         <span class="detail-title" id="detailTitle">—</span>
         <input class="detail-title-edit" id="detailTitleEdit" type="text">
       </div>
-      <div class="detail-hbtns">
-        <button class="btn btn-ghost btn-sm" id="detailAddCat"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg><span class="btn-label">Kategorie</span></button>
-        <button class="btn btn-ghost btn-sm" id="detailSaveTpl" title="Als Vorlage speichern"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 8h6M9 12h6M9 16h4"/></svg><span class="btn-label">Vorlage</span></button>
-        <button class="btn btn-ghost btn-sm" id="detailShare" title="Teilen"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg><span class="btn-label">Teilen</span></button>
-        <button class="btn btn-danger btn-sm" id="detailArchive"><span class="btn-label">Archivieren</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg></button>
-      </div>
+    </div>
+    <div class="detail-hbtns" id="detailHbtns">
+      <button class="btn btn-ghost btn-sm" id="detailAddCat"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg><span class="btn-label">Kategorie</span></button>
+      <button class="btn btn-ghost btn-sm" id="detailSaveTpl" title="Als Vorlage speichern"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-8H5v8M5 3v5h9M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg><span class="btn-label">Als Vorlage</span></button>
+      <button class="btn btn-ghost btn-sm" id="detailShare" title="Teilen"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg><span class="btn-label">Teilen</span></button>
+      <button class="btn btn-danger btn-sm" id="detailArchive"><span class="btn-label">Archivieren</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg></button>
     </div>
     <div class="detail-body" id="detailBody"></div>
   </div>
@@ -742,10 +744,14 @@ async function loadChecklists(){
     const ids=sharedData.map(c=>c.id);
     const cats=await sb.from("checklist_categories").select("id,checklist_id").in("checklist_id",ids);
     const cids=(cats.data||[]).map(c=>c.id);
-    const items=cids.length?await sb.from("checklist_items").select("category_id,is_checked").in("category_id",cids):{data:[]};
+    const[items,uncatItems]=await Promise.all([
+      cids.length?sb.from("checklist_items").select("category_id,is_checked").in("category_id",cids):{data:[]},
+      sb.from("checklist_items").select("checklist_id,is_checked").in("checklist_id",ids).is("category_id",null)
+    ]);
     const c2cl={};(cats.data||[]).forEach(c=>c2cl[c.id]=c.checklist_id);
     const prog={};ids.forEach(id=>prog[id]={d:0,t:0});
     (items.data||[]).forEach(it=>{const cl=c2cl[it.category_id];if(!cl)return;prog[cl].t++;if(it.is_checked)prog[cl].d++});
+    (uncatItems.data||[]).forEach(it=>{if(!prog[it.checklist_id])return;prog[it.checklist_id].t++;if(it.is_checked)prog[it.checklist_id].d++});
     const grid=q("div");grid.className="cl-grid";
     sharedData.forEach(cl=>{
       const{d,t}=prog[cl.id]||{d:0,t:0};
@@ -793,10 +799,14 @@ async function loadChecklists(){
   const ids=data.map(c=>c.id);
   const cats=await sb.from("checklist_categories").select("id,checklist_id").in("checklist_id",ids);
   const cids=(cats.data||[]).map(c=>c.id);
-  const items=cids.length?await sb.from("checklist_items").select("category_id,is_checked").in("category_id",cids):{data:[]};
+  const[items,uncatItems]=await Promise.all([
+    cids.length?sb.from("checklist_items").select("category_id,is_checked").in("category_id",cids):{data:[]},
+    sb.from("checklist_items").select("checklist_id,is_checked").in("checklist_id",ids).is("category_id",null)
+  ]);
   const c2cl={};(cats.data||[]).forEach(c=>c2cl[c.id]=c.checklist_id);
   const prog={};ids.forEach(id=>prog[id]={d:0,t:0});
   (items.data||[]).forEach(it=>{const cl=c2cl[it.category_id];if(!cl)return;prog[cl].t++;if(it.is_checked)prog[cl].d++});
+  (uncatItems.data||[]).forEach(it=>{if(!prog[it.checklist_id])return;prog[it.checklist_id].t++;if(it.is_checked)prog[it.checklist_id].d++});
   const grid=q("div");grid.className="cl-grid";
   (data||[]).forEach(cl=>{
     const{d,t}=prog[cl.id]||{d:0,t:0};
@@ -817,6 +827,7 @@ async function loadChecklists(){
       const cats=await sb.from("checklist_categories").select("id").eq("checklist_id",cl.id);
       const cids=(cats.data||[]).map(c=>c.id);
       if(cids.length)await sb.from("checklist_items").delete().in("category_id",cids);
+      await sb.from("checklist_items").delete().eq("checklist_id",cl.id).is("category_id",null);
       await sb.from("checklist_categories").delete().eq("checklist_id",cl.id);
       await sb.from("checklists").delete().eq("id",cl.id);
       loading(false);toast("Gelöscht");card.remove();};
@@ -829,9 +840,10 @@ async function loadChecklists(){
 async function loadDetailPanel(id){
   const body=$("detailBody");
   body.innerHTML='<div style="display:flex;justify-content:center;padding:48px"><div class="spinner"></div></div>';
-  const[clR,catR]=await Promise.all([
+  const[clR,catR,uncatR]=await Promise.all([
     sb.from("checklists").select("*").eq("id",id).single(),
-    sb.from("checklist_categories").select("*").eq("checklist_id",id).order("sort_order")
+    sb.from("checklist_categories").select("*").eq("checklist_id",id).order("sort_order"),
+    sb.from("checklist_items").select("*").eq("checklist_id",id).is("category_id",null).order("sort_order")
   ]);
   const cl=clR.data;
   $("detailTitle").textContent=cl.title;
@@ -840,7 +852,8 @@ async function loadDetailPanel(id){
   const cids=(catR.data||[]).map(c=>c.id);
   const itR=cids.length?await sb.from("checklist_items").select("*").in("category_id",cids).order("sort_order"):{data:[]};
   const bycat={};(itR.data||[]).forEach(it=>{(bycat[it.category_id]=bycat[it.category_id]||[]).push(it)});
-  let tot=(itR.data||[]).length,dn=(itR.data||[]).filter(i=>i.is_checked).length;
+  const uncatItems=uncatR.data||[];
+  let tot=(itR.data||[]).length+uncatItems.length,dn=(itR.data||[]).filter(i=>i.is_checked).length+uncatItems.filter(i=>i.is_checked).length;
   let wasComplete=tot>0&&dn===tot;
 
   const progWrap=q("div");progWrap.className="progress-wrap-outer";
@@ -862,7 +875,30 @@ async function loadDetailPanel(id){
     if(nowComp&&!wasComplete){celebrate();wasComplete=true}
   }
 
-  if(!catR.data||!catR.data.length){const hint=q("div");hint.className="empty-cat-hint";hint.textContent='Noch keine Kategorien. Klicke "+ Kategorie" oben.';body.appendChild(hint);return}
+  // Uncategorized items section (always shown so items can be added without a category)
+  const uncatBlk=q("div");uncatBlk.className="cat-block";uncatBlk.style.marginBottom="18px";
+  const uncatHead=q("div");uncatHead.className="cat-header";uncatHead.style.opacity=".75";
+  const uncatH=q("h3");uncatH.textContent="Ohne Kategorie";
+  uncatHead.append(uncatH);uncatBlk.appendChild(uncatHead);
+  const uncatInner=q("div");uncatInner.className="cat-inner";
+  uncatItems.forEach(it=>uncatInner.appendChild(makeRow(it,uncatInner,refreshProg)));
+  const uar=q("div");uar.className="inline-add";
+  const uinp=q("input");uinp.placeholder="Neuer Eintrag ohne Kategorie…";
+  const upb=q("button");upb.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><path d="M12 5v14M5 12h14"/></svg>';
+  const uDoAdd=async()=>{
+    const t=uinp.value.trim();if(!t)return;upb.disabled=true;loading(true,"Speichere…");
+    const res=await sb.from("checklist_items").insert({checklist_id:id,category_id:null,title:t,sort_order:Date.now()%100000,is_checked:false}).select().single();
+    loading(false);upb.disabled=false;if(res.error){alert(res.error.message);return}
+    uinp.value="";panelDirty=true;uncatInner.insertBefore(makeRow(res.data,uncatInner,refreshProg),uar);refreshProg();uinp.focus();
+  };
+  upb.onclick=uDoAdd;uinp.onkeydown=e=>{if(e.key==="Enter")uDoAdd()};
+  uar.append(uinp,upb);uncatInner.appendChild(uar);
+  uncatBlk.appendChild(uncatInner);
+  body.appendChild(uncatBlk);
+
+  if((!catR.data||!catR.data.length)){
+    const hint=q("div");hint.className="empty-cat-hint";hint.textContent='Noch keine Kategorien. Klicke "+ Kategorie" oben, oder erfasse Einträge oben ohne Kategorie.';body.appendChild(hint);return;
+  }
 
   const cc=q("div");cc.id="cc-"+id;
   for(const cat of catR.data){
@@ -1074,6 +1110,7 @@ async function loadArchivedCls(){
       const cats=await sb.from("checklist_categories").select("id").eq("checklist_id",cl.id);
       const cids=(cats.data||[]).map(c=>c.id);
       if(cids.length)await sb.from("checklist_items").delete().in("category_id",cids);
+      await sb.from("checklist_items").delete().eq("checklist_id",cl.id).is("category_id",null);
       await sb.from("checklist_categories").delete().eq("checklist_id",cl.id);
       await sb.from("checklists").delete().eq("id",cl.id);
       loading(false);toast("Gelöscht");card.remove();
@@ -1096,6 +1133,8 @@ async function duplicateCl(id){
     const items=await sb.from("checklist_items").select("*").eq("category_id",cat.id).order("sort_order");
     if(items.data&&items.data.length)await sb.from("checklist_items").insert(items.data.map(i=>({category_id:nc.data.id,title:i.title,sort_order:i.sort_order,is_checked:false})));
   }
+  const uncat=await sb.from("checklist_items").select("*").eq("checklist_id",id).is("category_id",null).order("sort_order");
+  if(uncat.data&&uncat.data.length)await sb.from("checklist_items").insert(uncat.data.map(i=>({checklist_id:r.data.id,category_id:null,title:i.title,sort_order:i.sort_order,is_checked:false})));
   loading(false);await loadChecklists();toast("Dupliziert");
 }
 
@@ -1224,7 +1263,7 @@ async function openTplEditor(id){
       +'<div style="display:grid;gap:4px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));margin-bottom:14px">'
       +'<div class="form-group"><label>Titel</label><input id="edTitle" value="'+escA(tpl.title||"")+'"></div>'
       +'<div class="form-group"><label>Beschreibung</label><input id="edDesc" value="'+escA(tpl.description||"")+'"></div>'
-      +'<div class="form-group"><label>Icon</label><input id="edIcon" value="'+escA(tpl.icon||"📂")+'" style="max-width:80px"></div>'
+      +'<div class="form-group"><label>Icon</label><button type="button" id="edIconBtn" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:10px;background:var(--bg);font-size:20px;cursor:pointer;text-align:left;font-family:inherit;color:var(--text)" data-icon="'+escA(tpl.icon||"📂")+'">'+ (tpl.icon||"📂") +' <span style="font-size:12px;color:var(--muted);vertical-align:middle">Ändern</span></button></div>'
       +(isSuper?'<div class="form-group"><label>Besitzer</label><select id="edOwner">'+uopts+'</select></div>':"")
       +'</div>'
       +(isSuper?'<label style="display:flex;align-items:center;gap:8px;font-size:14px;margin-bottom:14px;cursor:pointer"><input type="checkbox" id="edIsGlobal" style="width:18px;height:18px;accent-color:var(--accent)"'+(tpl.is_global?" checked":"")+'>Globale Vorlage</label>':"")
@@ -1232,9 +1271,12 @@ async function openTplEditor(id){
       +'<button class="btn btn-primary btn-sm" id="saveTpl">Speichern</button>'
       +'<button class="btn btn-ghost btn-sm" id="addCat">+ Kategorie</button>'
       +'<button class="btn btn-ghost btn-sm" id="closeTplEd">Schliessen</button>'
-      +'</div><div id="edCats"></div>';
+      +'</div><div id="edCatsWrap"><div id="edCats"></div></div>';
     on("saveTpl",async()=>{const ok=await saveTplMeta();if(ok){await loadTemplates();$("tplEditorWrap").classList.remove("show")}});
     on("addCat",addTplCat);
+    on("edIconBtn",()=>openIconPicker($("edIconBtn").dataset.icon,(picked)=>{
+      const b=$("edIconBtn");b.dataset.icon=picked;b.innerHTML=picked+' <span style="font-size:12px;color:var(--muted);vertical-align:middle">Ändern</span>';
+    }));
     on("closeTplEd",()=>wrap.classList.remove("show"));
     if(id){const cats=await sb.from("template_categories").select("*").eq("template_id",id).order("sort_order");for(const c of cats.data||[])await renderTplCat(c)}
     wrap.scrollIntoView({behavior:"smooth",block:"start"});
@@ -1246,7 +1288,7 @@ async function saveTplMeta(){
   const forOwner=($("edOwner")&&$("edOwner").value)||owner();
   const dat={organization_id:orgId,owner_id:forOwner,created_by:user.id,updated_by:user.id,
     title:($("edTitle").value||"").trim(),description:($("edDesc").value||"").trim(),
-    icon:($("edIcon").value||"").trim()||"📂",is_global:!!isGlob};
+    icon:($("edIconBtn")?.dataset.icon||"📂"),is_global:!!isGlob};
   if(!dat.title){toast("Titel fehlt");return false}
   if(currentTpl){
     const e=await sb.from("templates").update({title:dat.title,description:dat.description,icon:dat.icon,is_global:!!isGlob,updated_by:user.id}).eq("id",currentTpl);
@@ -1268,31 +1310,55 @@ async function addTplCat(){
 }
 
 async function renderTplCat(c){
-  const wrap=q("div");wrap.className="cat-editor";wrap.id="tc-"+c.id;
-  wrap.innerHTML='<div class="cat-editor-head"><h4>'+escH(c.title)+'</h4></div><div id="ti-'+c.id+'"></div>';
-  const del=q("button");del.className="btn btn-danger btn-sm";del.textContent="Löschen";
+  const wrap=q("div");wrap.className="cat-editor";wrap.id="tc-"+c.id;wrap.dataset.catId=c.id;
+  const head=q("div");head.className="cat-editor-head";
+  const hnd=q("div");hnd.className="cat-drag-handle";hnd.title="Ziehen zum Sortieren";hnd.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>';
+  const ht=q("h4");ht.textContent=c.title;ht.style.cursor="pointer";ht.title="Tippen zum Umbenennen";
+  const editBtn=q("button");editBtn.className="edit-inline-btn";editBtn.title="Umbenennen";editBtn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+  const doRename=()=>{
+    const inp=q("input");inp.value=c.title;
+    inp.style.cssText="font-size:14px;font-weight:700;color:var(--text);border:none;border-bottom:2px solid var(--accent);background:transparent;outline:none;flex:1;font-family:inherit;min-width:0";
+    ht.style.display="none";editBtn.style.display="none";
+    head.insertBefore(inp,ht.nextSibling);inp.focus();inp.select();
+    const save=async()=>{
+      const val=inp.value.trim();
+      if(val&&val!==c.title){
+        await sb.from("template_categories").update({title:val}).eq("id",c.id);
+        c.title=val;ht.textContent=val;toast("Umbenannt");
+      }
+      inp.remove();ht.style.display="";editBtn.style.display="";
+    };
+    inp.onblur=save;inp.onkeydown=e=>{if(e.key==="Enter")inp.blur();if(e.key==="Escape"){inp.value=c.title;inp.blur()}};
+  };
+  ht.onclick=doRename;editBtn.onclick=doRename;
+  const del=q("button");del.className="btn btn-danger btn-sm";del.textContent="Löschen";del.style.marginLeft="auto";
   del.onclick=async()=>{
     const ok=await showModal({title:'"'+c.title+'" löschen?',confirmLabel:"Löschen",danger:true});
     if(!ok)return;loading(true,"...");await sb.from("template_categories").delete().eq("id",c.id);loading(false);wrap.remove();
   };
-  wrap.querySelector(".cat-editor-head").appendChild(del);
+  head.append(hnd,ht,editBtn,del);
+  wrap.appendChild(head);
+  const itemsBox=q("div");itemsBox.id="ti-"+c.id;wrap.appendChild(itemsBox);
 
   /* Inline add for template items */
   const ar=q("div");ar.className="inline-add";ar.style.cssText="border:1px solid var(--border);border-radius:10px;padding:6px 10px;margin-top:8px";
-  const inp=q("input");inp.placeholder="Neuer Eintrag…";
+  const inp2=q("input");inp2.placeholder="Neuer Eintrag…";
   const pl=q("button");pl.innerHTML="+";
   const doA=async()=>{
-    const t=inp.value.trim();if(!t){toast("Bitte Punkt eingeben");return}
+    const t=inp2.value.trim();if(!t){toast("Bitte Eintrag eingeben");return}
     loading(true,"Speichere…");
     const r=await sb.from("template_items").insert({category_id:c.id,title:t,sort_order:Date.now()%100000}).select().single();
-    loading(false);inp.value="";if(r.error){alert(r.error.message);return}
-    /* Add row inline with drag */
+    loading(false);inp2.value="";if(r.error){alert(r.error.message);return}
     addTplItemRow(r.data,c.id,"ti-"+c.id);
     toast("Eintrag hinzugefügt");
   };
-  pl.onclick=doA;inp.onkeydown=e=>{if(e.key==="Enter")doA()};
-  ar.append(inp,pl);wrap.appendChild(ar);
+  pl.onclick=doA;inp2.onkeydown=e=>{if(e.key==="Enter")doA()};
+  ar.append(inp2,pl);wrap.appendChild(ar);
   $("edCats").appendChild(wrap);
+  ptrDrag(hnd,wrap,$("edCats"),".cat-editor",async cont=>{
+    const blocks=[...cont.querySelectorAll(".cat-editor[data-cat-id]")];
+    await Promise.all(blocks.map((b,i)=>sb.from("template_categories").update({sort_order:(i+1)*10}).eq("id",b.dataset.catId)));
+  });
   await loadTplItems(c.id);
 }
 
@@ -1308,13 +1374,30 @@ function addTplItemRow(it,catId,containerId){
   const row=q("div");row.className="tpl-item-row";row.dataset.id=it.id;
   const hnd=q("div");hnd.className="tpl-item-handle";
   hnd.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>';
-  const sp=q("span");sp.textContent="• "+it.title;sp.style.flex="1";sp.style.fontSize="14px";
+  const sp=q("span");sp.textContent=it.title;sp.style.cssText="flex:1;font-size:14px;cursor:pointer";sp.title="Tippen zum Umbenennen";
+  const editBtn=q("button");editBtn.className="edit-inline-btn";editBtn.title="Umbenennen";editBtn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+  const doRename=()=>{
+    const inp=q("input");inp.value=it.title;
+    inp.style.cssText="flex:1;font-size:14px;border:none;border-bottom:2px solid var(--accent);background:transparent;outline:none;font-family:inherit;color:var(--text);min-width:0";
+    sp.style.display="none";editBtn.style.display="none";
+    row.insertBefore(inp,sp.nextSibling);inp.focus();inp.select();
+    const save=async()=>{
+      const val=inp.value.trim();
+      if(val&&val!==it.title){
+        await sb.from("template_items").update({title:val}).eq("id",it.id);
+        it.title=val;sp.textContent=val;toast("Umbenannt");
+      }
+      inp.remove();sp.style.display="";editBtn.style.display="";
+    };
+    inp.onblur=save;inp.onkeydown=e=>{if(e.key==="Enter")inp.blur();if(e.key==="Escape"){inp.value=it.title;inp.blur()}};
+  };
+  sp.onclick=doRename;editBtn.onclick=doRename;
   const del=q("button");del.className="btn btn-ghost btn-sm";del.textContent="×";del.style.cssText="padding:4px 8px;color:var(--danger);border-color:#fca5a5";
   del.onclick=async()=>{
     const ok=await showModal({title:'"'+it.title+'" löschen?',confirmLabel:"Löschen",danger:true});
     if(!ok)return;loading(true,"...");await sb.from("template_items").delete().eq("id",it.id);loading(false);row.remove();
   };
-  row.append(hnd,sp,del);
+  row.append(hnd,sp,editBtn,del);
   ptrDrag(hnd,row,box,".tpl-item-row",async c=>{
     const rows=[...c.querySelectorAll(".tpl-item-row[data-id]")];
     await Promise.all(rows.map((r,i)=>sb.from("template_items").update({sort_order:(i+1)*10}).eq("id",r.dataset.id)));
@@ -1666,14 +1749,16 @@ async function loadDashboard(){
   const clIds=cls.map(c=>c.id);
   let prog={};
   if(clIds.length){
+    clIds.forEach(id=>prog[id]={d:0,t:0});
     const cats=await sb.from("checklist_categories").select("id,checklist_id").in("checklist_id",clIds);
     const catIds=(cats.data||[]).map(c=>c.id);
-    if(catIds.length){
-      const items=await sb.from("checklist_items").select("category_id,is_checked").in("category_id",catIds);
-      const c2cl={};(cats.data||[]).forEach(c=>c2cl[c.id]=c.checklist_id);
-      clIds.forEach(id=>prog[id]={d:0,t:0});
-      (items.data||[]).forEach(it=>{const cl=c2cl[it.category_id];if(!cl)return;prog[cl].t++;if(it.is_checked)prog[cl].d++});
-    }
+    const[items,uncatItems]=await Promise.all([
+      catIds.length?sb.from("checklist_items").select("category_id,is_checked").in("category_id",catIds):{data:[]},
+      sb.from("checklist_items").select("checklist_id,is_checked").in("checklist_id",clIds).is("category_id",null)
+    ]);
+    const c2cl={};(cats.data||[]).forEach(c=>c2cl[c.id]=c.checklist_id);
+    (items.data||[]).forEach(it=>{const cl=c2cl[it.category_id];if(!cl)return;prog[cl].t++;if(it.is_checked)prog[cl].d++});
+    (uncatItems.data||[]).forEach(it=>{if(!prog[it.checklist_id])return;prog[it.checklist_id].t++;if(it.is_checked)prog[it.checklist_id].d++});
   }
 
   const total=cls.length;
@@ -2186,7 +2271,147 @@ async function saveChecklistAsTemplate(clId){
     if(items.data&&items.data.length)
       await sb.from("template_items").insert(items.data.map(i=>({category_id:nc.data.id,title:i.title,sort_order:i.sort_order})));
   }
+  const uncat=await sb.from("checklist_items").select("*").eq("checklist_id",clId).is("category_id",null).order("sort_order");
+  if(uncat.data&&uncat.data.length){
+    const nc=await sb.from("template_categories").insert({template_id:tr.data.id,title:"Weitere Punkte",sort_order:9999}).select().single();
+    if(!nc.error)await sb.from("template_items").insert(uncat.data.map(i=>({category_id:nc.data.id,title:i.title,sort_order:i.sort_order})));
+  }
   loading(false);toast("✓ Vorlage erstellt");loadTemplates();
+}
+
+
+/* ── Icon Picker ── */
+const ICON_LIST=[
+  ["📂","ordner"],["📋","liste checkliste"],["✅","check haken erledigt"],["📝","notiz schreiben"],
+  ["🏕️","camping zelt"],["🎒","rucksack wandern"],["✈️","flug flugzeug reise"],["🏨","hotel unterkunft"],
+  ["🧳","koffer gepäck reise"],["🚗","auto fahrt"],["🚆","zug bahn"],["🚌","bus"],["⛴️","schiff fähre"],
+  ["🏖️","strand ferien"],["🏔️","berg wandern"],["🗺️","karte reise"],["🌍","welt reise"],["📍","standort ort"],
+  ["🛒","einkauf einkaufen"],["🍽️","essen restaurant"],["🍳","kochen küche"],["🥘","essen kochen"],
+  ["🧹","putzen reinigung haushalt"],["🧺","wäsche haushalt"],["🏠","haus zuhause"],["🔑","schlüssel"],
+  ["💼","arbeit business"],["📅","kalender termin datum"],["⏰","zeit wecker"],["🎉","party feier"],
+  ["🎁","geschenk"],["🎄","weihnachten"],["🎂","geburtstag kuchen"],["👶","baby kind"],
+  ["🐶","hund tier"],["🐱","katze tier"],["🌱","pflanze garten"],["⚽","sport fussball"],
+  ["🏋️","fitness sport training"],["🚴","fahrrad sport"],["📚","bücher lernen schule"],["💻","computer arbeit"],
+  ["🛠️","werkzeug reparatur"],["🏥","gesundheit arzt"],["💊","medizin gesundheit"],["🧾","rechnung dokument"],
+  ["💰","geld finanzen"],["📦","paket versand"],["🎓","schule bildung"],["🎨","kreativ kunst"],
+  ["🎵","musik"],["📷","foto kamera"],["🔧","werkzeug technik"],["🌟","stern favorit"],
+  ["❤️","herz liebe favorit"],["⭐","stern favorit"],["🔥","feuer wichtig"],["💡","idee licht"]
+];
+function openIconPicker(current,onPick){
+  const ov=$("iconPickerOverlay"),box=$("iconPickerBox"),grid=$("iconPickerGrid"),search=$("iconPickerSearch");
+  search.value="";
+  function render(filter){
+    const f=(filter||"").toLowerCase().trim();
+    const list=f?ICON_LIST.filter(([,kw])=>kw.includes(f)):ICON_LIST;
+    grid.innerHTML="";
+    if(!list.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:13px;padding:20px 0">Kein Icon gefunden</div>';return}
+    list.forEach(([emoji])=>{
+      const b=q("button");b.textContent=emoji;
+      b.style.cssText="font-size:24px;padding:8px;border-radius:10px;border:1px solid "+(emoji===current?"var(--accent)":"var(--border)")+";background:"+(emoji===current?"rgba(99,102,241,.1)":"var(--bg)")+";cursor:pointer;transition:border-color .15s,background .15s";
+      b.onclick=()=>{onPick(emoji);closeIconPicker()};
+      grid.appendChild(b);
+    });
+  }
+  render("");
+  search.oninput=()=>render(search.value);
+  ov.style.opacity="1";ov.style.pointerEvents="all";box.style.transform="scale(1) translateY(0)";
+  setTimeout(()=>search.focus(),80);
+}
+function closeIconPicker(){
+  const ov=$("iconPickerOverlay"),box=$("iconPickerBox");
+  ov.style.opacity="0";ov.style.pointerEvents="none";box.style.transform="scale(.95) translateY(10px)";
+}
+
+
+/* ── Checkliste importieren (Link / Screenshot / PDF) ── */
+let _clImportParsed=null;
+function openClImportModal(){
+  const ov=$("clImportOverlay"),bx=$("clImportBox");
+  $("clImpUrl").value="";$("clImpMsg").textContent="";$("clImpMsg").style.color="var(--muted)";
+  $("clImpPreviewWrap").style.display="none";$("clImpPreview").innerHTML="";$("clImpTitle").value="";
+  _clImportParsed=null;
+  ov.style.opacity="1";ov.style.pointerEvents="all";bx.style.transform="scale(1) translateY(0)";
+}
+function closeClImportModal(){
+  const ov=$("clImportOverlay"),bx=$("clImportBox");
+  ov.style.opacity="0";ov.style.pointerEvents="none";bx.style.transform="scale(.95) translateY(10px)";
+}
+function renderClImportPreview(data){
+  _clImportParsed=data;
+  $("clImpTitle").value=data.title||"Importierte Checkliste";
+  const cats=data.categories||[];
+  const uncat=data.uncategorized||[];
+  let html="";
+  cats.forEach(c=>{
+    html+='<div style="font-weight:700;margin:6px 0 3px">'+escH(c.title||"Kategorie")+'</div>';
+    (c.items||[]).forEach(it=>{html+='<div style="padding:2px 0 2px 10px;color:var(--muted)">• '+escH(it)+'</div>'});
+  });
+  if(uncat.length){
+    html+='<div style="font-weight:700;margin:6px 0 3px">Ohne Kategorie</div>';
+    uncat.forEach(it=>{html+='<div style="padding:2px 0 2px 10px;color:var(--muted)">• '+escH(it)+'</div>'});
+  }
+  if(!html)html='<div style="color:var(--muted)">Keine Einträge erkannt — du kannst die Checkliste trotzdem leer erstellen.</div>';
+  $("clImpPreview").innerHTML=html;
+  $("clImpPreviewWrap").style.display="";
+}
+async function clImportFromUrl(url){
+  const msg=$("clImpMsg");
+  msg.style.color="var(--muted)";msg.textContent="⏳ Wird geladen…";
+  try{
+    const sess=await sb.auth.getSession();
+    const tok=sess.data?.session?.access_token;
+    const res=await fetch(SB_URL+"/functions/v1/import-checklist",{
+      method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+tok},
+      body:JSON.stringify({url})
+    });
+    const json=await res.json();
+    if(!res.ok||json.error){msg.style.color="var(--danger)";msg.textContent="Fehler: "+(json.error||"Import fehlgeschlagen");return}
+    renderClImportPreview(json.data||{});
+    msg.style.color="var(--success)";msg.textContent="✓ Vorschau erstellt — bitte prüfen.";
+  }catch(e){msg.style.color="var(--danger)";msg.textContent="Netzwerkfehler: "+e.message}
+}
+async function clImportFromFile(base64,mediaType,kind){
+  const msg=$("clImpMsg");
+  msg.style.color="var(--muted)";msg.textContent=kind==="pdf"?"⏳ PDF wird analysiert…":"⏳ Screenshot wird analysiert…";
+  try{
+    const sess=await sb.auth.getSession();
+    const tok=sess.data?.session?.access_token;
+    const body=kind==="pdf"?{pdf:base64}:{image:base64,mediaType};
+    const res=await fetch(SB_URL+"/functions/v1/import-checklist",{
+      method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+tok},
+      body:JSON.stringify(body)
+    });
+    const json=await res.json();
+    if(!res.ok||json.error){msg.style.color="var(--danger)";msg.textContent="Fehler: "+(json.error||"Analyse fehlgeschlagen");return}
+    renderClImportPreview(json.data||{});
+    msg.style.color="var(--success)";msg.textContent="✓ Vorschau erstellt — bitte prüfen.";
+  }catch(e){msg.style.color="var(--danger)";msg.textContent="Netzwerkfehler: "+e.message}
+}
+async function clImportCreate(){
+  if(!_clImportParsed)return;
+  const title=($("clImpTitle").value||"").trim()||"Importierte Checkliste";
+  const oid=await ownerPicker(owner());if(!oid)return;
+  loading(true,"Erstelle Checkliste…");
+  const r=await sb.from("checklists").insert({organization_id:orgId,owner_id:oid,created_by:user.id,updated_by:user.id,title,icon:"📋"}).select().single();
+  if(r.error){loading(false);toast("Fehler: "+r.error.message);return}
+  const clId=r.data.id;
+  const cats=_clImportParsed.categories||[];
+  let sortN=10;
+  for(const c of cats){
+    const nc=await sb.from("checklist_categories").insert({checklist_id:clId,title:c.title||"Kategorie",sort_order:sortN}).select().single();
+    sortN+=10;
+    if(nc.error)continue;
+    const its=(c.items||[]).map((title,i)=>({category_id:nc.data.id,title,sort_order:(i+1)*10,is_checked:false}));
+    if(its.length)await sb.from("checklist_items").insert(its);
+  }
+  const uncat=_clImportParsed.uncategorized||[];
+  if(uncat.length){
+    const its=uncat.map((title,i)=>({checklist_id:clId,category_id:null,title,sort_order:(i+1)*10,is_checked:false}));
+    await sb.from("checklist_items").insert(its);
+  }
+  loading(false);closeClImportModal();
+  if(oid!==user.id){const us=await getUsers();const u=us.find(u=>u.id===oid);setActing(oid,u?u.display_name||u.email:"")}
+  await loadChecklists();openDetailPanel(clId);toast("✓ Checkliste importiert");
 }
 
 /* Wiring */
@@ -2204,9 +2429,28 @@ document.addEventListener("DOMContentLoaded",()=>{
   on("bbAdminGrp",()=>show("Admin"));
   on("refreshCheck",()=>{loading(true,"Aktualisiere…");loadChecklists().finally(()=>loading(false))});
   on("newEmptyCl",createEmptyCl);on("newFromTplCl",pickTplAndCreate);
+  on("openClImport",openClImportModal);
+  on("clImportClose",closeClImportModal);
+  $("clImportOverlay").onclick=e=>{if(e.target===$("clImportOverlay"))closeClImportModal()};
+  on("clImpUrlBtn",()=>{const u=($("clImpUrl").value||"").trim();if(!u){$("clImpMsg").style.color="var(--danger)";$("clImpMsg").textContent="Bitte Link eingeben.";return}clImportFromUrl(u)});
+  on("clImpCreate",clImportCreate);
+  $("clImpImage").addEventListener("change",e=>{
+    const file=e.target.files?.[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=()=>{clImportFromFile(reader.result.split(",")[1],file.type||"image/jpeg","image")};
+    reader.readAsDataURL(file);
+  });
+  $("clImpPdf").addEventListener("change",e=>{
+    const file=e.target.files?.[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=()=>{clImportFromFile(reader.result.split(",")[1],"application/pdf","pdf")};
+    reader.readAsDataURL(file);
+  });
   on("showArchivedCl",loadArchivedCls);on("closeArchivedCl",()=>{$("archivedClSection").style.display="none"});
   on("newTpl",()=>openTplEditor(null));on("seedMore",seedTpls);
-  on("showArchivedTpl",loadArchivedTpls);on("closeArchivedTpl",()=>{$("archivedTplSection").style.display="none"});
+  on("showArchivedTpl",loadArchivedTpls);
+  on("iconPickerClose",closeIconPicker);
+  $("iconPickerOverlay").onclick=e=>{if(e.target===$("iconPickerOverlay"))closeIconPicker()};on("closeArchivedTpl",()=>{$("archivedTplSection").style.display="none"});
   on("adminClClose",()=>{$("adminClSection").style.display="none"});
   on("addUser",addUser);
   on("detailClose",closeDetailPanel);on("detailAddCat",addChecklistCat);on("detailArchive",()=>archiveCl(currentChecklistId,true));
@@ -2284,6 +2528,48 @@ if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js");
     <div id="shareMsg" style="font-size:13px;margin-bottom:12px;min-height:18px"></div>
     <h3 style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px">Aktive Freigaben</h3>
     <div id="shareList"></div>
+  </div>
+</div>
+<div id="clImportOverlay" style="position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:210;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s ease">
+  <div style="background:var(--surface);border-radius:18px;box-shadow:var(--shadow-lg);padding:20px;width:100%;max-width:460px;max-height:82dvh;overflow-y:auto;transform:scale(.95) translateY(10px);transition:transform .22s ease" id="clImportBox">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+      <h3 style="font-size:16px;font-weight:700;flex:1">Checkliste importieren</h3>
+      <button id="clImportClose" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:4px;display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Aus Link, Screenshot oder PDF automatisch übernehmen.</p>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <input id="clImpUrl" type="url" placeholder="Link zur Checkliste/Packliste…" style="flex:1;padding:9px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none">
+      <button type="button" id="clImpUrlBtn" class="btn btn-primary btn-sm" style="flex-shrink:0">Laden</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <label style="display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:13px;font-weight:500;color:var(--text);flex:1">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        Screenshot
+        <input id="clImpImage" type="file" accept="image/*" style="display:none">
+      </label>
+      <label style="display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:13px;font-weight:500;color:var(--text);flex:1">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        PDF
+        <input id="clImpPdf" type="file" accept="application/pdf" style="display:none">
+      </label>
+    </div>
+    <div id="clImpMsg" style="font-size:13px;min-height:18px;margin-bottom:6px;color:var(--muted)"></div>
+    <div id="clImpPreviewWrap" style="display:none">
+      <div class="form-group"><label>Titel der Checkliste</label><input id="clImpTitle"></div>
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:12px 0 6px">Vorschau</div>
+      <div id="clImpPreview" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 12px;max-height:240px;overflow-y:auto;font-size:13px"></div>
+      <button class="btn btn-primary btn-sm" id="clImpCreate" style="width:100%;margin-top:14px">Checkliste erstellen</button>
+    </div>
+  </div>
+</div>
+<div id="iconPickerOverlay" style="position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:220;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s ease">
+  <div style="background:var(--surface);border-radius:18px;box-shadow:var(--shadow-lg);padding:18px;width:100%;max-width:380px;max-height:78dvh;display:flex;flex-direction:column;transform:scale(.95) translateY(10px);transition:transform .22s ease" id="iconPickerBox">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <h3 style="font-size:15px;font-weight:700;flex:1">Icon wählen</h3>
+      <button id="iconPickerClose" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:4px;display:flex"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+    <input id="iconPickerSearch" placeholder="Icon suchen… (z.B. reise, essen)" style="padding:8px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none;margin-bottom:10px">
+    <div id="iconPickerGrid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;overflow-y:auto;padding-right:2px"></div>
   </div>
 </div>
 </body>
