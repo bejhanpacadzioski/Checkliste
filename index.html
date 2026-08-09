@@ -217,9 +217,10 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
   .bnav-item.active{color:var(--accent)}
   .bnav-item.hidden{display:none}
   .cl-grid,.tpl-grid{grid-template-columns:1fr}
-  #detailPanel{width:100vw;border-left:none;border-radius:20px 20px 0 0;top:auto;height:94dvh;transform:translateY(100%)}
+  #detailPanel{left:0;right:0;width:auto;border-left:none;border-radius:20px 20px 0 0;top:auto;height:94dvh;transform:translateY(100%)}
   #detailOverlay.open #detailPanel{transform:translateY(0)}
-  .detail-hbtns .btn-sm{padding:7px 10px;border-radius:9px;font-size:12px}
+  .detail-hbtns{flex-wrap:wrap;overflow-x:visible}
+  .detail-hbtns .btn-sm{padding:7px 10px;border-radius:9px;font-size:12px;flex:1 1 auto}
   @media(hover:none){.item-del{opacity:.4}}
 }
 .trip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:18px 20px;cursor:pointer;transition:box-shadow .18s,transform .18s,border-color .18s;margin-bottom:14px}
@@ -295,7 +296,7 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
       <button id="changePwBtn" style="width:100%;margin-top:10px;background:none;border:1px solid var(--border);border-radius:8px;padding:7px;font-size:13px;color:var(--muted);cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Passwort ändern
       </button>
-      <div style="text-align:center;margin-top:12px;font-size:11px;color:var(--muted);opacity:.6">Checklists v4.3 · Stand 06.08.2026</div>
+      <div style="text-align:center;margin-top:12px;font-size:11px;color:var(--muted);opacity:.6">Checklists v4.4 · Stand 06.08.2026</div>
     </div>
   </aside>
 
