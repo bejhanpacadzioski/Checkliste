@@ -113,6 +113,7 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 .cl-tab:hover:not(.active){color:var(--text)}
 .drag-over-top{box-shadow:0 -2px 0 var(--accent)!important}
 .drag-over-bottom{box-shadow:0 2px 0 var(--accent)!important}
+.cat-inner.drop-target-hover{outline:2px dashed var(--accent);outline-offset:-2px;border-radius:10px;background:rgba(99,102,241,.05)}
 .inline-add{display:flex;gap:8px;align-items:center;padding:10px 14px;border-top:1px solid var(--border)}
 .inline-add input{flex:1;border:none;background:transparent;font-size:13px;color:var(--text);font-family:inherit;outline:none}
 .inline-add input::placeholder{color:var(--muted)}
@@ -299,7 +300,7 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
       <button id="changePwBtn" style="width:100%;margin-top:10px;background:none;border:1px solid var(--border);border-radius:8px;padding:7px;font-size:13px;color:var(--muted);cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Passwort ändern
       </button>
-      <div style="text-align:center;margin-top:12px;font-size:11px;color:var(--muted);opacity:.6">Checklists v4.8 · Stand 09.08.2026, 22:05</div>
+      <div style="text-align:center;margin-top:12px;font-size:11px;color:var(--muted);opacity:.6">Checklists v4.9 · Stand 09.08.2026, 22:25</div>
     </div>
   </aside>
 
@@ -898,8 +899,8 @@ async function loadDetailPanel(id){
   const uncatHead=q("div");uncatHead.className="cat-header";uncatHead.style.opacity=".75";
   const uncatH=q("h3");uncatH.textContent="Ohne Kategorie";
   uncatHead.append(uncatH);uncatBlk.appendChild(uncatHead);
-  const uncatInner=q("div");uncatInner.className="cat-inner";
-  uncatItems.forEach(it=>uncatInner.appendChild(makeRow(it,uncatInner,refreshProg)));
+  const uncatInner=q("div");uncatInner.className="cat-inner";uncatInner.dataset.catId="__none__";
+  uncatItems.forEach(it=>uncatInner.appendChild(makeRow(it,uncatInner,refreshProg,id)));
   const uar=q("div");uar.className="inline-add";
   const uinp=q("input");uinp.placeholder="Neuer Eintrag ohne Kategorie…";
   const upb=q("button");upb.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><path d="M12 5v14M5 12h14"/></svg>';
@@ -907,7 +908,7 @@ async function loadDetailPanel(id){
     const t=uinp.value.trim();if(!t)return;upb.disabled=true;loading(true,"Speichere…");
     const res=await sb.from("checklist_items").insert({checklist_id:id,category_id:null,title:t,sort_order:Date.now()%100000,is_checked:false}).select().single();
     loading(false);upb.disabled=false;if(res.error){alert(res.error.message);return}
-    uinp.value="";panelDirty=true;uncatInner.insertBefore(makeRow(res.data,uncatInner,refreshProg),uar);refreshProg();uinp.focus();
+    uinp.value="";panelDirty=true;uncatInner.insertBefore(makeRow(res.data,uncatInner,refreshProg,id),uar);refreshProg();uinp.focus();
   };
   upb.onclick=uDoAdd;uinp.onkeydown=e=>{if(e.key==="Enter")uDoAdd()};
   uar.append(uinp,upb);uncatInner.appendChild(uar);
@@ -955,8 +956,8 @@ async function loadDetailPanel(id){
       loading(false);toast("Gelöscht");panelDirty=true;loadDetailPanel(id);
     };
     hd.append(hnd,ht,editCatBtn,hd2);blk.appendChild(hd);
-    const inn=q("div");inn.className="cat-inner";
-    (bycat[cat.id]||[]).forEach(it=>inn.appendChild(makeRow(it,inn,refreshProg)));
+    const inn=q("div");inn.className="cat-inner";inn.dataset.catId=cat.id;
+    (bycat[cat.id]||[]).forEach(it=>inn.appendChild(makeRow(it,inn,refreshProg,id)));
     const ar=q("div");ar.className="inline-add";
     const inp=q("input");inp.placeholder="Neuer Eintrag…";
     const pb=q("button");pb.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><path d="M12 5v14M5 12h14"/></svg>';
@@ -964,7 +965,7 @@ async function loadDetailPanel(id){
       const t=inp.value.trim();if(!t)return;pb.disabled=true;loading(true,"Speichere…");
       const res=await sb.from("checklist_items").insert({category_id:cat.id,title:t,sort_order:Date.now()%100000,is_checked:false}).select().single();
       loading(false);pb.disabled=false;if(res.error){alert(res.error.message);return}
-      inp.value="";panelDirty=true;inn.insertBefore(makeRow(res.data,inn,refreshProg),ar);refreshProg();inp.focus();
+      inp.value="";panelDirty=true;inn.insertBefore(makeRow(res.data,inn,refreshProg,id),ar);refreshProg();inp.focus();
     };
     pb.onclick=doAdd;inp.onkeydown=e=>{if(e.key==="Enter")doAdd()};
     ar.append(inp,pb);inn.appendChild(ar);
@@ -975,7 +976,7 @@ async function loadDetailPanel(id){
   body.appendChild(cc);
 }
 
-function makeRow(it,container,refreshProg){
+function makeRow(it,container,refreshProg,clId){
   const row=q("div");row.className="checkrow";row.dataset.id=it.id;
   const hnd=q("div");hnd.className="drag-handle";hnd.title="Ziehen";
   hnd.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="5" r="1.5"/><circle cx="15" cy="5" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/></svg>';
@@ -1016,7 +1017,7 @@ function makeRow(it,container,refreshProg){
     panelDirty=true;refreshProg();
   };
   row.append(hnd,cb,lb,editBtn,del);
-  ptrDrag(hnd,row,container,".checkrow",saveItemOrd);
+  ptrDrag(hnd,row,container,".checkrow",(dest,src)=>saveItemOrdCross(dest,src,clId),".cat-inner");
   return row;
 }
 
@@ -1031,7 +1032,7 @@ function findScrollParent(el){
   }
   return document.scrollingElement||document.documentElement;
 }
-function ptrDrag(handle,el,container,sel,onDone){
+function ptrDrag(handle,el,container,sel,onDone,crossSel){
   let timer=null;
   handle.style.touchAction="none";
   handle.addEventListener("pointerdown",e=>{
@@ -1058,7 +1059,7 @@ function ptrDrag(handle,el,container,sel,onDone){
     document.body.appendChild(gh);
     el.classList.add("dragging");
     const scrollEl=findScrollParent(container);
-    _drg={el,container,gh,ox:e.clientX-rc.left,oy:e.clientY-rc.top,sel,onDone,tgt:null,scrollEl,lastX:e.clientX,lastY:e.clientY,raf:null};
+    _drg={el,container,gh,ox:e.clientX-rc.left,oy:e.clientY-rc.top,sel,crossSel,onDone,tgt:null,activeContainer:container,scrollEl,lastX:e.clientX,lastY:e.clientY,raf:null};
     handle.addEventListener("pointermove",move);
     handle.addEventListener("pointerup",up,{once:true});
     handle.addEventListener("pointercancel",up,{once:true});
@@ -1066,11 +1067,19 @@ function ptrDrag(handle,el,container,sel,onDone){
   }
   function updateTarget(cx,cy){
     if(!_drg)return;
-    const{gh,el,container,sel}=_drg;
+    const{gh,el,container,sel,crossSel}=_drg;
     gh.style.display="none";const under=document.elementFromPoint(cx,cy);gh.style.display="";
+    let activeContainer=container;
+    if(crossSel){
+      const cUnder=under?under.closest(crossSel):null;
+      if(cUnder)activeContainer=cUnder;
+      document.querySelectorAll(crossSel).forEach(c=>c.classList.remove("drop-target-hover"));
+      if(activeContainer!==el.parentNode)activeContainer.classList.add("drop-target-hover");
+    }
+    _drg.activeContainer=activeContainer;
     const tgt=under?under.closest(sel):null;
-    clearInd(container,sel);
-    if(tgt&&tgt!==el&&tgt.parentNode===container){
+    clearInd(document,sel);
+    if(tgt&&tgt!==el&&tgt.parentNode===activeContainer){
       const rb=tgt.getBoundingClientRect(),ab=cy<rb.top+rb.height/2;
       tgt.classList.add(ab?"drag-over-top":"drag-over-bottom");
       _drg.tgt={el:tgt,ab};
@@ -1101,16 +1110,38 @@ function ptrDrag(handle,el,container,sel,onDone){
     if(!_drg)return;
     handle.removeEventListener("pointermove",move);
     if(_drg.raf)cancelAnimationFrame(_drg.raf);
-    const{el,container,gh,tgt,onDone,sel}=_drg;
-    gh.remove();el.classList.remove("dragging");clearInd(container,sel);
-    if(tgt){if(tgt.ab)container.insertBefore(el,tgt.el);else tgt.el.after(el)}
-    _drg=null;onDone(container);
+    const{el,container,gh,tgt,onDone,sel,crossSel,activeContainer}=_drg;
+    const srcContainer=el.parentNode;
+    gh.remove();el.classList.remove("dragging");clearInd(document,sel);
+    if(crossSel)document.querySelectorAll(crossSel).forEach(c=>c.classList.remove("drop-target-hover"));
+    const dest=activeContainer||container;
+    if(tgt&&tgt.el&&tgt.el.parentNode===dest){
+      if(tgt.ab)dest.insertBefore(el,tgt.el);else tgt.el.after(el);
+    } else if(dest!==srcContainer||!tgt){
+      const addRow=dest.querySelector(":scope > .inline-add");
+      if(addRow)dest.insertBefore(el,addRow);else dest.appendChild(el);
+    }
+    _drg=null;onDone(dest,srcContainer);
   }
 }
 function clearInd(c,sel){c.querySelectorAll(sel).forEach(e=>e.classList.remove("drag-over-top","drag-over-bottom"))}
 async function saveItemOrd(c){
   const rows=[...c.querySelectorAll(".checkrow[data-id]")];
   await Promise.all(rows.map((r,i)=>sb.from("checklist_items").update({sort_order:(i+1)*10}).eq("id",r.dataset.id)));
+  panelDirty=true;
+}
+async function saveItemOrdCross(dest,src,clId){
+  const destCatId=dest.dataset.catId;
+  const isUncat=destCatId==="__none__";
+  const destRows=[...dest.querySelectorAll(":scope > .checkrow[data-id]")];
+  await Promise.all(destRows.map((r,i)=>{
+    const patch=isUncat?{sort_order:(i+1)*10,category_id:null,checklist_id:clId}:{sort_order:(i+1)*10,category_id:destCatId,checklist_id:null};
+    return sb.from("checklist_items").update(patch).eq("id",r.dataset.id);
+  }));
+  if(src&&src!==dest){
+    const srcRows=[...src.querySelectorAll(":scope > .checkrow[data-id]")];
+    await Promise.all(srcRows.map((r,i)=>sb.from("checklist_items").update({sort_order:(i+1)*10}).eq("id",r.dataset.id)));
+  }
   panelDirty=true;
 }
 async function saveCatOrd(c,clId){
