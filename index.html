@@ -114,6 +114,24 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
 .drag-over-top{box-shadow:0 -2px 0 var(--accent)!important}
 .drag-over-bottom{box-shadow:0 2px 0 var(--accent)!important}
 .cat-inner.drop-target-hover{outline:2px dashed var(--accent);outline-offset:-2px;border-radius:10px;background:rgba(99,102,241,.05)}
+#printArea{display:none}
+@media print{
+  body *{visibility:hidden}
+  #printArea,#printArea *{visibility:visible}
+  #printArea{display:block!important;position:absolute;left:0;top:0;width:100%;padding:0;margin:0}
+  @page{margin:16mm 14mm}
+}
+.pdf-header{border-bottom:2px solid #111;padding-bottom:10px;margin-bottom:18px}
+.pdf-title{font-size:22px;font-weight:800;color:#111}
+.pdf-meta{font-size:11px;color:#555;margin-top:3px}
+.pdf-progress{font-size:12px;margin-top:6px;font-weight:700;color:#111}
+.pdf-cat{margin-top:16px;break-inside:avoid}
+.pdf-cat-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #ccc;padding-bottom:4px;margin-bottom:6px;color:#111}
+.pdf-item{display:flex;align-items:flex-start;gap:8px;padding:4px 0;font-size:12px;color:#222;break-inside:avoid}
+.pdf-checkbox{width:12px;height:12px;border:1.4px solid #333;border-radius:3px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:9px;color:#fff;margin-top:2px}
+.pdf-checkbox.checked{background:#333}
+.pdf-item.done .pdf-item-text{text-decoration:line-through;color:#999}
+.pdf-footer{margin-top:26px;font-size:9px;color:#aaa;text-align:center}
 .inline-add{display:flex;gap:8px;align-items:center;padding:10px 14px;border-top:1px solid var(--border)}
 .inline-add input{flex:1;border:none;background:transparent;font-size:13px;color:var(--text);font-family:inherit;outline:none}
 .inline-add input::placeholder{color:var(--muted)}
@@ -300,7 +318,7 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
       <button id="changePwBtn" style="width:100%;margin-top:10px;background:none;border:1px solid var(--border);border-radius:8px;padding:7px;font-size:13px;color:var(--muted);cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Passwort ändern
       </button>
-      <div style="text-align:center;margin-top:12px;font-size:11px;color:var(--muted);opacity:.6">Checklists v4.9 · Stand 09.08.2026, 22:25</div>
+      <div style="text-align:center;margin-top:12px;font-size:11px;color:var(--muted);opacity:.6">Checklists v4.10 · Stand 09.08.2026, 22:40</div>
     </div>
   </aside>
 
@@ -439,6 +457,7 @@ nav.snav{flex:1;display:flex;flex-direction:column;gap:4px}
     <div class="detail-hbtns" id="detailHbtns">
       <button class="btn btn-ghost btn-sm" id="detailAddCat"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg><span class="btn-label">Kategorie</span></button>
       <button class="btn btn-ghost btn-sm" id="detailSaveTpl" title="Als Vorlage speichern"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-8H5v8M5 3v5h9M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg><span class="btn-label">Als Vorlage</span></button>
+      <button class="btn btn-ghost btn-sm" id="detailExportPdf" title="Als PDF exportieren"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg><span class="btn-label">PDF</span></button>
       <button class="btn btn-ghost btn-sm" id="detailShare" title="Teilen"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg><span class="btn-label">Teilen</span></button>
       <button class="btn btn-ghost btn-sm" id="detailArchive" title="Archivieren"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg><span class="btn-label">Archivieren</span></button>
       <button class="btn btn-danger btn-sm" id="detailDelete" title="Endgültig löschen"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg><span class="btn-label">Löschen</span></button>
@@ -854,6 +873,7 @@ async function loadDetailPanel(id){
   const cl=clR.data;
   $("detailTitle").textContent=cl.title;
   $("detailArchive").onclick=()=>archiveCl(id,true);
+  $("detailExportPdf").onclick=()=>exportChecklistPdf(id);
   $("detailDelete").onclick=async()=>{
     const ok=await showModal({title:"Checkliste endgültig löschen?",sub:'"'+cl.title+'" wird unwiderruflich gelöscht — inkl. aller Kategorien und Einträge.',confirmLabel:"Löschen",danger:true});
     if(!ok)return;loading(true,"Lösche…");
@@ -2495,6 +2515,45 @@ async function clImportCreate(){
   await loadChecklists();openDetailPanel(clId);toast("✓ Checkliste importiert");
 }
 
+
+/* ── PDF Export (via Browser-Druckdialog) ── */
+async function exportChecklistPdf(clId){
+  loading(true,"Bereite Export vor…");
+  const[clR,catR,uncatR]=await Promise.all([
+    sb.from("checklists").select("*").eq("id",clId).single(),
+    sb.from("checklist_categories").select("*").eq("checklist_id",clId).order("sort_order"),
+    sb.from("checklist_items").select("*").eq("checklist_id",clId).is("category_id",null).order("sort_order")
+  ]);
+  const cl=clR.data;
+  if(!cl){loading(false);toast("Fehler beim Laden");return}
+  const cids=(catR.data||[]).map(c=>c.id);
+  const itR=cids.length?await sb.from("checklist_items").select("*").in("category_id",cids).order("sort_order"):{data:[]};
+  const bycat={};(itR.data||[]).forEach(it=>{(bycat[it.category_id]=bycat[it.category_id]||[]).push(it)});
+  const uncat=uncatR.data||[];
+  const allItems=[...(itR.data||[]),...uncat];
+  const tot=allItems.length,dn=allItems.filter(i=>i.is_checked).length;
+  const pct=tot?Math.round(dn/tot*100):0;
+
+  function itemsHtml(items){
+    return items.map(it=>'<div class="pdf-item'+(it.is_checked?" done":"")+'"><span class="pdf-checkbox'+(it.is_checked?" checked":"")+'">'+(it.is_checked?"✓":"")+'</span><span class="pdf-item-text">'+escH(it.title)+'</span></div>').join("");
+  }
+
+  let html='<div class="pdf-header"><div class="pdf-title">'+escH(cl.title)+'</div>';
+  if(cl.description)html+='<div class="pdf-meta">'+escH(cl.description)+'</div>';
+  html+='<div class="pdf-meta">Exportiert am '+new Date().toLocaleDateString("de-CH")+'</div>';
+  html+='<div class="pdf-progress">'+dn+' von '+tot+' erledigt ('+pct+'%)</div></div>';
+
+  if(uncat.length)html+='<div class="pdf-cat"><div class="pdf-cat-title">Ohne Kategorie</div>'+itemsHtml(uncat)+'</div>';
+  (catR.data||[]).forEach(cat=>{
+    html+='<div class="pdf-cat"><div class="pdf-cat-title">'+escH(cat.title)+'</div>'+itemsHtml(bycat[cat.id]||[])+'</div>';
+  });
+  html+='<div class="pdf-footer">Erstellt mit Checklists</div>';
+
+  $("printArea").innerHTML=html;
+  loading(false);
+  setTimeout(()=>window.print(),150);
+}
+
 /* Wiring */
 document.addEventListener("DOMContentLoaded",()=>{
   initClient();
@@ -2653,5 +2712,6 @@ if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js");
     <div id="iconPickerGrid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;overflow-y:auto;padding-right:2px"></div>
   </div>
 </div>
+<div id="printArea"></div>
 </body>
 </html>
