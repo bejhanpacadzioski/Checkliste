@@ -1772,24 +1772,29 @@ function closeSharePanel(){
 }
 
 async function loadSharePanel(clId){
-  // Populate user dropdown (exclude owner and already-shared)
   const us=await getUsers();
   const{data:existing}=await sb.from("checklist_shares").select("shared_with").eq("checklist_id",clId);
   const sharedIds=new Set((existing||[]).map(s=>s.shared_with));
-  const eligible=us.filter(u=>u.id!==user.id&&!sharedIds.has(u.id));
-  const sel=$("shareUserSel");
-  $("shareAddBtn").disabled=!eligible.length;
-  sel.innerHTML=eligible.length
-    ? eligible.map(u=>'<option value="'+u.id+'">'+escH(u.display_name||u.email)+'</option>').join("")
-    : '<option value="">— Kein weiterer Benutzer verfügbar —</option>';
+  // Vorschläge nur aus Personen, mit denen bereits zuvor etwas geteilt wurde — keine volle Nutzerauswahl
+  const{data:prevShares}=await sb.from("checklist_shares").select("shared_with").eq("created_by",user.id);
+  const prevIds=new Set((prevShares||[]).map(s=>s.shared_with));
+  const suggestions=us.filter(u=>u.id!==user.id&&prevIds.has(u.id)&&!sharedIds.has(u.id)&&u.email);
+  $("shareEmailSuggestions").innerHTML=suggestions.map(u=>'<option value="'+escH(u.email)+'">'+escH(u.display_name||u.email)+'</option>').join("");
+  const input=$("shareEmailInput");
+  input.value="";
   // Load existing shares
   await loadShareList(clId);
   // Wire add button
   $("shareAddBtn").onclick=async()=>{
-    const uid=sel.value,perm=$("sharePermSel").value;
-    if(!uid)return;
+    const email=(input.value||"").trim().toLowerCase();
+    if(!email){$("shareMsg").style.color="var(--danger)";$("shareMsg").textContent="Bitte eine E-Mail-Adresse eingeben.";return}
+    const perm=$("sharePermSel").value;
+    const target=us.find(u=>(u.email||"").toLowerCase()===email);
+    if(!target){$("shareMsg").style.color="var(--danger)";$("shareMsg").textContent="Kein Benutzer mit dieser E-Mail-Adresse gefunden.";return}
+    if(target.id===user.id){$("shareMsg").style.color="var(--danger)";$("shareMsg").textContent="Du kannst nicht mit dir selbst teilen.";return}
+    if(sharedIds.has(target.id)){$("shareMsg").style.color="var(--danger)";$("shareMsg").textContent="Mit dieser Person ist die Checkliste bereits geteilt.";return}
     loading(true,"Speichere…");
-    const{error}=await sb.from("checklist_shares").insert({checklist_id:clId,shared_with:uid,permission:perm,created_by:user.id});
+    const{error}=await sb.from("checklist_shares").insert({checklist_id:clId,shared_with:target.id,permission:perm,created_by:user.id});
     loading(false);
     if(error){$("shareMsg").style.color="var(--danger)";$("shareMsg").textContent=error.message;return}
     $("shareMsg").style.color="var(--success)";$("shareMsg").textContent="✓ Freigabe hinzugefügt";
@@ -2659,10 +2664,11 @@ if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js");
       <button id="sharePanelClose" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:6px;border-radius:8px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
       <h2 style="font-size:18px;font-weight:700;flex:1">Checkliste teilen</h2>
     </div>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Wähle einen Benutzer und die Berechtigung.</p>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Gib die E-Mail-Adresse der Person ein, mit der du teilen möchtest.</p>
     <div class="form-group">
-      <label>Benutzer</label>
-      <select id="shareUserSel" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none"></select>
+      <label>E-Mail-Adresse</label>
+      <input type="email" id="shareEmailInput" list="shareEmailSuggestions" placeholder="name@beispiel.ch" autocomplete="off" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none">
+      <datalist id="shareEmailSuggestions"></datalist>
     </div>
     <div class="form-group">
       <label>Berechtigung</label>
