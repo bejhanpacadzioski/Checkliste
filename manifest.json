@@ -1,6 +1,8 @@
 {
   "name": "Checklists by Bejhan",
   "short_name": "Checklists",
+  "version": "5.0.0",
+  "description": "Checklisten, Vorlagen und Reiseplanung - gemeinsam nutzbar.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f6f7fb",
