@@ -291,6 +291,31 @@ html.dark .checkrow:hover{background:rgba(129,140,248,.07)}
 .star-select{display:flex;gap:4px;margin:8px 0}
 .star-select button{background:none;border:none;cursor:pointer;font-size:28px;padding:2px;transition:transform .1s;line-height:1}
 .star-select button:hover{transform:scale(1.2)}
+/* Einstellungen */
+.settings-h{font-size:15px;font-weight:700;margin-bottom:14px}
+.setting-row{display:flex;align-items:center;gap:14px;padding:13px 0;border-top:1px solid var(--border)}
+.setting-row:first-of-type{border-top:none}
+.setting-title{font-size:14px;font-weight:600}
+.setting-sub{font-size:12.5px;color:var(--muted)}
+.switch{flex-shrink:0;margin-left:auto;width:46px;height:27px;border-radius:99px;border:none;background:var(--border);cursor:pointer;padding:3px;transition:background .2s;display:flex;align-items:center}
+.switch span{width:21px;height:21px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
+.switch.on{background:var(--accent)}
+.switch.on span{transform:translateX(19px)}
+/* Onboarding */
+.ob-hero{background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:var(--r);padding:26px 24px;color:#fff;margin-bottom:20px}
+.ob-hero h2{font-size:21px;font-weight:800;letter-spacing:-.4px;margin-bottom:6px}
+.ob-hero p{font-size:14px;opacity:.92;max-width:52ch}
+.ob-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(220px,100%),1fr));gap:12px;margin-bottom:18px}
+.ob-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;cursor:pointer;text-align:left;font-family:inherit;transition:border-color .18s,transform .18s,box-shadow .18s}
+.ob-card:hover{border-color:var(--accent2);transform:translateY(-2px);box-shadow:var(--shadow)}
+.ob-card .ob-icon{font-size:26px;display:block;margin-bottom:8px}
+.ob-card .ob-name{display:block;font-size:14px;font-weight:700;color:var(--text)}
+.ob-card .ob-sub{display:block;font-size:12px;color:var(--muted);margin-top:3px;line-height:1.45}
+/* Suche */
+.search-wrap{position:relative;flex:1;min-width:180px;max-width:340px}
+.search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.search-input{width:100%;padding:9px 12px 9px 34px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s}
+.search-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
 </style>
 </head>
 <body>
@@ -336,9 +361,9 @@ html.dark .checkrow:hover{background:rgba(129,140,248,.07)}
       <div class="nav-group-label">Checklisten</div>
       <button class="nav-item active" id="bCheck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M9 12l2 2 4-4"/></svg>Checklisten</button>
       <button class="nav-item" id="bTpl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>Vorlagen</button>
-      <div class="nav-group-label" style="margin-top:10px">Reisen</div>
+      <div class="nav-group-label" id="navTripsLabel" style="margin-top:10px">Reisen</div>
       <button class="nav-item" id="bTrips"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>Reisen</button>
-      <button class="nav-item hidden" id="bAdmin" style="margin-top:10px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 11l1.5 1.5L21 9"/></svg>Admin</button>
+      <button class="nav-item" id="bSettings" style="margin-top:10px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Einstellungen</button>
     </nav>
     <div class="suser">
       <span class="uname" id="sUserName">—</span>
@@ -389,7 +414,16 @@ html.dark .checkrow:hover{background:rgba(129,140,248,.07)}
             <select id="checkUserSelect" style="flex:1;min-width:180px;padding:8px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none"></select>
           </div>
         </div>
+        <div id="clSearchRow" style="display:flex;gap:12px;align-items:center;margin-top:14px;padding:0 26px;flex-wrap:wrap">
+          <div class="search-wrap">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input class="search-input" id="clSearch" type="search" placeholder="Checklisten durchsuchen…" autocomplete="off">
+          </div>
+        </div>
         <div id="checkList" style="margin-top:14px"></div>
+        <div id="clMoreWrap" style="display:none;justify-content:center;padding:4px 26px 10px">
+          <button class="btn btn-ghost btn-sm" id="clMoreBtn">Mehr laden</button>
+        </div>
         <div id="archivedClSection" style="display:none;margin-top:24px;padding:0 24px">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
             <span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);flex:1">Archivierte Checklisten</span>
@@ -431,8 +465,49 @@ html.dark .checkrow:hover{background:rgba(129,140,248,.07)}
         </div>
         <div id="tripsList" style="margin-top:18px"></div>
       </div>
+      <!-- Einstellungen -->
+      <div id="vSettings" style="display:none">
+        <div class="page-header"><div><h1 class="page-title">Einstellungen</h1><p class="page-sub">Konto, Darstellung und Funktionen</p></div></div>
+        <div style="margin-top:18px;display:flex;flex-direction:column;gap:16px;max-width:680px">
+          <div class="editor-card">
+            <h3 class="settings-h">Konto</h3>
+            <div class="form-group"><label>Anzeigename</label><input id="setDisplayName" type="text" placeholder="Dein Name"></div>
+            <div class="form-group"><label>E-Mail</label><input id="setEmail" type="email" disabled></div>
+            <div id="setProfileMsg" style="font-size:13px;min-height:18px;margin-bottom:8px"></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn btn-primary btn-sm" id="setSaveProfile">Speichern</button>
+              <button class="btn btn-ghost btn-sm" id="setChangePw">Passwort ändern</button>
+            </div>
+          </div>
+          <div class="editor-card">
+            <h3 class="settings-h">Darstellung &amp; Funktionen</h3>
+            <div class="setting-row">
+              <div><div class="setting-title">Dark Mode</div><div class="setting-sub">Dunkles Farbschema verwenden</div></div>
+              <button class="switch" id="swDark" role="switch" aria-label="Dark Mode"><span></span></button>
+            </div>
+            <div class="setting-row">
+              <div><div class="setting-title">Reiseplanung</div><div class="setting-sub">Reisen-Bereich in der Navigation anzeigen</div></div>
+              <button class="switch" id="swTrips" role="switch" aria-label="Reiseplanung"><span></span></button>
+            </div>
+          </div>
+          <div class="editor-card" id="setAdminCard" style="display:none">
+            <h3 class="settings-h">Administration</h3>
+            <p class="setting-sub" style="margin-bottom:14px">Benutzer und Inhalte deiner Organisation verwalten.</p>
+            <button class="btn btn-ghost btn-sm" id="setOpenAdmin">Admin-Bereich öffnen</button>
+          </div>
+          <div class="editor-card">
+            <h3 class="settings-h">Über die App</h3>
+            <div id="settingsVersion" class="setting-sub"></div>
+            <button class="btn btn-ghost btn-sm" id="setLogout" style="margin-top:14px">Abmelden</button>
+          </div>
+        </div>
+      </div>
+
       <div id="vAdmin" style="display:none">
-        <div class="page-header"><div><h1 class="page-title">Admin</h1><p class="page-sub">Benutzer &amp; Inhalte verwalten</p></div></div>
+        <div class="page-header">
+          <div><h1 class="page-title">Admin</h1><p class="page-sub">Benutzer &amp; Inhalte verwalten</p></div>
+          <button class="btn btn-ghost btn-sm" id="adminBack"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>Einstellungen</button>
+        </div>
         <div style="margin-top:18px;display:flex;flex-direction:column;gap:16px">
           <div class="editor-card">
             <h3 style="font-size:15px;font-weight:700;margin-bottom:4px">Neuer Benutzer</h3>
@@ -467,7 +542,7 @@ html.dark .checkrow:hover{background:rgba(129,140,248,.07)}
     <button class="bnav-item" id="bbHome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</button>
     <button class="bnav-item" id="bbCheckGrp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M9 12l2 2 4-4"/></svg>Checklisten</button>
     <button class="bnav-item" id="bbTripsGrp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>Reisen</button>
-    <button class="bnav-item hidden" id="bbAdminGrp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 11l1.5 1.5L21 9"/></svg>Admin</button>
+    <button class="bnav-item" id="bbSettings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Mehr</button>
     </div>
   </nav>
 </div>
@@ -543,7 +618,7 @@ const APP_VERSION="5.0.0";
 const APP_BUILD="21.09.2026, 20:15";
 const SB_URL="https://hcxqhyswdaycfnxivhnm.supabase.co";
 const SB_KEY="sb_publishable_WwSZT4nIB1hRbDhxF2uZpg_bxnq2BM2";
-let sb,user,orgId,isSuper=false,actingAs=null,currentTpl=null,currentChecklistId=null,panelDirty=false;
+let sb,user,orgId,isSuper=false,isAdminOrSuper=false,myProfile=null,actingAs=null,currentTpl=null,currentChecklistId=null,panelDirty=false;
 const $=id=>document.getElementById(id),q=t=>document.createElement(t);
 const on=(id,fn)=>{const e=$(id);if(e)e.onclick=fn};
 const onkey=(id,fn)=>{const e=$(id);if(e)e.onkeydown=fn};
@@ -621,7 +696,12 @@ function celebrate(){
 const MOON='<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
 const SUN='<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
 function applyDark(v){document.documentElement.classList.toggle("dark",!!v);[$("darkIcon"),$("darkIconDesktop")].forEach(el=>{if(el)el.innerHTML=v?SUN:MOON})}
-async function toggleDark(){const d=document.documentElement.classList.contains("dark");applyDark(!d);await sb.from("profiles").update({dark_mode:!d}).eq("id",user.id)}
+async function toggleDark(){
+  const d=document.documentElement.classList.contains("dark");
+  applyDark(!d);setSwitch("swDark",!d);
+  if(myProfile)myProfile.dark_mode=!d;
+  await sb.from("profiles").update({dark_mode:!d}).eq("id",user.id);
+}
 
 /* Nav */
 let _currentView=localStorage.getItem("lastView")||"Home";
@@ -630,17 +710,18 @@ function show(v,skipHistory=false){
     history.pushState({view:_currentView},"","#"+_currentView.toLowerCase());
   }
   _currentView=v;try{localStorage.setItem("lastView",v)}catch(_){}
-  ["Home","Check","Tpl","Trips","Admin"].forEach(x=>{
+  ["Home","Check","Tpl","Trips","Settings","Admin"].forEach(x=>{
     $("v"+x).style.display=x===v?"":"none";
     $("b"+x)?.classList.toggle("active",x===v);
   });
   // Bottom nav: main groups + subnav
-  const grpOf={Home:"Home",Check:"Checklisten",Tpl:"Checklisten",Trips:"Reisen",Admin:"Admin"};
+  const grpOf={Home:"Home",Check:"Checklisten",Tpl:"Checklisten",Trips:"Reisen",Settings:"Mehr",Admin:"Mehr"};
   const grp=grpOf[v]||"Home";
   $("bbHome")?.classList.toggle("active",grp==="Home");
   $("bbCheckGrp")?.classList.toggle("active",grp==="Checklisten");
   $("bbTripsGrp")?.classList.toggle("active",grp==="Reisen");
-  $("bbAdminGrp")?.classList.toggle("active",grp==="Admin");
+  $("bbSettings")?.classList.toggle("active",grp==="Mehr");
+  $("bSettings")?.classList.toggle("active",v==="Settings"||v==="Admin");
   // Subnav for groups with subcategories
   const sub=$("bnavSub"),subInner=$("bnavSubInner");
   if(sub&&subInner){
@@ -649,6 +730,11 @@ function show(v,skipHistory=false){
       subInner.innerHTML=
         '<button class="bnav-sub-pill'+(v==="Check"?" active":"")+'" onclick="show(\'Check\')">Checklisten</button>'
         +'<button class="bnav-sub-pill'+(v==="Tpl"?" active":"")+'" onclick="show(\'Tpl\')">Vorlagen</button>';
+    } else if(grp==="Mehr"&&isAdminOrSuper){
+      sub.style.display="";
+      subInner.innerHTML=
+        '<button class="bnav-sub-pill'+(v==="Settings"?" active":"")+'" onclick="show(\'Settings\')">Einstellungen</button>'
+        +'<button class="bnav-sub-pill'+(v==="Admin"?" active":"")+'" onclick="show(\'Admin\')">Admin</button>';
     } else {
       sub.style.display="none";subInner.innerHTML="";
     }
@@ -657,6 +743,7 @@ function show(v,skipHistory=false){
   if(v==="Home")loadDashboard();
   if(v==="Admin")loadUsers();
   if(v==="Trips")loadTrips();
+  if(v==="Settings")renderSettings();
 }
 window.addEventListener("popstate",e=>{
   // If a panel is open, close it
@@ -697,6 +784,41 @@ function initTitleEdit(id,cur){
     cur=v;t.textContent=v;panelDirty=true;toast("Titel gespeichert");
   };
   e.onblur=save;e.onkeydown=ev=>{if(ev.key==="Enter")save();if(ev.key==="Escape"){t.classList.remove("editing");e.classList.remove("active")}};
+}
+
+/* ── Einstellungen ── */
+function applyTripsVisible(v){
+  [$("bTrips"),$("navTripsLabel"),$("bbTripsGrp")].forEach(el=>{if(el)el.style.display=v?"":"none"});
+}
+function setSwitch(id,on){const el=$(id);if(el)el.classList.toggle("on",!!on)}
+function renderSettings(){
+  $("setDisplayName").value=myProfile?.display_name||"";
+  $("setEmail").value=user?.email||"";
+  $("setProfileMsg").textContent="";
+  setSwitch("swDark",document.documentElement.classList.contains("dark"));
+  setSwitch("swTrips",myProfile?.show_trips!==false);
+  $("setAdminCard").style.display=isAdminOrSuper?"":"none";
+  renderVersion();
+}
+async function saveDisplayName(){
+  const name=$("setDisplayName").value.trim();
+  const msg=$("setProfileMsg");
+  if(!name){msg.style.color="var(--danger)";msg.textContent="Bitte gib einen Namen ein.";return}
+  loading(true,"Speichere…");
+  const{error}=await sb.from("profiles").update({display_name:name}).eq("id",user.id);
+  loading(false);
+  if(error){msg.style.color="var(--danger)";msg.textContent=error.message;return}
+  myProfile.display_name=name;
+  $("sUserName").textContent=name;
+  _users=null;
+  msg.style.color="var(--success)";msg.textContent="✓ Gespeichert";
+}
+async function toggleTrips(){
+  const next=myProfile?.show_trips===false;
+  setSwitch("swTrips",next);applyTripsVisible(next);
+  myProfile.show_trips=next;
+  if(!next&&["Trips"].includes(_currentView))show("Home");
+  await sb.from("profiles").update({show_trips:next}).eq("id",user.id);
 }
 
 function owner(){return actingAs||user.id}
@@ -809,9 +931,10 @@ async function checkSession(){
   else{$("loginScreen").classList.add("show");setAuthMode("login")}
 }
 
-/* User cache */
+/* User cache — nur noch für Admin-Ansichten. RLS gibt normalen
+   Nutzern ohnehin nur die eigene Organisation und echte Kontakte frei. */
 let _users=null;
-async function getUsers(){if(_users)return _users;const{data}=await sb.from("profiles").select("id,display_name,email").order("display_name");_users=data||[];return _users}
+async function getUsers(){if(_users)return _users;const{data}=await sb.from("profiles").select("id,display_name,email,is_disabled").order("display_name");_users=data||[];return _users}
 async function ownerPicker(def){
   if(!isSuper)return def||owner();
   const us=await getUsers();
@@ -824,20 +947,26 @@ async function loadApp(){
     $("loginScreen").classList.remove("show");$("shell").style.display="flex";
     const u=await sb.auth.getUser();user=u.data.user;
     const p=await sb.from("profiles").select("*").eq("id",user.id).single();
-    $("sUserName").textContent=p.data?.display_name||user.email;
+    myProfile=p.data||{};
+    $("sUserName").textContent=myProfile.display_name||user.email;
     $("sUserEmail").textContent=user.email;
-    applyDark(p.data?.dark_mode===true);
+    applyDark(myProfile.dark_mode===true);
     const m=await sb.from("organization_members").select("organization_id,role").eq("user_id",user.id);
     orgId=m.data?.[0]?.organization_id;
     isSuper=(m.data||[]).some(x=>x.role==="super_admin");
-    const isAdminOrSuper=(m.data||[]).some(x=>["admin","super_admin"].includes(x.role));
-    [$("bAdmin"),$("bbAdminGrp")].forEach(el=>{if(el)el.classList.toggle("hidden",!isAdminOrSuper)});
+    isAdminOrSuper=(m.data||[]).some(x=>["admin","super_admin"].includes(x.role));
+    applyTripsVisible(myProfile.show_trips!==false);
+    // Offene Einladungen an die eigene Adresse einlösen
+    try{
+      const{data:claimed}=await sb.rpc("claim_my_invites");
+      if(claimed>0)toast(claimed===1?"Eine neue Checkliste wurde mit dir geteilt":claimed+" neue Checklisten wurden mit dir geteilt",3600);
+    }catch(_){}
     await Promise.all([loadTemplates(),loadChecklists()]);
     // Restore last view
     const lastView=localStorage.getItem("lastView")||"Home";
-    const validViews=["Home","Check","Tpl","Trips",...(isAdminOrSuper?["Admin"]:[])];
+    const validViews=["Home","Check","Tpl","Settings",...(myProfile.show_trips!==false?["Trips"]:[]),...(isAdminOrSuper?["Admin"]:[])];
     show(validViews.includes(lastView)?lastView:"Home",true);
-    const isAdmin=(m.data||[]).some(x=>["admin","super_admin"].includes(x.role));
+    const isAdmin=isAdminOrSuper;
     if(isAdmin){
       const filt=$("checkUserFilter"),sel=$("checkUserSelect");
       filt.style.display="";
@@ -913,17 +1042,28 @@ async function loadChecklists(){
     box.innerHTML="";box.appendChild(grid);
     return;
   }
-  // "mine" tab: owned checklists
-  let clQ=sb.from("checklists").select("*").is("deleted_at",null).order("created_at",{ascending:false});
-  const viewAs=actingAs;
-  if(viewAs==="ALL"){}
-  else if(viewAs)clQ=clQ.eq("owner_id",viewAs);
-  else clQ=clQ.eq("owner_id",user.id);
-  const{data,error}=await clQ;
+  // "mine" tab: owned checklists — serverseitig gefiltert und seitenweise geladen
+  const applyScope=qb=>{
+    const viewAs=actingAs;
+    if(viewAs==="ALL")return qb;
+    return qb.eq("owner_id",viewAs||user.id);
+  };
+  let clQ=applyScope(sb.from("checklists").select("*").is("deleted_at",null)).order("created_at",{ascending:false});
+  let countQ=applyScope(sb.from("checklists").select("id",{count:"exact",head:true}).is("deleted_at",null));
+  if(clSearch){
+    const pattern="%"+clSearch.replace(/[%_]/g,m=>"\\"+m)+"%";
+    clQ=clQ.ilike("title",pattern);countQ=countQ.ilike("title",pattern);
+  }
+  const[listRes,countRes]=await Promise.all([clQ.range(0,clLimit),countQ]);
+  const{data:rows,error}=listRes;
   const sharedData=[];
-  if(error){box.textContent=error.message;return}
-  const n=data?data.length:0;
-  $("checkSub").textContent=n?n+" Checklist"+(n!==1?"en":""):"";
+  if(error){box.textContent=error.message;$("clMoreWrap").style.display="none";return}
+  const hasMore=(rows||[]).length>clLimit;
+  const data=hasMore?rows.slice(0,clLimit):(rows||[]);
+  const total=countRes.count??data.length;
+  const n=data.length;
+  $("checkSub").textContent=total?(clSearch?n+" von "+total+" Treffern":total+" Checklist"+(total!==1?"en":"")):"";
+  $("clMoreWrap").style.display=hasMore?"flex":"none";
   // Fetch owner profiles + shared info in parallel
   const sharedByMe={};
   const ownerMap={};
@@ -938,8 +1078,12 @@ async function loadChecklists(){
     (profilesRes.data||[]).forEach(p=>ownerMap[p.id]=p.display_name||p.email||"");
   }
   if(!n){
-    box.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Noch keine Checklisten</div><div class="empty-sub">Erstelle eine Checkliste.</div><button class="btn btn-primary" id="goTpl">Zu den Vorlagen</button></div>';
-    on("goTpl",()=>show("Tpl"));return;
+    box.innerHTML=clSearch
+      ? '<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">Keine Treffer</div><div class="empty-sub">Für „'+escH(clSearch)+'“ wurde nichts gefunden.</div><button class="btn btn-ghost" id="clearSearch">Suche zurücksetzen</button></div>'
+      : '<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Noch keine Checklisten</div><div class="empty-sub">Erstelle eine Checkliste.</div><button class="btn btn-primary" id="goTpl">Zu den Vorlagen</button></div>';
+    on("goTpl",()=>show("Tpl"));
+    on("clearSearch",()=>{$("clSearch").value="";clSearch="";clLimit=CL_PAGE_SIZE;loadChecklists()});
+    return;
   }
   const ids=data.map(c=>c.id);
   const cats=await sb.from("checklist_categories").select("id,checklist_id").in("checklist_id",ids);
@@ -1861,6 +2005,8 @@ async function submitPw(){
 }
 
 /* ── Checklist tabs ── */
+const CL_PAGE_SIZE=24;
+let clSearch="",clLimit=CL_PAGE_SIZE,_searchTimer=null;
 let clTab="mine"; // "mine" or "shared"
 function setClTab(tab){
   clTab=tab;
@@ -1870,6 +2016,9 @@ function setClTab(tab){
   if($("checkUserFilter").style.display!=="none"){
     $("checkUserFilter").style.display=tab==="shared"?"none":"";
   }
+  $("clSearchRow").style.display=tab==="shared"?"none":"flex";
+  if(tab==="shared")$("clMoreWrap").style.display="none";
+  clLimit=CL_PAGE_SIZE;
   loadChecklists();
 }
 
@@ -1886,69 +2035,110 @@ function closeSharePanel(){
   if(pn)pn.style.transform="translateX(100%)";
 }
 
+function shareMsg(text,kind="error"){
+  const el=$("shareMsg");
+  el.style.color=kind==="ok"?"var(--success)":kind==="info"?"var(--muted)":"var(--danger)";
+  el.textContent=text;
+}
+/* Profile nach IDs auflösen — RLS gibt nur Kontakte/Org-Mitglieder frei */
+async function profilesByIds(ids){
+  const list=[...new Set(ids.filter(Boolean))];
+  if(!list.length)return{};
+  const{data}=await sb.from("profiles").select("id,display_name,email").in("id",list);
+  const map={};(data||[]).forEach(p=>map[p.id]=p);
+  return map;
+}
+
 async function loadSharePanel(clId){
-  const us=await getUsers();
-  const{data:existing}=await sb.from("checklist_shares").select("shared_with").eq("checklist_id",clId);
-  const sharedIds=new Set((existing||[]).map(s=>s.shared_with));
-  // Vorschläge nur aus Personen, mit denen bereits zuvor etwas geteilt wurde (in beide Richtungen) — keine volle Nutzerauswahl
-  const[{data:sharedByMe},{data:sharedWithMe}]=await Promise.all([
-    sb.from("checklist_shares").select("shared_with").eq("created_by",user.id),
-    sb.from("checklist_shares").select("created_by").eq("shared_with",user.id)
+  const[{data:existing},{data:contacts}]=await Promise.all([
+    sb.from("checklist_shares").select("shared_with").eq("checklist_id",clId),
+    sb.rpc("share_contacts")
   ]);
-  const prevIds=new Set([...(sharedByMe||[]).map(s=>s.shared_with),...(sharedWithMe||[]).map(s=>s.created_by)]);
-  const suggestions=us.filter(u=>u.id!==user.id&&prevIds.has(u.id)&&!sharedIds.has(u.id)&&u.email);
+  const sharedIds=new Set((existing||[]).map(s=>s.shared_with));
+  // Vorschläge: nur Personen, mit denen schon einmal in eine der beiden
+  // Richtungen geteilt wurde — nie das ganze Nutzerverzeichnis.
+  const suggestions=(contacts||[]).filter(u=>u.email&&!sharedIds.has(u.id));
   $("shareEmailSuggestions").innerHTML=suggestions.map(u=>'<option value="'+escH(u.email)+'">'+escH(u.display_name||u.email)+'</option>').join("");
   const input=$("shareEmailInput");
   input.value="";
-  // Load existing shares
   await loadShareList(clId);
-  // Wire add button
   $("shareAddBtn").onclick=async()=>{
     const email=(input.value||"").trim().toLowerCase();
-    if(!email){$("shareMsg").style.color="var(--danger)";$("shareMsg").textContent="Bitte eine E-Mail-Adresse eingeben.";return}
+    if(!email){shareMsg("Bitte eine E-Mail-Adresse eingeben.");return}
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){shareMsg("Diese E-Mail-Adresse sieht nicht gültig aus.");return}
+    if(email===(user.email||"").toLowerCase()){shareMsg("Du kannst nicht mit dir selbst teilen.");return}
     const perm=$("sharePermSel").value;
-    const target=us.find(u=>(u.email||"").toLowerCase()===email);
-    if(!target){$("shareMsg").style.color="var(--danger)";$("shareMsg").textContent="Kein Benutzer mit dieser E-Mail-Adresse gefunden.";return}
-    if(target.id===user.id){$("shareMsg").style.color="var(--danger)";$("shareMsg").textContent="Du kannst nicht mit dir selbst teilen.";return}
-    if(sharedIds.has(target.id)){$("shareMsg").style.color="var(--danger)";$("shareMsg").textContent="Mit dieser Person ist die Checkliste bereits geteilt.";return}
     loading(true,"Speichere…");
-    const{error}=await sb.from("checklist_shares").insert({checklist_id:clId,shared_with:target.id,permission:perm,created_by:user.id});
-    loading(false);
-    if(error){$("shareMsg").style.color="var(--danger)";$("shareMsg").textContent=error.message;return}
-    $("shareMsg").style.color="var(--success)";$("shareMsg").textContent="✓ Freigabe hinzugefügt";
-    await loadSharePanel(clId);
+    try{
+      const{data:found,error:lookupErr}=await sb.rpc("lookup_profile_by_email",{p_email:email});
+      if(lookupErr)throw lookupErr;
+      const target=Array.isArray(found)?found[0]:found;
+      if(target){
+        if(sharedIds.has(target.id)){shareMsg("Mit dieser Person ist die Checkliste bereits geteilt.");return}
+        const{error}=await sb.from("checklist_shares").insert({checklist_id:clId,shared_with:target.id,permission:perm,created_by:user.id});
+        if(error)throw error;
+        shareMsg("✓ Freigabe hinzugefügt","ok");
+      }else{
+        // Noch kein Konto: Einladung hinterlegen, wird beim Registrieren eingelöst
+        const{error}=await sb.from("checklist_invites").insert({checklist_id:clId,email,permission:perm,invited_by:user.id});
+        if(error&&error.code!=="23505")throw error;
+        shareMsg("✓ Eingeladen. Sobald sich "+email+" registriert, erscheint die Checkliste automatisch.","ok");
+      }
+      await loadSharePanel(clId);
+    }catch(e){
+      shareMsg(e.message||"Freigabe konnte nicht gespeichert werden.");
+    }finally{loading(false)}
   };
 }
 
 async function loadShareList(clId){
   const box=$("shareList");
   box.innerHTML='<div style="display:flex;justify-content:center;padding:16px"><div class="spinner"></div></div>';
-  const{data,error}=await sb.from("checklist_shares").select("*").eq("checklist_id",clId);
-  if(error||!data||!data.length){box.innerHTML='<p style="font-size:13px;color:var(--muted)">Noch keine Freigaben.</p>';return}
-  const us=await getUsers();
+  const[{data:shares},{data:invites}]=await Promise.all([
+    sb.from("checklist_shares").select("*").eq("checklist_id",clId),
+    sb.from("checklist_invites").select("*").eq("checklist_id",clId).is("accepted_at",null)
+  ]);
+  if(!(shares||[]).length&&!(invites||[]).length){
+    box.innerHTML='<p style="font-size:13px;color:var(--muted)">Noch keine Freigaben.</p>';return;
+  }
+  const pmap=await profilesByIds((shares||[]).map(s=>s.shared_with));
   box.innerHTML="";
-  (data||[]).forEach(s=>{
-    const u=us.find(u=>u.id===s.shared_with);
-    const row=q("div");row.style.cssText="display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--border)";
+  const mkRow=()=>{const r=q("div");r.style.cssText="display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--border)";return r};
+  (shares||[]).forEach(s=>{
+    const u=pmap[s.shared_with];
+    const row=mkRow();
     const av=q("div");av.className="user-avatar";av.style.cssText="width:30px;height:30px;font-size:11px;flex-shrink:0";
     av.textContent=(u?.display_name||u?.email||"?")[0].toUpperCase();
-    const inf=q("div");inf.style.flex="1";
-    inf.innerHTML='<div style="font-size:14px;font-weight:600">'+escH(u?.display_name||u?.email||s.shared_with)+'</div>'
+    const inf=q("div");inf.style.cssText="flex:1;min-width:0";
+    inf.innerHTML='<div style="font-size:14px;font-weight:600;word-break:break-word">'+escH(u?.display_name||u?.email||"Unbekannt")+'</div>'
       +'<div style="font-size:12px;color:var(--muted)">'+(s.permission==="edit"?"Bearbeiten":"Lesen")+'</div>';
-    // Permission toggle
     const tog=q("button");tog.className="btn btn-ghost btn-sm";
     tog.textContent=s.permission==="edit"?"→ Lesen":"→ Bearbeiten";
     tog.onclick=async()=>{
       const newPerm=s.permission==="edit"?"read":"edit";
-      loading(true,"...");await sb.from("checklist_shares").update({permission:newPerm}).eq("id",s.id);
+      loading(true,"…");await sb.from("checklist_shares").update({permission:newPerm}).eq("id",s.id);
       loading(false);await loadShareList(clId);
     };
     const del=q("button");del.className="btn btn-danger btn-sm";del.textContent="×";del.title="Freigabe entfernen";
     del.onclick=async()=>{
-      loading(true,"...");await sb.from("checklist_shares").delete().eq("id",s.id);
+      loading(true,"…");await sb.from("checklist_shares").delete().eq("id",s.id);
       loading(false);toast("Freigabe entfernt");await loadSharePanel(clId);
     };
     row.append(av,inf,tog,del);box.appendChild(row);
+  });
+  (invites||[]).forEach(i=>{
+    const row=mkRow();row.style.opacity=".75";
+    const av=q("div");av.className="user-avatar";av.style.cssText="width:30px;height:30px;font-size:11px;flex-shrink:0;background:var(--muted)";
+    av.textContent="✉";
+    const inf=q("div");inf.style.cssText="flex:1;min-width:0";
+    inf.innerHTML='<div style="font-size:14px;font-weight:600;word-break:break-all">'+escH(i.email)+'</div>'
+      +'<div style="font-size:12px;color:var(--muted)">Eingeladen · '+(i.permission==="edit"?"Bearbeiten":"Lesen")+' · noch nicht registriert</div>';
+    const del=q("button");del.className="btn btn-danger btn-sm";del.textContent="×";del.title="Einladung zurückziehen";
+    del.onclick=async()=>{
+      loading(true,"…");await sb.from("checklist_invites").delete().eq("id",i.id);
+      loading(false);toast("Einladung zurückgezogen");await loadSharePanel(clId);
+    };
+    row.append(av,inf,del);box.appendChild(row);
   });
 }
 
@@ -1959,9 +2149,65 @@ async function loadShareList(clId){
 
 
 /* ── Dashboard ── */
+/* ── Onboarding ── */
+const STARTERS=[
+  ["Camping","🏕️","Packliste fürs Camping","Schlafen\n- Zelt\n- Schlafsack\n- Isomatte\n\nKochen\n- Gaskocher\n- Geschirr\n- Besteck"],
+  ["Wandern","🎒","Für Tagestouren","Ausrüstung\n- Wanderschuhe\n- Rucksack\n- Regenjacke\n\nVerpflegung\n- Wasser\n- Snacks"],
+  ["Flugreise","✈️","Nichts vergessen am Flughafen","Dokumente\n- Pass/ID\n- Boardingpass\n- Versicherung\n\nHandgepäck\n- Kopfhörer\n- Ladegerät"],
+  ["Einkauf","🛒","Der Wocheneinkauf","Lebensmittel\n- Brot\n- Milch\n- Früchte\n\nHaushalt\n- Küchenpapier\n- Müllsäcke"]
+];
+async function finishOnboarding(reload=true){
+  const ts=new Date().toISOString();
+  if(myProfile)myProfile.onboarded_at=ts;
+  await sb.from("profiles").update({onboarded_at:ts}).eq("id",user.id);
+  if(reload)loadDashboard();
+}
+async function createFromStarter(s){
+  loading(true,"Erstelle…");
+  try{
+    const r=await sb.from("checklists").insert({organization_id:orgId,owner_id:user.id,created_by:user.id,updated_by:user.id,title:s[0],description:s[2],icon:s[1]}).select().single();
+    if(r.error)throw r.error;
+    let cur=null,n=10,i=10;
+    for(const line of s[3].split("\n").map(x=>x.trim()).filter(Boolean)){
+      if(line.startsWith("-")){
+        if(cur)await sb.from("checklist_items").insert({category_id:cur,title:line.replace(/^-\s*/,""),sort_order:i});
+        i+=10;
+      }else{
+        const c=await sb.from("checklist_categories").insert({checklist_id:r.data.id,title:line,sort_order:n}).select().single();
+        cur=c.data?.id;n+=10;i=10;
+      }
+    }
+    await finishOnboarding(false);
+    await loadChecklists();
+    show("Check");
+    openDetailPanel(r.data.id);
+  }catch(e){
+    toast("Checkliste konnte nicht erstellt werden");
+  }finally{loading(false)}
+}
+function renderOnboarding(box){
+  const first=(myProfile?.display_name||"").trim().split(" ")[0];
+  box.innerHTML='<div class="ob-hero"><h2>Willkommen'+(first?", "+escH(first):"")+'!</h2>'
+    +'<p>Starte mit einer fertigen Liste — du kannst alles umbenennen, ergänzen und später per E-Mail mit anderen teilen.</p></div>'
+    +'<div class="ob-grid">'
+    +STARTERS.map((s,i)=>'<button class="ob-card" data-i="'+i+'"><span class="ob-icon">'+s[1]+'</span><span class="ob-name">'+escH(s[0])+'</span><span class="ob-sub">'+escH(s[2])+'</span></button>').join("")
+    +'<button class="ob-card" data-empty="1"><span class="ob-icon">➕</span><span class="ob-name">Leere Checkliste</span><span class="ob-sub">Ganz von vorn anfangen</span></button>'
+    +'</div><button class="btn btn-ghost btn-sm" id="obSkip">Überspringen</button>';
+  box.querySelectorAll(".ob-card[data-i]").forEach(b=>b.onclick=()=>createFromStarter(STARTERS[+b.dataset.i]));
+  const empty=box.querySelector(".ob-card[data-empty]");
+  if(empty)empty.onclick=async()=>{await finishOnboarding(false);show("Check");createEmptyCl()};
+  on("obSkip",()=>finishOnboarding(true));
+}
+
 async function loadDashboard(){
   const box=$("dashContent");
   box.innerHTML='<div style="display:flex;justify-content:center;padding:40px"><div class="spinner"></div></div>';
+
+  if(myProfile&&!myProfile.onboarded_at){
+    const{count}=await sb.from("checklists").select("id",{count:"exact",head:true}).eq("owner_id",user.id).is("deleted_at",null);
+    if(!count){renderOnboarding(box);return}
+    finishOnboarding(false); // Bestandsnutzer: einmalig markieren, nie wieder zeigen
+  }
 
   const[clRes,tplRes,tripRes,sharedRes]=await Promise.all([
     sb.from("checklists").select("id,title,icon,created_at,updated_at").is("deleted_at",null).eq("owner_id",user.id).order("created_at",{ascending:false}).limit(50),
@@ -2688,6 +2934,19 @@ async function exportChecklistPdf(clId){
 document.addEventListener("DOMContentLoaded",()=>{
   initClient();
   renderVersion();
+  if(!window.supabase){
+    // Das Supabase-SDK kommt per CDN. Ist es nicht erreichbar (Offline,
+    // Firewall, blockierender Adblocker), lief die App bisher in einen
+    // weissen Bildschirm ohne jede Erklärung.
+    document.body.innerHTML='<div style="min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:Inter,system-ui,sans-serif;background:#0b1120;color:#f1f5f9">'
+      +'<div style="max-width:380px;text-align:center">'
+      +'<div style="font-size:40px;margin-bottom:12px">📡</div>'
+      +'<h1 style="font-size:19px;font-weight:700;margin-bottom:8px">App konnte nicht geladen werden</h1>'
+      +'<p style="font-size:14px;color:#94a3b8;line-height:1.6">Ein benötigter Teil der App ist nicht erreichbar. Prüfe deine Internetverbindung und lade die Seite neu. Falls du einen Werbeblocker nutzt, deaktiviere ihn für diese Seite.</p>'
+      +'<button onclick="location.reload()" style="margin-top:18px;background:linear-gradient(135deg,#6366f1,#818cf8);color:#fff;border:none;border-radius:11px;padding:11px 22px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer">Neu laden</button>'
+      +'</div></div>';
+    return;
+  }
   on("loginBtn",doAuth);
   ["loginPw","loginPw2","loginEmail","signupName"].forEach(id=>onkey(id,e=>{if(e.key==="Enter")doAuth()}));
   on("tabLogin",()=>setAuthMode("login"));on("tabSignup",()=>setAuthMode("signup"));
@@ -2696,12 +2955,30 @@ document.addEventListener("DOMContentLoaded",()=>{
   on("darkToggle",toggleDark);on("darkToggleDesktop",toggleDark);
   on("menuBtn",openSidebar);on("sidebarBackdrop",closeSidebar);
   on("stopActing",()=>setActing(null,""));
-  on("bCheck",()=>show("Check"));on("bTpl",()=>show("Tpl"));on("bTrips",()=>show("Trips"));on("bAdmin",()=>show("Admin"));on("bHome",()=>show("Home"));
+  on("bCheck",()=>show("Check"));on("bTpl",()=>show("Tpl"));on("bTrips",()=>show("Trips"));on("bHome",()=>show("Home"));
+  on("bSettings",()=>show("Settings"));
   on("bbHome",()=>show("Home"));
   on("bbCheckGrp",()=>show("Check"));
   on("bbTripsGrp",()=>show("Trips"));
-  on("bbAdminGrp",()=>show("Admin"));
+  on("bbSettings",()=>show("Settings"));
+  on("setOpenAdmin",()=>show("Admin"));
+  on("adminBack",()=>show("Settings"));
+  on("setSaveProfile",saveDisplayName);
+  on("setChangePw",()=>$("changePwOverlay").classList.add("open"));
+  on("setLogout",doLogout);
+  on("swDark",toggleDark);
+  on("swTrips",toggleTrips);
   on("refreshCheck",()=>{loading(true,"Aktualisiere…");loadChecklists().finally(()=>loading(false))});
+  const clSearchInput=$("clSearch");
+  if(clSearchInput)clSearchInput.oninput=()=>{
+    clearTimeout(_searchTimer);
+    _searchTimer=setTimeout(()=>{
+      clSearch=clSearchInput.value.trim();
+      clLimit=CL_PAGE_SIZE;
+      loadChecklists();
+    },280);
+  };
+  on("clMoreBtn",()=>{clLimit+=CL_PAGE_SIZE;loadChecklists()});
   on("newEmptyCl",createEmptyCl);on("newFromTplCl",pickTplAndCreate);
   on("openClImport",openClImportModal);
   on("clImportClose",closeClImportModal);
@@ -2786,7 +3063,7 @@ if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js");
       <button id="sharePanelClose" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:6px;border-radius:8px;display:flex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
       <h2 style="font-size:18px;font-weight:700;flex:1">Checkliste teilen</h2>
     </div>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Gib die E-Mail-Adresse der Person ein, mit der du teilen möchtest.</p>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Gib die E-Mail-Adresse der Person ein. Wer noch kein Konto hat, wird eingeladen und sieht die Checkliste direkt nach der Registrierung.</p>
     <div class="form-group">
       <label>E-Mail-Adresse</label>
       <input type="email" id="shareEmailInput" list="shareEmailSuggestions" placeholder="name@beispiel.ch" autocomplete="off" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none">
